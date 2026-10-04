@@ -998,7 +998,7 @@ async function admin(){
   await Promise.allSettled([
     adminStats(),
     adminProducts(),
-    adminServices(),
+        adminServices(),
     adminProjects(),
     adminPosts(),
     adminUsers(),
@@ -1022,7 +1022,7 @@ async function adminStats(){
     "usuario",
     "produtos",
     "servicos",
-    "solicitacoes_servico"
+    "solicitações_servico"
   ];
 
   const labels=[
@@ -1454,7 +1454,7 @@ async function adminRequests(){
       data,
       error
     }=await window.supabaseClient
-      .from("solicitacoes_servico")
+      .from("solicitações_servico")
       .select(`
         id,
         status,
@@ -2016,8 +2016,6 @@ function bindAdminActions(){
       );
     });
 }
-
-
 /* =========================================================
    AÇÕES DE USUÁRIO / ADMIN
    ========================================================= */
@@ -2150,9 +2148,8 @@ async function account(){
   /*
     CORREÇÃO IMPORTANTE:
 
-    Aqui fazemos uma nova consulta diretamente
-    na tabela "usuario" para garantir que o tipo
-    atual seja usado.
+    Consulta diretamente a tabela "usuario"
+    para pegar o tipo atual do usuário.
   */
 
   if($("contaTipo")){
@@ -2173,7 +2170,8 @@ async function account(){
         usuarioError
       );
 
-      $("contaTipo").textContent="Visualizador";
+      $("contaTipo").textContent=
+        "Visualizador";
 
     }else{
 
@@ -2181,17 +2179,25 @@ async function account(){
         usuarioAtual?.tipo_usuario||""
       ).toLowerCase().trim();
 
-      if(tipo==="admin" || tipo==="administrador"){
+      if(
+        tipo==="admin" ||
+        tipo==="administrador"
+      ){
 
-        $("contaTipo").textContent="Administrador";
+        $("contaTipo").textContent=
+          "Administrador";
 
-      }else if(tipo==="solicitante_admin"){
+      }else if(
+        tipo==="solicitante_admin"
+      ){
 
-        $("contaTipo").textContent="Solicitação de administrador";
+        $("contaTipo").textContent=
+          "Solicitação de administrador";
 
       }else{
 
-        $("contaTipo").textContent="Visualizador";
+        $("contaTipo").textContent=
+          "Visualizador";
       }
     }
   }
@@ -2207,7 +2213,7 @@ async function account(){
       data,
       error
     }=await window.supabaseClient
-      .from("solicitacoes_servico")
+      .from("solicitações_servico")
       .select(`
         id,
         status,
