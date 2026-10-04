@@ -1,921 +1,8 @@
-/* MAX SOM - aplicação */
-const $ = id => document.getElementById(id);
-
-const esc = value =>
-  String(value ?? "").replace(/[&<>"']/g, c => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#039;'
-  }[c]));
-
-const fmtDate = value =>
-  value ? new Date(value).toLocaleString("pt-BR") : "-";
-
-const msg = (el, text, type="info") => {
-  if(!el)return;
-  el.textContent=text;
-  el.className=`message message-${type}`;
-  el.classList.remove("hidden");
-};
-
-const clearMsg = el => {
-  if(el){
-    el.textContent="";
-    el.className="message hidden";
-  }
-};
-
-const loading = (btn,on,label) => {
-  if(btn){
-    btn.disabled=on;
-    btn.textContent=on?"Aguarde...":label;
-  }
-};
-
-function enhanceInterface(){
-  const current=location.pathname.split('/').pop()||'index.html';
-
-  document.querySelectorAll('nav a[href]').forEach(a=>{
-    const href=a.getAttribute('href');
-
-    if(
-      href===current ||
-      (current==='' && href==='index.html')
-    ){
-      a.classList.add('nav-current');
-    }
-  });
-
-  document
-    .querySelectorAll('.product-card,.service-card,.project-card,.post-card,.benefit-card')
-    .forEach((card,i)=>{
-      card.style.animationDelay=`${Math.min(i*45,180)}ms`;
-    });
-}
-
-function dbError(error, fallback){
-  console.error(error);
-
-  return error?.message ||
-         error?.details ||
-         error?.hint ||
-         fallback;
-}
-
-async function authUser(){
-  if(!window.supabaseClient)return null;
-
-  const {data,error}=await window.supabaseClient.auth.getUser();
-
-  if(error){
-    console.error(error);
-    return null;
-  }
-
-  return data?.user||null;
-}
-
-
-/* =========================================================
-   PERFIL DO USUÁRIO
-   ========================================================= */
-
-async function ensureProfile(user, values={}){
-  if(!user || !window.supabaseClient)return null;
-
-  const {
-    data:existing,
-    error:readError
-  }=await window.supabaseClient
-    .from("usuario")
-    .select("*")
-    .eq("id",user.id)
-    .maybeSingle();
-
-  if(readError){
-    console.error(readError);
-    return null;
-  }
-
-  if(existing)return existing;
-
-  const metadata=user.user_metadata||{};
-
-  const row={
-    id:user.id,
-    nome:String(
-      values.nome ||
-      metadata.nome ||
-      user.email?.split("@")[0] ||
-      "Cliente"
-    ).trim(),
-
-    telefone:String(
-      values.telefone ||
-      metadata.telefone ||
-      ""
-    ).trim()||null,
-
-    whatsapp:String(
-      values.whatsapp ||
-      metadata.whatsapp ||
-      ""
-    ).trim()||null,
-
-    tipo_usuario:"cliente",
-    ativo:true
-  };
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("usuario")
-    .insert(row)
-    .select("*")
-    .single();
-
-  if(error){
-    console.error(error);
-    return null;
-  }
-
-  return data;
-}
-
-async function profile(){
-  const u=await authUser();
-
-  if(!u)return null;
-
-  const profileRow=await ensureProfile(u);
-
-  return {
-    auth:u,
-    profile:profileRow
-  };
-}
-
-
-/* =========================================================
-   AUTENTICAÇÃO
-   ========================================================= */
-
-function setupAuth(){
-
-  if(!window.supabaseClient){
-    document
-      .querySelectorAll("form")
-      .forEach(form=>{
-        form.addEventListener(
-          "submit",
-          e=>e.preventDefault()
-        );
-      });
-
-    return false;
-  }
-
-  document
-    .querySelectorAll("[data-logout]")
-    .forEach(b=>b.addEventListener("click",async()=>{
-
-      b.disabled=true;
-
-      const {
-        error
-      }=await window.supabaseClient.auth.signOut();
-
-      if(error){
-        console.error(error);
-        b.disabled=false;
-        alert("Não foi possível sair da conta.");
-        return;
-      }
-
-      location.href="index.html";
-    }));
-
-  updateNav();
-
-  window.supabaseClient.auth.onAuthStateChange(()=>{
-    setTimeout(updateNav,0);
-  });
-
-  return true;
-}
-
-async function updateNav(){
-
-  if(!window.supabaseClient)return;
-
-  const p=await profile();
-
-  const u=p?.auth;
-
-  document
-    .querySelectorAll("[data-logged-only]")
-    .forEach(e=>{
-      e.style.display=u?"":"none";
-    });
-
-  document
-    .querySelectorAll("[data-guest-only]")
-    .forEach(e=>{
-      e.style.display=u?"none":"";
-    });
-
-  const type=String(
-    p?.profile?.tipo_usuario||""
-  ).toLowerCase().trim();
-
-  const isAdmin=[
-    "admin",
-    "funcionario",
-    "funcionário",
-    "dono",
-    "administrador"
-  ].includes(type);
-
-  document
-    .querySelectorAll("[data-admin-only]")
-    .forEach(e=>{
-      e.style.display=isAdmin?"":"none";
-    });
-}
-
-
-/* =========================================================
-   PRODUTOS
-   ========================================================= */
-
-async function loadProducts(){
-
-  const grid=$("productsGrid");
-
-  if(!grid)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("produtos")
-    .select(`
-      id,
-      nome,
-      modelo,
-      descricao,
-      especificacoes,
-      imagem_capa,
-      disponivel,
-      destaque,
-      categorias_produto(nome),
-      marcas(nome)
-    `)
-    .eq("disponivel",true)
-    .order("destaque",{ascending:false})
-    .order("criado_em",{ascending:false});
-
-  if(error){
-
-    grid.innerHTML=`
-      <div class="empty">
-        Não foi possível carregar os produtos.
-        <small>${esc(
-          dbError(error,"Erro no banco de dados.")
-        )}</small>
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML=data?.length
-    ?data.map(p=>`
-      <article class="product-card">
-
-        ${
-          p.imagem_capa
-          ?`<img
-              src="${esc(p.imagem_capa)}"
-              alt="${esc(p.nome)}"
-            >`
-          :'<div class="product-image">Sem imagem</div>'
-        }
-
-        <div class="product-info">
-
-          <span>
-            ${esc(p.categorias_produto?.nome||"Produto")}
-            ${
-              p.marcas?.nome
-              ?" • "+esc(p.marcas.nome)
-              :""
-            }
-          </span>
-
-          <h3>${esc(p.nome)}</h3>
-
-          ${
-            p.modelo
-            ?`<p>
-                <strong>Modelo:</strong>
-                ${esc(p.modelo)}
-              </p>`
-            :""
-          }
-
-          <p>
-            ${esc(
-              p.descricao||
-              "Sem descrição disponível."
-            )}
-          </p>
-
-          ${
-            p.especificacoes
-            ?`
-              <details>
-                <summary>Especificações</summary>
-                <p>${esc(p.especificacoes)}</p>
-              </details>
-            `
-            :""
-          }
-
-        </div>
-
-      </article>
-    `).join("")
-    :'<div class="empty">Nenhum produto disponível no momento.</div>';
-}
-
-
-/* =========================================================
-   SERVIÇOS
-   ========================================================= */
-
-async function loadServices(){
-
-  const grid=$("servicesGrid");
-
-  if(!grid)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("servicos")
-    .select(
-      "id,nome,descricao,imagem_capa,ativo"
-    )
-    .eq("ativo",true)
-    .order("criado_em",{ascending:false});
-
-  if(error){
-
-    grid.innerHTML=`
-      <div class="empty">
-        Não foi possível carregar os serviços.
-        <small>${esc(
-          dbError(error,"Erro no banco de dados.")
-        )}</small>
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML=data?.length
-    ?data.map(s=>`
-      <article class="service-card">
-
-        ${
-          s.imagem_capa
-          ?`<img
-              src="${esc(s.imagem_capa)}"
-              alt="${esc(s.nome)}"
-            >`
-          :""
-        }
-
-        <h3>${esc(s.nome)}</h3>
-
-        <p>
-          ${esc(
-            s.descricao||
-            "Sem descrição disponível."
-          )}
-        </p>
-
-        <p
-          style="
-            margin-top:10px;
-            color:#68b8ff;
-            font-weight:800
-          "
-        >
-          Sob orçamento
-        </p>
-
-        <a href="atendimento.html">
-          Solicitar orçamento →
-        </a>
-
-      </article>
-    `).join("")
-    :'<div class="empty">Nenhum serviço disponível no momento.</div>';
-}
-
-
-/* =========================================================
-   PROJETOS
-   ========================================================= */
-
-async function loadProjects(){
-
-  const grid=$("projectsGrid");
-
-  if(!grid)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("projetos")
-    .select(`
-      id,
-      titulo,
-      descricao,
-      categoria,
-      imagem_capa,
-      publicado
-    `)
-    .eq("publicado",true)
-    .order("criado_em",{ascending:false});
-
-  if(error){
-
-    grid.innerHTML=`
-      <div class="empty">
-        Não foi possível carregar os projetos.
-        <small>${esc(
-          dbError(error,"Erro no banco de dados.")
-        )}</small>
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML=data?.length
-    ?data.map((p,i)=>`
-      <article class="project-card">
-
-        ${
-          p.imagem_capa
-          ?`<img
-              src="${esc(p.imagem_capa)}"
-              alt="${esc(p.titulo)}"
-            >`
-          :`<img
-              src="projeto-${String(
-                (i%4)+1
-              ).padStart(2,"0")}.png"
-              alt="${esc(p.titulo)}"
-            >`
-        }
-
-        <div class="project-info">
-
-          ${
-            p.categoria
-            ?`<span>${esc(p.categoria)}</span>`
-            :""
-          }
-
-          <h3>${esc(p.titulo)}</h3>
-
-          <p>
-            ${esc(
-              p.descricao||
-              "Sem descrição disponível."
-            )}
-          </p>
-
-          <a href="atendimento.html">
-            Conhecer soluções →
-          </a>
-
-        </div>
-
-      </article>
-    `).join("")
-    :'<div class="empty">Nenhum projeto publicado no momento.</div>';
-}
-
-
-/* =========================================================
-   PUBLICAÇÕES
-   ========================================================= */
-
-async function loadPosts(){
-
-  const grid=$("postsGrid");
-
-  if(!grid)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("publicacoes")
-    .select(`
-      id,
-      titulo,
-      resumo,
-      conteudo,
-      imagem_capa,
-      publicado,
-      data_publicacao,
-      categorias_publicacao(nome)
-    `)
-    .eq("publicado",true)
-    .order(
-      "data_publicacao",
-      {ascending:false}
-    );
-
-  if(error){
-
-    grid.innerHTML=`
-      <div class="empty">
-        Não foi possível carregar as publicações.
-        <small>${esc(
-          dbError(error,"Erro no banco de dados.")
-        )}</small>
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML=data?.length
-    ?data.map(p=>`
-      <article class="post-card">
-
-        ${
-          p.imagem_capa
-          ?`<img
-              src="${esc(p.imagem_capa)}"
-              alt="${esc(p.titulo)}"
-            >`
-          :'<div class="post-image">Imagem da publicação</div>'
-        }
-
-        <div class="post-info">
-
-          <span>
-            ${esc(
-              p.categorias_publicacao?.nome||
-              "Publicação"
-            )}
-          </span>
-
-          <h3>${esc(p.titulo)}</h3>
-
-          <p>${esc(p.resumo||"")}</p>
-
-          ${
-            p.conteudo
-            ?`
-              <details>
-                <summary>Ler publicação</summary>
-                <p>${esc(p.conteudo)}</p>
-              </details>
-            `
-            :""
-          }
-
-          <small class="muted">
-            ${fmtDate(p.data_publicacao)}
-          </small>
-
-        </div>
-
-      </article>
-    `).join("")
-    :'<div class="empty">Nenhuma publicação disponível no momento.</div>';
-}
-
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
-async function setupLogin(){
-
-  const form=$("formLogin");
-
-  if(!form)return;
-
-  form.addEventListener("submit",async e=>{
-
-    e.preventDefault();
-
-    const m=$("mensagemLogin");
-    const b=form.querySelector("button");
-
-    clearMsg(m);
-    loading(b,true,"Entrar");
-
-    try{
-
-      const email=$("email")
-        .value
-        .trim()
-        .toLowerCase();
-
-      const password=$("senha").value;
-
-      const {
-        data,
-        error
-      }=await window.supabaseClient.auth
-        .signInWithPassword({
-          email,
-          password
-        });
-
-      if(error)throw error;
-
-      if(!data?.user){
-        throw new Error(
-          "A sessão não foi criada."
-        );
-      }
-
-      await ensureProfile(data.user);
-
-      msg(
-        m,
-        "Login realizado com sucesso. Entrando...",
-        "success"
-      );
-
-      setTimeout(async()=>{
-
-        const pr=await profile();
-
-        const t=String(
-          pr?.profile?.tipo_usuario||""
-        ).toLowerCase().trim();
-
-        location.href=
-          adminTypes.includes(t)
-          ?"admin.html"
-          :"conta.html";
-
-      },250);
-
-    }catch(err){
-
-      msg(
-        m,
-        dbError(
-          err,
-          "Não foi possível fazer o login."
-        ),
-        "error"
-      );
-
-      loading(b,false,"Entrar");
-    }
-  });
-}
-
-
-/* =========================================================
-   CADASTRO
-   ========================================================= */
-
-async function setupSignup(){
-
-  const form=$("formCadastro");
-
-  if(!form)return;
-
-  form.addEventListener("submit",async e=>{
-
-    e.preventDefault();
-
-    const m=$("mensagemCadastro");
-    const b=form.querySelector("button");
-
-    clearMsg(m);
-    loading(b,true,"Criar conta");
-
-    const values={
-      nome:$("nome").value.trim(),
-      telefone:$("telefone").value.trim(),
-      whatsapp:$("whatsapp").value.trim()
-    };
-
-    try{
-
-      const {
-        data,
-        error
-      }=await window.supabaseClient.auth.signUp({
-
-        email:$("email")
-          .value
-          .trim()
-          .toLowerCase(),
-
-        password:$("senha").value,
-
-        options:{
-          data:values
-        }
-
-      });
-
-      if(error)throw error;
-
-      if(!data?.user){
-        throw new Error(
-          "O usuário não foi criado."
-        );
-      }
-
-      if(data.session){
-
-        await ensureProfile(
-          data.user,
-          values
-        );
-
-        msg(
-          m,
-          "Conta criada com sucesso. Entrando...",
-          "success"
-        );
-
-        setTimeout(
-          ()=>location.href="conta.html",
-          350
-        );
-
-      }else{
-
-        msg(
-          m,
-          "Conta criada. Confirme seu e-mail e depois faça login para acessar sua conta.",
-          "success"
-        );
-
-        form.reset();
-      }
-
-    }catch(err){
-
-      msg(
-        m,
-        dbError(
-          err,
-          "Não foi possível criar a conta."
-        ),
-        "error"
-      );
-
-    }finally{
-
-      loading(
-        b,
-        false,
-        "Criar conta"
-      );
-    }
-  });
-}
-
-
-/* =========================================================
-   ATENDIMENTO
-   ========================================================= */
-
-async function prepareAttendance(){
-
-  const form=$("formAtendimento");
-
-  if(!form)return;
-
-  const select=$("servico");
-
-  if(select){
-
-    const {
-      data,
-      error
-    }=await window.supabaseClient
-      .from("servicos")
-      .select("id,nome")
-      .eq("ativo",true)
-      .order("nome");
-
-    if(!error){
-
-      select.innerHTML=
-        '<option value="">Selecione um serviço</option>'+
-        (data||[])
-          .map(s=>
-            `<option value="${esc(s.nome)}">
-              ${esc(s.nome)}
-            </option>`
-          )
-          .join("");
-
-    }else{
-
-      select.innerHTML=
-        '<option value="">Sob consulta</option>';
-    }
-  }
-
-  form.addEventListener("submit",e=>{
-
-    e.preventDefault();
-
-    const nome=$("nomeContato")
-      .value
-      .trim();
-
-    const telefone=$("telefoneContato")
-      .value
-      .trim();
-
-    const servico=$("servico")
-      .value
-      .trim();
-
-    const equip=$("equipamento")
-      .value
-      .trim();
-
-    const descricao=$("descricao")
-      .value
-      .trim();
-
-    if(!nome||!descricao){
-
-      msg(
-        $("mensagemAtendimento"),
-        "Preencha seu nome e a mensagem.",
-        "error"
-      );
-
-      return;
-    }
-
-    const text=
-      `Olá, Max Som!%0A%0A`+
-      `*Nome:* ${encodeURIComponent(nome)}%0A`+
-      `*WhatsApp:* ${encodeURIComponent(
-        telefone||"Não informado"
-      )}%0A`+
-      `*Serviço:* ${encodeURIComponent(
-        servico||"Não informado"
-      )}%0A`+
-      `*Produto/equipamento:* ${encodeURIComponent(
-        equip||"Não informado"
-      )}%0A`+
-      `*Mensagem:* ${encodeURIComponent(
-        descricao
-      )}`;
-
-    window.open(
-      `https://wa.me/5565996262514?text=${text}`,
-      "_blank",
-      "noopener"
-    );
-
-    msg(
-      $("mensagemAtendimento"),
-      "Pronto! O WhatsApp foi aberto com sua mensagem.",
-      "success"
-    );
-  });
-}
-
-
-/* =========================================================
-   ADMIN
-   ========================================================= */
-
-const adminTypes=[
+const SUPABASE_URL = "https://diabhunpflawknocixit.supabase.co";
+const SUPABASE_KEY = "sb_publishable_GrFU5c86UZESBh3qs1znQw__ZMNVAnC";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const adminTypes = [
   "admin",
   "funcionario",
   "funcionário",
@@ -923,1543 +10,585 @@ const adminTypes=[
   "administrador"
 ];
 
-async function requireAdmin(){
+let currentUser = null;
+let currentProfile = null;
 
-  const p=await profile();
+async function ensureProfile() {
+  const { data: { user }, error: userError } =
+    await supabase.auth.getUser();
 
-  if(!p){
-
-    location.href="login.html";
-
+  if (userError || !user) {
+    currentUser = null;
+    currentProfile = null;
     return null;
   }
 
-  const type=String(
-    p.profile?.tipo_usuario||""
-  ).toLowerCase().trim();
+  currentUser = user;
 
-  if(!adminTypes.includes(type)){
+  const { data, error } = await supabase
+    .from("usuario")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
 
-    msg(
-      $("adminMensagem"),
-      "Esta área é exclusiva do administrador.",
-      "error"
-    );
-
-    setTimeout(
-      ()=>location.href="index.html",
-      900
-    );
-
+  if (error) {
+    console.error("Erro ao buscar perfil:", error);
+    currentProfile = null;
     return null;
   }
 
-  return p;
+  currentProfile = data;
+  return data;
 }
 
-function setupAdminMenu(){
+function isAdmin(profile = currentProfile) {
+  const type = String(profile?.tipo_usuario || "")
+    .trim()
+    .toLowerCase();
 
-  document
-    .querySelectorAll("[data-panel]")
-    .forEach(b=>b.addEventListener("click",()=>{
-
-      document
-        .querySelectorAll("[data-panel]")
-        .forEach(x=>
-          x.classList.remove("active")
-        );
-
-      document
-        .querySelectorAll(".admin-panel")
-        .forEach(x=>
-          x.classList.remove("active")
-        );
-
-      b.classList.add("active");
-
-      $(b.dataset.panel)
-        ?.classList.add("active");
-    }));
+  return adminTypes.includes(type);
 }
 
-async function admin(){
+async function updateNav() {
+  const p = await ensureProfile();
 
-  if(
-    !$("adminPage") &&
-    !$("adminStats")
-  )return;
+  const adminLink = document.querySelector("#adminLink");
 
-  const p=await requireAdmin();
+  if (adminLink) {
+    adminLink.style.display = isAdmin(p) ? "" : "none";
+  }
 
-  if(!p)return;
+  const loginLink = document.querySelector("#loginLink");
+  const accountLink = document.querySelector("#accountLink");
 
-  setupAdminMenu();
-
-  await Promise.allSettled([
-    adminStats(),
-    adminProducts(),
-    adminServices(),
-    adminProjects(),
-    adminPosts(),
-    adminUsers(),
-    adminRequests(),
-    setupAdminForms()
-  ]);
+  if (p) {
+    if (loginLink) loginLink.style.display = "none";
+    if (accountLink) accountLink.style.display = "";
+  } else {
+    if (loginLink) loginLink.style.display = "";
+    if (accountLink) accountLink.style.display = "none";
+  }
 }
 
+async function setupLogin() {
+  const form = document.querySelector("#loginForm");
 
-/* =========================================================
-   ESTATÍSTICAS ADMIN
-   ========================================================= */
+  if (!form) return;
 
-async function adminStats(){
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const stats=$("adminStats");
+    const email =
+      document.querySelector("#loginEmail")?.value.trim();
 
-  if(!stats)return;
+    const password =
+      document.querySelector("#loginPassword")?.value;
 
-  const tables=[
+    const errorBox = document.querySelector("#loginError");
+
+    if (errorBox) {
+      errorBox.textContent = "";
+    }
+
+    if (!email || !password) {
+      if (errorBox) {
+        errorBox.textContent =
+          "Preencha o e-mail e a senha.";
+      }
+      return;
+    }
+
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+      console.error(error);
+
+      if (errorBox) {
+        errorBox.textContent =
+          error.message || "Erro ao entrar.";
+      }
+
+      return;
+    }
+
+    const profile = await ensureProfile();
+
+    const type = String(profile?.tipo_usuario || "")
+      .trim()
+      .toLowerCase();
+
+    if (adminTypes.includes(type)) {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+}
+
+async function setupSignup() {
+  const form = document.querySelector("#signupForm");
+
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nome =
+      document.querySelector("#signupNome")?.value.trim();
+
+    const email =
+      document.querySelector("#signupEmail")?.value.trim();
+
+    const password =
+      document.querySelector("#signupPassword")?.value;
+
+    const errorBox =
+      document.querySelector("#signupError");
+
+    if (errorBox) {
+      errorBox.textContent = "";
+    }
+
+    if (!nome || !email || !password) {
+      if (errorBox) {
+        errorBox.textContent =
+          "Preencha todos os campos.";
+      }
+      return;
+    }
+
+    const { data, error } =
+      await supabase.auth.signUp({
+        email,
+        password
+      });
+
+    if (error) {
+      console.error(error);
+
+      if (errorBox) {
+        errorBox.textContent =
+          error.message || "Erro ao criar conta.";
+      }
+
+      return;
+    }
+
+    const user = data?.user;
+
+    if (!user) {
+      if (errorBox) {
+        errorBox.textContent =
+          "Não foi possível criar o usuário.";
+      }
+      return;
+    }
+
+    const { error: profileError } =
+      await supabase
+        .from("usuario")
+        .insert({
+          id: user.id,
+          nome: nome,
+          tipo_usuario: "cliente"
+        });
+
+    if (profileError) {
+      console.error(
+        "Erro ao criar perfil:",
+        profileError
+      );
+
+      if (errorBox) {
+        errorBox.textContent =
+          "Conta criada, mas houve um erro ao criar o perfil.";
+      }
+
+      return;
+    }
+
+    window.location.href = "login.html";
+  });
+}
+
+async function logout() {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("Erro ao sair:", error);
+    return;
+  }
+
+  window.location.href = "index.html";
+}
+
+async function adminStats() {
+  const tables = [
     "usuario",
     "produtos",
     "servicos",
     "solicitações_servico"
   ];
 
-  const labels=[
-    "Usuários",
-    "Produtos",
-    "Serviços",
-    "Solicitações"
-  ];
+  for (const table of tables) {
+    const { count, error } = await supabase
+      .from(table)
+      .select("*", {
+        count: "exact",
+        head: true
+      });
 
-  const counts=await Promise.all(
-    tables.map(async t=>{
+    if (error) {
+      console.error(
+        `Erro ao contar ${table}:`,
+        error
+      );
+      continue;
+    }
 
-      const {
-        count
-      }=await window.supabaseClient
-        .from(t)
-        .select("*",{
-          count:"exact",
-          head:true
-        });
+    const element =
+      document.querySelector(
+        `[data-count="${table}"]`
+      );
 
-      return count??0;
-    })
-  );
-
-  stats.innerHTML=
-    labels.map((l,i)=>`
-      <div class="admin-card">
-        <span class="muted">${l}</span>
-        <strong>${counts[i]}</strong>
-        <span>registros</span>
-      </div>
-    `).join("");
-}
-
-
-/* =========================================================
-   TABELAS ADMIN
-   ========================================================= */
-
-function adminTable(items,kind){
-
-  if(!items?.length){
-    return '<p class="muted">Nenhum registro.</p>';
+    if (element) {
+      element.textContent = count ?? 0;
+    }
   }
-
-  return `
-    <table class="admin-table">
-
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Informação</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        ${items.map(x=>{
-
-          let name=
-            kind==='produto'
-            ?x.nome
-            :kind==='servico'
-            ?x.nome
-            :kind==='projeto'
-            ?x.titulo
-            :x.titulo;
-
-          let info=
-            kind==='produto'
-            ?(x.modelo||x.descricao||"")
-            :kind==='servico'
-            ?"Sob orçamento"
-            :kind==='projeto'
-            ?(x.categoria||"Projeto")
-            :x.resumo||"";
-
-          return `
-            <tr>
-
-              <td>${esc(name)}</td>
-
-              <td>${esc(info)}</td>
-
-              <td>
-
-                <div class="admin-actions">
-
-                  <button
-                    class="btn btn-outline"
-                    data-edit="${kind}"
-                    data-id="${esc(x.id)}"
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    class="btn btn-danger"
-                    data-delete="${kind}"
-                    data-id="${esc(x.id)}"
-                  >
-                    Excluir
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-          `;
-
-        }).join("")}
-
-      </tbody>
-
-    </table>
-  `;
 }
 
+async function adminUsers() {
+  const container =
+    document.querySelector("#adminUsuariosLista");
 
-/* =========================================================
-   ADMIN PRODUTOS
-   ========================================================= */
+  if (!container) return;
 
-async function adminProducts(){
+  const { data, error } =
+    await supabase
+      .from("usuario")
+      .select("*")
+      .order("nome", {
+        ascending: true
+      });
 
-  const el=$("produtosAdminLista");
-
-  if(!el)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("produtos")
-    .select(`
-      id,
-      nome,
-      modelo,
-      descricao,
-      imagem_capa,
-      disponivel,
-      destaque
-    `)
-    .order(
-      "criado_em",
-      {ascending:false}
+  if (error) {
+    console.error(
+      "Erro ao carregar usuários:",
+      error
     );
 
-  el.innerHTML=error
-    ?`<p class="muted">
-        ${esc(
-          dbError(
-            error,
-            "Não foi possível carregar."
-          )
-        )}
-      </p>`
-    :adminTable(
-      data,
-      "produto"
-    );
-
-  bindAdminActions();
-}
-
-
-/* =========================================================
-   ADMIN SERVIÇOS
-   ========================================================= */
-
-async function adminServices(){
-
-  const el=$("servicosAdminLista");
-
-  if(!el)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("servicos")
-    .select(`
-      id,
-      nome,
-      descricao,
-      imagem_capa,
-      ativo
-    `)
-    .order(
-      "criado_em",
-      {ascending:false}
-    );
-
-  el.innerHTML=error
-    ?`<p class="muted">
-        ${esc(
-          dbError(
-            error,
-            "Não foi possível carregar."
-          )
-        )}
-      </p>`
-    :adminTable(
-      data,
-      "servico"
-    );
-
-  bindAdminActions();
-}
-
-
-/* =========================================================
-   ADMIN PROJETOS
-   ========================================================= */
-
-async function adminProjects(){
-
-  const el=$("projetosAdminLista");
-
-  if(!el)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("projetos")
-    .select(`
-      id,
-      titulo,
-      descricao,
-      categoria,
-      imagem_capa,
-      publicado
-    `)
-    .order(
-      "criado_em",
-      {ascending:false}
-    );
-
-  el.innerHTML=error
-    ?`<p class="muted">
-        ${esc(
-          dbError(
-            error,
-            "Não foi possível carregar."
-          )
-        )}
-      </p>`
-    :adminTable(
-      data,
-      "projeto"
-    );
-
-  bindAdminActions();
-}
-
-
-/* =========================================================
-   ADMIN PUBLICAÇÕES
-   ========================================================= */
-
-async function adminPosts(){
-
-  const el=$("publicacoesAdminLista");
-
-  if(!el)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("publicacoes")
-    .select(`
-      id,
-      titulo,
-      resumo,
-      conteudo,
-      imagem_capa,
-      publicado,
-      data_publicacao
-    `)
-    .order(
-      "data_publicacao",
-      {ascending:false}
-    );
-
-  el.innerHTML=error
-    ?`<p class="muted">
-        ${esc(
-          dbError(
-            error,
-            "Não foi possível carregar."
-          )
-        )}
-      </p>`
-    :adminTable(
-      data,
-      "publicacao"
-    );
-
-  bindAdminActions();
-}
-
-
-/* =========================================================
-   ADMIN USUÁRIOS
-   ========================================================= */
-
-async function adminUsers(){
-
-  const el=$("adminUsuariosLista");
-
-  if(!el)return;
-
-  const {
-    data,
-    error
-  }=await window.supabaseClient
-    .from("usuario")
-    .select(`
-      id,
-      nome,
-      telefone,
-      whatsapp,
-      tipo_usuario,
-      ativo
-    `)
-    .order("nome");
-
-  if(error){
-
-    el.innerHTML=`
-      <p class="muted">
-        ${esc(
-          dbError(
-            error,
-            "Não foi possível carregar usuários."
-          )
-        )}
-      </p>
-    `;
+    container.innerHTML =
+      "<p>Erro ao carregar usuários.</p>";
 
     return;
   }
 
-  el.innerHTML=
-    (data||[])
-      .map(u=>`
-        <div class="admin-request">
+  if (!data || data.length === 0) {
+    container.innerHTML =
+      "<p>Nenhum usuário encontrado.</p>";
+    return;
+  }
 
+  container.innerHTML = data
+    .map((user) => {
+      const type = String(
+        user.tipo_usuario || "cliente"
+      )
+        .trim()
+        .toLowerCase();
+
+      const isSolicitante =
+        type === "solicitante_admin";
+
+      const isUserAdmin =
+        adminTypes.includes(type);
+
+      let action = "";
+
+      if (isSolicitante) {
+        action = `
+          <button
+            class="btn-aprovar-admin"
+            data-user-id="${user.id}"
+            data-action="aprovar"
+          >
+            Aprovar administrador
+          </button>
+
+          <button
+            class="btn-recusar-admin"
+            data-user-id="${user.id}"
+            data-action="recusar"
+          >
+            Recusar
+          </button>
+        `;
+      }
+
+      return `
+        <div class="admin-user-card">
           <div>
-
             <strong>
-              ${esc(
-                u.nome||"Sem nome"
-              )}
+              ${user.nome || "Sem nome"}
             </strong>
 
-            <div class="muted">
-              ${esc(
-                u.telefone||
-                u.whatsapp||
-                "Sem telefone"
-              )}
-              •
-              ${esc(
-                u.tipo_usuario||
-                "cliente"
-              )}
-            </div>
-
+            <span>
+              ${user.tipo_usuario || "cliente"}
+            </span>
           </div>
 
-          <div class="admin-actions">
-
-            ${
-              String(
-                u.tipo_usuario
-              ).toLowerCase()==='solicitante_admin'
-
-              ?`
-                <button
-                  class="btn btn-green"
-                  data-approve-admin="${esc(u.id)}"
-                >
-                  Aprovar administrador
-                </button>
-
-                <button
-                  class="btn btn-danger"
-                  data-reject-admin="${esc(u.id)}"
-                >
-                  Recusar
-                </button>
-              `
-
-              :""
-            }
-
-          </div>
-
+          ${
+            isUserAdmin
+              ? `<span class="admin-badge">Administrador</span>`
+              : action
+          }
         </div>
-      `)
-      .join("")
-      ||
-      '<p class="muted">Nenhum usuário.</p>';
+      `;
+    })
+    .join("");
 
   bindUserActions();
 }
 
-
-/* =========================================================
-   ADMIN SOLICITAÇÕES
-   ========================================================= */
-
-async function adminRequests(){
-
-  const s=$("adminSolicitacoes");
-  const c=$("adminConversas");
-
-  if(!s&&!c)return;
-
-  if(s){
-
-    const {
-      data,
-      error
-    }=await window.supabaseClient
-      .from("solicitações_servico")
-      .select(`
-        id,
-        status,
-        descricao_problema,
-        criado_em,
-        servicos(nome)
-      `)
-      .order(
-        "criado_em",
-        {ascending:false}
-      )
-      .limit(20);
-
-    s.innerHTML=error
-
-      ?`<p class="muted">
-          ${esc(
-            dbError(error,"Erro.")
-          )}
-        </p>`
-
-      :data?.length
-
-        ?data.map(x=>`
-          <div class="account-item">
-
-            <strong>
-              ${esc(
-                x.servicos?.nome||
-                "Serviço"
-              )}
-            </strong>
-
-            <span>
-              ${esc(x.status)}
-              •
-              ${fmtDate(x.criado_em)}
-            </span>
-
-            <p>
-              ${esc(
-                x.descricao_problema||""
-              )}
-            </p>
-
-          </div>
-        `).join("")
-
-        :'<p class="muted">Nenhuma solicitação.</p>';
-  }
-
-  if(c){
-
-    const {
-      data,
-      error
-    }=await window.supabaseClient
-      .from("conversas")
-      .select(`
-        id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
-      .order(
-        "atualizado_em",
-        {ascending:false}
-      )
-      .limit(20);
-
-    c.innerHTML=error
-
-      ?`<p class="muted">
-          ${esc(
-            dbError(error,"Erro.")
-          )}
-        </p>`
-
-      :data?.length
-
-        ?data.map(x=>`
-          <div class="account-item">
-
-            <strong>
-              ${esc(
-                x.assunto||
-                "Atendimento"
-              )}
-            </strong>
-
-            <span>
-              ${esc(x.status)}
-              •
-              ${fmtDate(
-                x.atualizado_em||
-                x.criado_em
-              )}
-            </span>
-
-          </div>
-        `).join("")
-
-        :'<p class="muted">Nenhuma conversa.</p>';
-  }
-}
-
-
-/* =========================================================
-   FORMULÁRIOS ADMIN
-   ========================================================= */
-
-async function setupAdminForms(){
-
-  const pf=$("produtoForm");
-
-  if(pf){
-
-    pf.addEventListener("submit",async e=>{
-
-      e.preventDefault();
-
-      const id=$("produtoId").value;
-
-      const row={
-        nome:$("produtoNome")
-          .value
-          .trim(),
-
-        modelo:$("produtoModelo")
-          .value
-          .trim()||null,
-
-        descricao:$("produtoDescricao")
-          .value
-          .trim()||null,
-
-        imagem_capa:$("produtoImagem")
-          .value
-          .trim()||null,
-
-        disponivel:$("produtoDisponivel")
-          .checked,
-
-        destaque:$("produtoDestaque")
-          .checked
-      };
-
-      await saveAdmin(
-        "produtos",
-        id,
-        row,
-        pf,
-        "produto"
-      );
-    });
-  }
-
-  const sf=$("servicoForm");
-
-  if(sf){
-
-    sf.addEventListener("submit",async e=>{
-
-      e.preventDefault();
-
-      const id=$("servicoId").value;
-
-      const row={
-        nome:$("servicoNome")
-          .value
-          .trim(),
-
-        descricao:$("servicoDescricao")
-          .value
-          .trim()||null,
-
-        imagem_capa:$("servicoImagem")
-          .value
-          .trim()||null,
-
-        ativo:$("servicoAtivo")
-          .checked
-      };
-
-      await saveAdmin(
-        "servicos",
-        id,
-        row,
-        sf,
-        "servico"
-      );
-    });
-  }
-
-  const pr=$("projetoForm");
-
-  if(pr){
-
-    pr.addEventListener("submit",async e=>{
-
-      e.preventDefault();
-
-      const id=$("projetoId").value;
-
-      const row={
-        titulo:$("projetoTitulo")
-          .value
-          .trim(),
-
-        categoria:$("projetoCategoria")
-          .value
-          .trim()||null,
-
-        descricao:$("projetoDescricao")
-          .value
-          .trim()||null,
-
-        imagem_capa:$("projetoImagem")
-          .value
-          .trim()||null,
-
-        publicado:$("projetoPublicado")
-          .checked
-      };
-
-      await saveAdmin(
-        "projetos",
-        id,
-        row,
-        pr,
-        "projeto"
-      );
-    });
-  }
-
-  const po=$("publicacaoForm");
-
-  if(po){
-
-    po.addEventListener("submit",async e=>{
-
-      e.preventDefault();
-
-      const id=$("publicacaoId").value;
-
-      const row={
-        titulo:$("publicacaoTitulo")
-          .value
-          .trim(),
-
-        resumo:$("publicacaoResumo")
-          .value
-          .trim()||null,
-
-        conteudo:$("publicacaoConteudo")
-          .value
-          .trim()||null,
-
-        imagem_capa:$("publicacaoImagem")
-          .value
-          .trim()||null,
-
-        publicado:$("publicacaoPublicado")
-          .checked,
-
-        data_publicacao:
-          new Date().toISOString()
-      };
-
-      await saveAdmin(
-        "publicacoes",
-        id,
-        row,
-        po,
-        "publicacao"
-      );
-    });
-  }
-
+function bindUserActions() {
   document
-    .querySelectorAll("[id$='Cancelar']")
-    .forEach(b=>
-      b.addEventListener(
-        "click",
-        ()=>b.closest("form")?.reset()
-      )
-    );
+    .querySelectorAll("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const userId =
+          button.dataset.userId;
+
+        const action =
+          button.dataset.action;
+
+        if (!userId || !action) return;
+
+        let newType = "cliente";
+
+        if (action === "aprovar") {
+          newType = "admin";
+        }
+
+        const { error } =
+          await supabase
+            .from("usuario")
+            .update({
+              tipo_usuario: newType
+            })
+            .eq("id", userId);
+
+        if (error) {
+          console.error(
+            "Erro ao atualizar usuário:",
+            error
+          );
+
+          alert(
+            "Não foi possível atualizar o usuário."
+          );
+
+          return;
+        }
+
+        await adminUsers();
+      });
+    });
 }
 
+async function requireAdmin() {
+  const profile = await ensureProfile();
 
-/* =========================================================
-   SALVAR ADMIN
-   ========================================================= */
+  if (!profile || !isAdmin(profile)) {
+    window.location.href = "index.html";
+    return false;
+  }
 
-async function saveAdmin(
-  table,
-  id,
-  row,
-  form,
-  kind
-){
+  return true;
+}
 
-  const q=id
-    ?window.supabaseClient
-      .from(table)
-      .update(row)
-      .eq("id",id)
+async function account() {
+  const container =
+    document.querySelector("#accountContent");
 
-    :window.supabaseClient
-      .from(table)
-      .insert(row);
+  if (!container) return;
 
-  const {
-    error
-  }=await q;
+  const { data: { user }, error } =
+    await supabase.auth.getUser();
 
-  if(error){
-
-    alert(
-      dbError(
-        error,
-        "Não foi possível salvar."
-      )
-    );
-
+  if (error || !user) {
+    container.innerHTML = `
+      <p>Você precisa estar logado.</p>
+    `;
     return;
   }
 
-  form.reset();
-
-  await Promise.all([
-    adminStats(),
-    adminProducts(),
-    adminServices(),
-    adminProjects(),
-    adminPosts()
-  ]);
-
-  alert("Salvo com sucesso.");
-}
-
-
-/* =========================================================
-   AÇÕES ADMIN
-   ========================================================= */
-
-function bindAdminActions(){
-
-  document
-    .querySelectorAll("[data-delete]")
-    .forEach(b=>{
-
-      if(b.dataset.bound)return;
-
-      b.dataset.bound='1';
-
-      b.addEventListener(
-        'click',
-        async()=>{
-
-          if(
-            !confirm(
-              'Tem certeza que deseja excluir?'
-            )
-          )return;
-
-          const table={
-            produto:'produtos',
-            servico:'servicos',
-            projeto:'projetos',
-            publicacao:'publicacoes'
-          }[b.dataset.delete];
-
-          const {
-            error
-          }=await window.supabaseClient
-            .from(table)
-            .delete()
-            .eq(
-              'id',
-              b.dataset.id
-            );
-
-          if(error){
-
-            alert(
-              dbError(
-                error,
-                'Não foi possível excluir.'
-              )
-            );
-
-          }else{
-
-            await Promise.all([
-              adminStats(),
-              adminProducts(),
-              adminServices(),
-              adminProjects(),
-              adminPosts()
-            ]);
-          }
-        }
-      );
-    });
-
-
-  document
-    .querySelectorAll("[data-edit]")
-    .forEach(b=>{
-
-      if(b.dataset.bound)return;
-
-      b.dataset.bound='1';
-
-      b.addEventListener(
-        'click',
-        async()=>{
-
-          const map={
-            produto:[
-              'produtos',
-              'produtoId'
-            ],
-
-            servico:[
-              'servicos',
-              'servicoId'
-            ],
-
-            projeto:[
-              'projetos',
-              'projetoId'
-            ],
-
-            publicacao:[
-              'publicacoes',
-              'publicacaoId'
-            ]
-          };
-
-          const [
-            table
-          ]=map[b.dataset.edit];
-
-          const {
-            data,
-            error
-          }=await window.supabaseClient
-            .from(table)
-            .select('*')
-            .eq(
-              'id',
-              b.dataset.id
-            )
-            .single();
-
-          if(error||!data){
-
-            alert(
-              dbError(
-                error,
-                'Não foi possível carregar.'
-              )
-            );
-
-            return;
-          }
-
-          if(
-            b.dataset.edit==='produto'
-          ){
-
-            $("produtoId").value=data.id;
-
-            $("produtoNome").value=
-              data.nome||'';
-
-            $("produtoModelo").value=
-              data.modelo||'';
-
-            $("produtoDescricao").value=
-              data.descricao||'';
-
-            $("produtoImagem").value=
-              data.imagem_capa||'';
-
-            $("produtoDisponivel").checked=
-              !!data.disponivel;
-
-            $("produtoDestaque").checked=
-              !!data.destaque;
-          }
-
-          if(
-            b.dataset.edit==='servico'
-          ){
-
-            $("servicoId").value=data.id;
-
-            $("servicoNome").value=
-              data.nome||'';
-
-            $("servicoDescricao").value=
-              data.descricao||'';
-
-            $("servicoImagem").value=
-              data.imagem_capa||'';
-
-            $("servicoAtivo").checked=
-              !!data.ativo;
-          }
-
-          if(
-            b.dataset.edit==='projeto'
-          ){
-
-            $("projetoId").value=data.id;
-
-            $("projetoTitulo").value=
-              data.titulo||'';
-
-            $("projetoCategoria").value=
-              data.categoria||'';
-
-            $("projetoDescricao").value=
-              data.descricao||'';
-
-            $("projetoImagem").value=
-              data.imagem_capa||'';
-
-            $("projetoPublicado").checked=
-              !!data.publicado;
-          }
-
-          if(
-            b.dataset.edit==='publicacao'
-          ){
-
-            $("publicacaoId").value=data.id;
-
-            $("publicacaoTitulo").value=
-              data.titulo||'';
-
-            $("publicacaoResumo").value=
-              data.resumo||'';
-
-            $("publicacaoConteudo").value=
-              data.conteudo||'';
-
-            $("publicacaoImagem").value=
-              data.imagem_capa||'';
-
-            $("publicacaoPublicado").checked=
-              !!data.publicado;
-          }
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   AÇÕES DE USUÁRIO / ADMIN
-   ========================================================= */
-
-function bindUserActions(){
-
-  document
-    .querySelectorAll('[data-approve-admin]')
-    .forEach(b=>{
-
-      if(b.dataset.bound)return;
-
-      b.dataset.bound='1';
-
-      b.onclick=async()=>{
-
-        const {
-          error
-        }=await window.supabaseClient
-          .from('usuario')
-          .update({
-            tipo_usuario:'admin'
-          })
-          .eq(
-            'id',
-            b.dataset.approveAdmin
-          );
-
-        if(error){
-
-          alert(
-            dbError(
-              error,
-              'Não foi possível aprovar.'
-            )
-          );
-
-        }else{
-
-          await adminUsers();
-        }
-      };
-    });
-
-
-  document
-    .querySelectorAll('[data-reject-admin]')
-    .forEach(b=>{
-
-      if(b.dataset.bound)return;
-
-      b.dataset.bound='1';
-
-      b.onclick=async()=>{
-
-        const {
-          error
-        }=await window.supabaseClient
-          .from('usuario')
-          .update({
-            tipo_usuario:'cliente'
-          })
-          .eq(
-            'id',
-            b.dataset.rejectAdmin
-          );
-
-        if(error){
-
-          alert(
-            dbError(
-              error,
-              'Não foi possível recusar.'
-            )
-          );
-
-        }else{
-
-          await adminUsers();
-        }
-      };
-    });
-}
-
-
-/* =========================================================
-   CONTA
-   ========================================================= */
-
-async function account(){
-
-  if(
-    !$("contaNome") &&
-    !$("contaNomeTitulo")
-  )return;
-
-  const p=await profile();
-
-  if(!p){
-
-    location.href="login.html";
-
-    return;
-  }
-
-  const u=p.auth;
-  const r=p.profile||{};
-
-  if($("contaNomeTitulo"))
-    $("contaNomeTitulo").textContent=
-      r.nome||
-      u.email?.split("@")[0]||
-      "Usuário";
-
-  if($("contaNome"))
-    $("contaNome").textContent=
-      r.nome||"-";
-
-  if($("contaEmail"))
-    $("contaEmail").textContent=
-      u.email||"-";
-
-  if($("contaTelefone"))
-    $("contaTelefone").textContent=
-      r.telefone||
-      r.whatsapp||
-      "-";
-
-
-  if($("contaTipo")){
-
-    const {
-      data:usuarioAtual,
-      error:usuarioError
-    }=await window.supabaseClient
+  const { data: profile, error: profileError } =
+    await supabase
       .from("usuario")
       .select("tipo_usuario")
-      .eq("id",u.id)
+      .eq("id", user.id)
       .maybeSingle();
 
-    if(usuarioError){
-
-      console.error(
-        "Erro ao buscar tipo de usuário:",
-        usuarioError
-      );
-
-      $("contaTipo").textContent=
-        "Visualizador";
-
-    }else{
-
-      const tipo=String(
-        usuarioAtual?.tipo_usuario||""
-      ).toLowerCase().trim();
-
-      if(
-        tipo==="admin" ||
-        tipo==="administrador"
-      ){
-
-        $("contaTipo").textContent=
-          "Administrador";
-
-      }else if(
-        tipo==="solicitante_admin"
-      ){
-
-        $("contaTipo").textContent=
-          "Solicitação de administrador";
-
-      }else{
-
-        $("contaTipo").textContent=
-          "Visualizador";
-      }
-    }
+  if (profileError) {
+    console.error(
+      "Erro ao carregar conta:",
+      profileError
+    );
   }
 
+  const type = String(
+    profile?.tipo_usuario || "cliente"
+  )
+    .trim()
+    .toLowerCase();
 
-  const s=$("solicitacoesConta");
+  let typeLabel = "Visualizador";
 
-  if(s){
-
-    const {
-      data,
-      error
-    }=await window.supabaseClient
-      .from("solicitações_servico")
-      .select(`
-        id,
-        status,
-        descricao_problema,
-        criado_em,
-        servicos(nome)
-      `)
-      .eq(
-        "cliente_id",
-        u.id
-      )
-      .order(
-        "criado_em",
-        {ascending:false}
-      )
-      .limit(10);
-
-    s.innerHTML=error
-
-      ?`<p class="muted">
-          ${esc(
-            dbError(
-              error,
-              "Não foi possível carregar suas solicitações."
-            )
-          )}
-        </p>`
-
-      :data?.length
-
-        ?data.map(x=>`
-          <div class="account-item">
-
-            <strong>
-              ${esc(
-                x.servicos?.nome||
-                "Solicitação"
-              )}
-            </strong>
-
-            <span>
-              ${esc(
-                x.status||
-                "Em análise"
-              )}
-              •
-              ${fmtDate(x.criado_em)}
-            </span>
-
-            <p>
-              ${esc(
-                x.descricao_problema||""
-              )}
-            </p>
-
-          </div>
-        `).join("")
-
-        :'<p class="muted">Nenhuma solicitação encontrada.</p>';
+  if (
+    type === "admin" ||
+    type === "administrador"
+  ) {
+    typeLabel = "Administrador";
+  } else if (
+    type === "solicitante_admin"
+  ) {
+    typeLabel = "Solicitação de administrador";
   }
 
+  container.innerHTML = `
+    <div class="account-card">
+      <h2>Minha conta</h2>
 
-  const c=$("conversasConta");
+      <p>
+        <strong>E-mail:</strong>
+        ${user.email || ""}
+      </p>
 
-  if(c){
+      <p>
+        <strong>Tipo de conta:</strong>
+        ${typeLabel}
+      </p>
 
-    const {
-      data,
-      error
-    }=await window.supabaseClient
-      .from("conversas")
-      .select(`
-        id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
-      .eq(
-        "cliente_id",
-        u.id
-      )
-      .order(
-        "atualizado_em",
-        {ascending:false}
-      )
-      .limit(10);
+      <button id="logoutButton">
+        Sair
+      </button>
+    </div>
+  `;
 
-    c.innerHTML=error
+  const logoutButton =
+    document.querySelector("#logoutButton");
 
-      ?`<p class="muted">
-          ${esc(
-            dbError(
-              error,
-              "Não foi possível carregar suas conversas."
-            )
-          )}
-        </p>`
-
-      :data?.length
-
-        ?data.map(x=>`
-          <div class="account-item">
-
-            <strong>
-              ${esc(
-                x.assunto||
-                "Atendimento"
-              )}
-            </strong>
-
-            <span>
-              ${esc(
-                x.status||
-                "Em atendimento"
-              )}
-              •
-              ${fmtDate(
-                x.atualizado_em||
-                x.criado_em
-              )}
-            </span>
-
-          </div>
-        `).join("")
-
-        :'<p class="muted">Nenhuma conversa encontrada.</p>';
+  if (logoutButton) {
+    logoutButton.addEventListener(
+      "click",
+      logout
+    );
   }
 }
 
+async function requestAdminAccess() {
+  const { data: { user }, error } =
+    await supabase.auth.getUser();
 
-/* =========================================================
-   SOLICITAR ACESSO ADMIN
-   ========================================================= */
+  if (error || !user) {
+    alert(
+      "Você precisa estar logado para solicitar acesso."
+    );
+    return;
+  }
 
-async function requestAdminAccess(){
+  const { error: updateError } =
+    await supabase
+      .from("usuario")
+      .update({
+        tipo_usuario: "solicitante_admin"
+      })
+      .eq("id", user.id);
 
-  const b=$("btnAdminRequest");
+  if (updateError) {
+    console.error(
+      "Erro ao solicitar administrador:",
+      updateError
+    );
 
-  if(!b)return;
-
-  const p=await profile();
-
-  if(!p)return;
-
-  const type=String(
-    p.profile?.tipo_usuario||""
-  )
-  .toLowerCase()
-  .trim();
-
-  if(
-    adminTypes.includes(type)
-  ){
-
-    b.textContent=
-      'Você já é administrador';
-
-    b.disabled=true;
+    alert(
+      "Não foi possível enviar a solicitação."
+    );
 
     return;
   }
 
-  if(
-    type==='solicitante_admin'
-  ){
+  alert(
+    "Sua solicitação de administrador foi enviada."
+  );
 
-    b.textContent=
-      'Solicitação enviada';
+  await account();
+}
 
-    b.disabled=true;
+async function setupAdminRequestButton() {
+  const button =
+    document.querySelector(
+      "#requestAdminButton"
+    );
 
-    return;
-  }
+  if (!button) return;
 
-  b.addEventListener(
-    'click',
-    async()=>{
-
-      const {
-        error
-      }=await window.supabaseClient
-        .from('usuario')
-        .update({
-          tipo_usuario:
-            'solicitante_admin'
-        })
-        .eq(
-          'id',
-          p.auth.id
-        );
-
-      if(error){
-
-        msg(
-          $("contaMensagem"),
-          dbError(
-            error,
-            'Não foi possível enviar a solicitação.'
-          ),
-          'error'
-        );
-
-        return;
-      }
-
-      b.textContent=
-        'Solicitação enviada';
-
-      b.disabled=true;
-
-      msg(
-        $("contaMensagem"),
-        'Pedido enviado. Um administrador precisa aprovar seu acesso.',
-        'success'
-      );
-    }
+  button.addEventListener(
+    "click",
+    requestAdminAccess
   );
 }
 
+async function loadAdminPage() {
+  const isAllowed =
+    await requireAdmin();
 
-/* =========================================================
-   INICIALIZAÇÃO
-   ========================================================= */
+  if (!isAllowed) return;
 
-(async()=>{
+  await adminStats();
+  await adminUsers();
+}
 
-  if(!setupAuth())return;
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+    await updateNav();
 
-  enhanceInterface();
+    await setupLogin();
+    await setupSignup();
 
-  await Promise.allSettled([
+    await setupAdminRequestButton();
 
-    loadProducts(),
+    await account();
 
-    loadServices(),
+    if (
+      document.querySelector(
+        "#adminUsuariosLista"
+      )
+    ) {
+      await loadAdminPage();
+    }
 
-    loadProjects(),
+    const logoutButton =
+      document.querySelector(
+        "#logoutButton"
+      );
 
-    loadPosts(),
+    if (logoutButton) {
+      logoutButton.addEventListener(
+        "click",
+        logout
+      );
+    }
+  }
+);
 
-    setupLogin(),
-
-    setupSignup(),
-
-    prepareAttendance(),
-
-    account(),
-
-    admin(),
-
-    requestAdminAccess()
-
-  ]);
-
-})(); 
+supabase.auth.onAuthStateChange(
+  async () => {
+    await updateNav();
+  }
+);
