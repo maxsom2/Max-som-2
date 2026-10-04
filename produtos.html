@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos | Max Som</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="container header-content">
+    <a class="logo" href="index.html"><img src="logo-maxsom-white.png" alt="Max Som"></a>
+    <a class="header-whatsapp" href="https://wa.me/5565996262514" target="_blank" rel="noopener">WhatsApp</a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="produtos.html">Produtos</a>
+      <a href="servicos.html">Serviços</a>
+      <a href="projetos.html">Projetos</a>
+      <a href="publicacoes.html">Publicações</a>
+      <a href="atendimento.html">Atendimento</a>
+      <a href="admin.html" data-admin-only>⚙ Painel</a>
+      <a href="conta.html" data-logged-only>Minha conta</a>
+      <a href="login.html" data-guest-only>Entrar</a>
+      <a href="cadastro.html" data-guest-only>Criar conta</a>
+      <button class="btn btn-outline" data-logout data-logged-only type="button">Sair</button>
+    </nav>
+  </div>
+</header>
+<main><section class="page-header"><div class="container"><h1>Produtos</h1><p class="muted">Consulte os equipamentos e informações cadastrados pela Max Som.</p></div></section>
+<section><div class="container"><div class="products-grid" id="productsGrid"><div class="empty">Carregando produtos...</div></div></div></section></main>
+
+<footer class="footer footer-v2">
+  <div class="container footer-content">
+    <div class="footer-column">
+      <a class="logo" href="index.html"><img src="logo-maxsom-white.png" alt="Max Som"></a>
+      <p>Soluções em som, equipamentos, serviços e atendimento.</p>
+    </div>
+    <div class="footer-column">
+      <h3>Navegação</h3>
+      <a href="index.html">Início</a><a href="produtos.html">Produtos</a><a href="servicos.html">Serviços</a>
+      <a href="projetos.html">Projetos</a><a href="publicacoes.html">Publicações</a>
+    </div>
+    <div class="footer-column">
+      <h3>Atendimento</h3>
+      <a href="atendimento.html">Solicitar atendimento</a><a href="conta.html">Minha conta</a>
+      <a href="login.html">Entrar</a>
+    </div>
+    <div class="footer-column">
+      <h3>Contato</h3>
+      <p>Telefone: (65) 99626-2514</p><p>WhatsApp: (65) 99626-2514</p><p>Email: contato@maxsom.com.br</p>
+    </div>
+  </div>
+  <div class="footer-bottom"><div class="container">© 2026 Max Som. Todos os direitos reservados.</div></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script><script src="main.js"></script>
+</body></html>
