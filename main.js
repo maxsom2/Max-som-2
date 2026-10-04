@@ -998,7 +998,7 @@ async function admin(){
   await Promise.allSettled([
     adminStats(),
     adminProducts(),
-        adminServices(),
+    adminServices(),
     adminProjects(),
     adminPosts(),
     adminUsers(),
@@ -2016,6 +2016,8 @@ function bindAdminActions(){
       );
     });
 }
+
+
 /* =========================================================
    AÇÕES DE USUÁRIO / ADMIN
    ========================================================= */
@@ -2145,13 +2147,6 @@ async function account(){
       "-";
 
 
-  /*
-    CORREÇÃO IMPORTANTE:
-
-    Consulta diretamente a tabela "usuario"
-    para pegar o tipo atual do usuário.
-  */
-
   if($("contaTipo")){
 
     const {
@@ -2202,8 +2197,6 @@ async function account(){
     }
   }
 
-
-  /* SOLICITAÇÕES */
 
   const s=$("solicitacoesConta");
 
@@ -2275,8 +2268,6 @@ async function account(){
         :'<p class="muted">Nenhuma solicitação encontrada.</p>';
   }
 
-
-  /* CONVERSAS */
 
   const c=$("conversasConta");
 
@@ -2471,4 +2462,4 @@ async function requestAdminAccess(){
 
   ]);
 
-})();
+})(); 
