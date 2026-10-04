@@ -2164,7 +2164,7 @@ async function account(){
       .from("usuario")
       .select("tipo_usuario")
       .eq("id",u.id)
-      .single();
+      .maybeSingle();
 
     if(usuarioError){
 
@@ -2173,36 +2173,25 @@ async function account(){
         usuarioError
       );
 
-      $("contaTipo").textContent=
-        "Visualizador";
+      $("contaTipo").textContent="Visualizador";
 
     }else{
 
-      const tipo=
-        String(
-          usuarioAtual?.tipo_usuario||""
-        )
-        .toLowerCase()
-        .trim();
+      const tipo=String(
+        usuarioAtual?.tipo_usuario||""
+      ).toLowerCase().trim();
 
-      if(
-        adminTypes.includes(tipo)
-      ){
+      if(tipo==="admin" || tipo==="administrador"){
 
-        $("contaTipo").textContent=
-          "Administrador";
+        $("contaTipo").textContent="Administrador";
 
-      }else if(
-        tipo==="solicitante_admin"
-      ){
+      }else if(tipo==="solicitante_admin"){
 
-        $("contaTipo").textContent=
-          "Solicitação de administrador";
+        $("contaTipo").textContent="Solicitação de administrador";
 
       }else{
 
-        $("contaTipo").textContent=
-          "Visualizador";
+        $("contaTipo").textContent="Visualizador";
       }
     }
   }
