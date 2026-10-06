@@ -58,6 +58,15 @@ let currentProfile = null;
    4. FUNÇÕES AUXILIARES
    ========================================================= */
 
+function qs(...selectors) {
+  return (
+    selectors
+      .map((selector) => document.querySelector(selector))
+      .find(Boolean) || null
+  );
+}
+
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -188,17 +197,29 @@ async function updateNav() {
     await ensureProfile();
 
   const adminLink =
-    document.querySelector("#adminLink");
+    qs("#adminLink", "[data-admin-only]");
 
   const accountLink =
-    document.querySelector("#accountLink");
+    qs("#accountLink", "[data-logged-only]");
 
   const loginLink =
-    document.querySelector("#loginLink");
+    qs("#loginLink", "[data-guest-only]");
 
   const conversationsLink =
-    document.querySelector(
-      "#conversationsLink"
+    qs(
+      "#conversationsLink",
+      "[data-conversations-link]"
+    );
+
+  const signupLink =
+    qs(
+      "#signupLink",
+      "[data-signup-link]"
+    );
+
+  const logoutLinks =
+    document.querySelectorAll(
+      "[data-logout], #logoutLink"
     );
 
 
@@ -213,12 +234,16 @@ async function updateNav() {
   }
 
 
-  /* LOGIN / CONTA */
+  /* LOGIN / CONTA / CADASTRO */
 
   if (profile) {
 
     if (loginLink) {
       loginLink.style.display = "none";
+    }
+
+    if (signupLink) {
+      signupLink.style.display = "none";
     }
 
     if (accountLink) {
@@ -235,6 +260,10 @@ async function updateNav() {
       loginLink.style.display = "";
     }
 
+    if (signupLink) {
+      signupLink.style.display = "";
+    }
+
     if (accountLink) {
       accountLink.style.display = "none";
     }
@@ -243,6 +272,29 @@ async function updateNav() {
       conversationsLink.style.display = "none";
     }
   }
+
+
+  logoutLinks.forEach((element) => {
+
+    element.style.display =
+      profile ? "" : "none";
+
+    if (!element.dataset.logoutBound) {
+
+      element.dataset.logoutBound =
+        "true";
+
+      element.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          logout();
+        }
+      );
+    }
+  });
 }
 
 
@@ -253,7 +305,10 @@ async function updateNav() {
 async function setupLogin() {
 
   const form =
-    document.querySelector("#loginForm");
+    qs(
+      "#loginForm",
+      "#formLogin"
+    );
 
   if (!form) return;
 
@@ -264,18 +319,25 @@ async function setupLogin() {
       event.preventDefault();
 
       const email =
-        document
-          .querySelector("#loginEmail")
+        qs(
+          "#loginEmail",
+          "#email"
+        )
           ?.value
           .trim();
 
       const password =
-        document
-          .querySelector("#loginPassword")
+        qs(
+          "#loginPassword",
+          "#senha"
+        )
           ?.value;
 
       const errorBox =
-        document.querySelector("#loginError");
+        qs(
+          "#loginError",
+          "#mensagemLogin"
+        );
 
 
       if (errorBox) {
@@ -346,7 +408,10 @@ async function setupLogin() {
 async function setupSignup() {
 
   const form =
-    document.querySelector("#signupForm");
+    qs(
+      "#signupForm",
+      "#formCadastro"
+    );
 
   if (!form) return;
 
@@ -359,25 +424,32 @@ async function setupSignup() {
 
 
       const nome =
-        document
-          .querySelector("#signupNome")
+        qs(
+          "#signupNome",
+          "#nome"
+        )
           ?.value
           .trim();
 
       const email =
-        document
-          .querySelector("#signupEmail")
+        qs(
+          "#signupEmail",
+          "#email"
+        )
           ?.value
           .trim();
 
       const password =
-        document
-          .querySelector("#signupPassword")
+        qs(
+          "#signupPassword",
+          "#senha"
+        )
           ?.value;
 
       const errorBox =
-        document.querySelector(
-          "#signupError"
+        qs(
+          "#signupError",
+          "#mensagemCadastro"
         );
 
 
@@ -1066,62 +1138,40 @@ function setupAdminRequestButton() {
     requestAdminAccess
   );
 }
-
-
 /* =========================================================
    17. CONVERSAS
    ========================================================= */
-
-
-/*
-   IMPORTANTE:
-
-   A privacidade das conversas NÃO depende
-   somente dessas funções.
-
-   O Supabase RLS precisa impedir:
-
-   CLIENTE A
-   ↓
-   acessar conversa do CLIENTE B
-
-   CLIENTE A
-   ↓
-   acessar mensagens do CLIENTE B
-
-   CLIENTE A
-   ↓
-   acessar arquivos do CLIENTE B
-
-   O JavaScript apenas trabalha com os
-   dados que o Supabase permitir.
-*/
-
 
 async function loadConversations() {
 
   const container =
     document.querySelector(
-      "#conversasLista"
+      "#conversationList"
     );
 
   if (!container) return;
 
 
-  const profile =
-    await ensureProfile();
+  const {
+    data: { user },
+    error: userError
+  } =
+    await supabase.auth.getUser();
 
 
-  if (!profile || !currentUser) {
+  if (userError || !user) {
 
     container.innerHTML = `
-      <p>
-        Você precisa estar logado para ver suas conversas.
-      </p>
+      <div class="empty">
+        Você precisa estar logado para visualizar suas conversas.
+      </div>
     `;
 
     return;
   }
+
+
+  currentUser = user;
 
 
   const {
@@ -1130,17 +1180,12 @@ async function loadConversations() {
   } =
     await supabase
       .from(TABLES.CONVERSAS)
-      .select(`
-        id,
-        cliente_id,
-        funcionario_id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
+      .select("*")
+      .or(
+        `cliente_id.eq.${user.id},funcionario_id.eq.${user.id}`
+      )
       .order(
-        "atualizado_em",
+        "created_at",
         {
           ascending: false
         }
@@ -1155,9 +1200,9 @@ async function loadConversations() {
     );
 
     container.innerHTML = `
-      <p>
+      <div class="empty">
         Não foi possível carregar suas conversas.
-      </p>
+      </div>
     `;
 
     return;
@@ -1167,17 +1212,8 @@ async function loadConversations() {
   if (!data?.length) {
 
     container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhuma conversa ainda
-        </h3>
-
-        <p>
-          Quando você iniciar um atendimento,
-          sua conversa aparecerá aqui.
-        </p>
-
+      <div class="empty">
+        Você ainda não possui conversas.
       </div>
     `;
 
@@ -1189,44 +1225,44 @@ async function loadConversations() {
     data
       .map((conversation) => {
 
+        const title =
+          conversation.titulo ||
+          conversation.assunto ||
+          "Atendimento";
+
+
+        const status =
+          conversation.status ||
+          "aberta";
+
+
         return `
 
           <a
-            href="conversa.html?id=${encodeURIComponent(
+            class="conversation-card"
+            href="atendimento.html?conversa=${encodeURIComponent(
               conversation.id
             )}"
-            class="conversation-card"
           >
 
-            <div class="conversation-card-content">
+            <div>
 
-              <div>
+              <strong>
+                ${esc(title)}
+              </strong>
 
-                <h3>
-                  ${esc(
-                    conversation.assunto ||
-                    "Atendimento Max Som"
-                  )}
-                </h3>
-
-                <span>
-                  ${esc(
-                    conversation.status ||
-                    "aberta"
-                  )}
-                </span>
-
-              </div>
-
-
-              <time>
-                ${formatDateTime(
-                  conversation.atualizado_em ||
-                  conversation.criado_em
-                )}
-              </time>
+              <p>
+                ${esc(status)}
+              </p>
 
             </div>
+
+
+            <span>
+              ${formatDate(
+                conversation.created_at
+              )}
+            </span>
 
           </a>
 
@@ -1237,71 +1273,14 @@ async function loadConversations() {
 
 
 /* =========================================================
-   18. CRIAR CONVERSA
-   ========================================================= */
-
-async function createConversation({
-  assunto = "Atendimento Max Som"
-} = {}) {
-
-  const {
-    data: { user },
-    error: authError
-  } =
-    await supabase.auth.getUser();
-
-
-  if (authError || !user) {
-
-    throw new Error(
-      "Você precisa estar logado."
-    );
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .insert({
-
-        cliente_id: user.id,
-
-        assunto: assunto,
-
-        status: "aberta"
-
-      })
-      .select()
-      .single();
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao criar conversa:",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return data;
-}
-
-
-/* =========================================================
-   19. CARREGAR UMA CONVERSA
+   18. CARREGAR UMA CONVERSA
    ========================================================= */
 
 async function loadConversation() {
 
   const container =
     document.querySelector(
-      "#conversaContainer"
+      "#chatMessages"
     );
 
   if (!container) return;
@@ -1314,31 +1293,16 @@ async function loadConversation() {
 
 
   const conversationId =
-    params.get("id");
+    params.get("conversa") ||
+    params.get("conversation");
 
 
   if (!conversationId) {
 
     container.innerHTML = `
-      <p>
-        Conversa não encontrada.
-      </p>
-    `;
-
-    return;
-  }
-
-
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile || !currentUser) {
-
-    container.innerHTML = `
-      <p>
-        Você precisa estar logado.
-      </p>
+      <div class="empty">
+        Nenhuma conversa selecionada.
+      </div>
     `;
 
     return;
@@ -1346,84 +1310,97 @@ async function loadConversation() {
 
 
   const {
-    data: conversation,
-    error
+    data: { user },
+    error: userError
   } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .select(`
-        id,
-        cliente_id,
-        funcionario_id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
-      .eq("id", conversationId)
-      .maybeSingle();
+    await supabase.auth.getUser();
 
 
-  if (error || !conversation) {
-
-    console.error(
-      "Erro ao carregar conversa:",
-      error
-    );
+  if (userError || !user) {
 
     container.innerHTML = `
-      <p>
-        Esta conversa não está disponível.
-      </p>
+      <div class="empty">
+        Você precisa estar logado.
+      </div>
     `;
 
     return;
   }
 
 
-  /*
-    Não fazemos uma "autorização" falsa aqui.
-
-    O RLS do Supabase deve impedir
-    que alguém consiga obter uma conversa
-    que não pertence a ele.
-  */
+  currentUser = user;
 
 
-  const messagesContainer =
-    document.querySelector(
-      "#mensagensLista"
+  const {
+    data: conversation,
+    error: conversationError
+  } =
+    await supabase
+      .from(TABLES.CONVERSAS)
+      .select("*")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+
+  if (conversationError) {
+
+    console.error(
+      "Erro ao carregar conversa:",
+      conversationError
     );
 
+    container.innerHTML = `
+      <div class="empty">
+        Não foi possível carregar a conversa.
+      </div>
+    `;
 
-  if (!messagesContainer) return;
+    return;
+  }
+
+
+  if (!conversation) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Conversa não encontrada ou sem permissão de acesso.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const allowed =
+    conversation.cliente_id === user.id ||
+    conversation.funcionario_id === user.id ||
+    isAdmin(currentProfile);
+
+
+  if (!allowed) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Você não possui acesso a esta conversa.
+      </div>
+    `;
+
+    return;
+  }
 
 
   const title =
     document.querySelector(
-      "#conversaTitulo"
-    );
-
-
-  const status =
-    document.querySelector(
-      "#conversaStatus"
+      "#conversationTitle"
     );
 
 
   if (title) {
 
     title.textContent =
+      conversation.titulo ||
       conversation.assunto ||
-      "Atendimento Max Som";
-  }
-
-
-  if (status) {
-
-    status.textContent =
-      conversation.status ||
-      "aberta";
+      "Atendimento";
   }
 
 
@@ -1439,7 +1416,7 @@ async function loadConversation() {
 
 
 /* =========================================================
-   20. CARREGAR MENSAGENS
+   19. MENSAGENS
    ========================================================= */
 
 async function loadMessages(
@@ -1448,10 +1425,23 @@ async function loadMessages(
 
   const container =
     document.querySelector(
-      "#mensagensLista"
+      "#chatMessages"
     );
 
   if (!container) return;
+
+
+  const {
+    data: { user },
+    error: userError
+  } =
+    await supabase.auth.getUser();
+
+
+  if (userError || !user) {
+
+    return;
+  }
 
 
   const {
@@ -1460,20 +1450,13 @@ async function loadMessages(
   } =
     await supabase
       .from(TABLES.MENSAGENS)
-      .select(`
-        id,
-        conversa_id,
-        remetente_id,
-        conteudo,
-        lida,
-        criado_em
-      `)
+      .select("*")
       .eq(
         "conversa_id",
         conversationId
       )
       .order(
-        "criado_em",
+        "created_at",
         {
           ascending: true
         }
@@ -1488,9 +1471,9 @@ async function loadMessages(
     );
 
     container.innerHTML = `
-      <p>
+      <div class="empty">
         Não foi possível carregar as mensagens.
-      </p>
+      </div>
     `;
 
     return;
@@ -1500,7 +1483,7 @@ async function loadMessages(
   if (!data?.length) {
 
     container.innerHTML = `
-      <div class="empty-messages">
+      <div class="empty">
         Nenhuma mensagem ainda.
       </div>
     `;
@@ -1514,36 +1497,34 @@ async function loadMessages(
       .map((message) => {
 
         const mine =
-          message.remetente_id ===
-          currentUser?.id;
+          message.usuario_id === user.id ||
+          message.autor_id === user.id;
+
+
+        const text =
+          message.mensagem ||
+          message.conteudo ||
+          message.texto ||
+          "";
 
 
         return `
 
           <div
-            class="
-              message
-              ${mine
-                ? "message-own"
-                : "message-other"}
-            "
+            class="chat-message ${
+              mine ? "mine" : ""
+            }"
           >
 
-            <div class="message-content">
-
-              <p>
-                ${esc(
-                  message.conteudo
-                )}
-              </p>
-
-              <time>
-                ${formatDateTime(
-                  message.criado_em
-                )}
-              </time>
-
+            <div>
+              ${esc(text)}
             </div>
+
+            <small>
+              ${formatDateTime(
+                message.created_at
+              )}
+            </small>
 
           </div>
 
@@ -1558,7 +1539,7 @@ async function loadMessages(
 
 
 /* =========================================================
-   21. ENVIAR MENSAGEM
+   20. FORMULÁRIO DE MENSAGEM
    ========================================================= */
 
 function setupMessageForm(
@@ -1566,21 +1547,22 @@ function setupMessageForm(
 ) {
 
   const form =
-    document.querySelector(
-      "#mensagemForm"
+    qs(
+      "#messageForm",
+      "#formMensagem"
     );
 
   if (!form) return;
 
 
   if (
-    form.dataset.ready === "true"
+    form.dataset.bound === "true"
   ) {
     return;
   }
 
 
-  form.dataset.ready = "true";
+  form.dataset.bound = "true";
 
 
   form.addEventListener(
@@ -1591,27 +1573,52 @@ function setupMessageForm(
 
 
       const input =
-        document.querySelector(
-          "#mensagemInput"
+        qs(
+          "#messageInput",
+          "#mensagem",
+          "#textoMensagem"
         );
 
 
-      const button =
-        document.querySelector(
-          "#mensagemEnviar"
+      if (!input) return;
+
+
+      const text =
+        input.value.trim();
+
+
+      if (!text) return;
+
+
+      const {
+        data: { user },
+        error: userError
+      } =
+        await supabase.auth.getUser();
+
+
+      if (userError || !user) {
+
+        alert(
+          "Você precisa estar logado."
         );
 
-
-      const content =
-        input?.value.trim();
-
-
-      if (!content) return;
-
-
-      if (button) {
-        button.disabled = true;
+        return;
       }
+
+
+      const messageData = {
+
+        conversa_id:
+          conversationId,
+
+        usuario_id:
+          user.id,
+
+        mensagem:
+          text
+
+      };
 
 
       const {
@@ -1619,18 +1626,9 @@ function setupMessageForm(
       } =
         await supabase
           .from(TABLES.MENSAGENS)
-          .insert({
-
-            conversa_id:
-              conversationId,
-
-            remetente_id:
-              currentUser.id,
-
-            conteudo:
-              content
-
-          });
+          .insert(
+            messageData
+          );
 
 
       if (error) {
@@ -1644,51 +1642,45 @@ function setupMessageForm(
           "Não foi possível enviar a mensagem."
         );
 
-        if (button) {
-          button.disabled = false;
-        }
-
         return;
       }
 
 
-      if (input) {
-        input.value = "";
-      }
+      input.value = "";
 
 
       await loadMessages(
         conversationId
       );
-
-
-      if (button) {
-        button.disabled = false;
-      }
     }
   );
 }
 
 
 /* =========================================================
-   22. NOTIFICAÇÕES
+   21. NOTIFICAÇÕES
    ========================================================= */
 
 async function loadNotifications() {
 
   const container =
     document.querySelector(
-      "#notificacoesLista"
+      "#notificationsList"
     );
 
   if (!container) return;
 
 
-  const profile =
-    await ensureProfile();
+  const {
+    data: { user },
+    error: userError
+  } =
+    await supabase.auth.getUser();
 
 
-  if (!profile || !currentUser) {
+  if (userError || !user) {
+
+    container.innerHTML = "";
 
     return;
   }
@@ -1700,20 +1692,13 @@ async function loadNotifications() {
   } =
     await supabase
       .from(TABLES.NOTIFICACOES)
-      .select(`
-        id,
-        titulo,
-        mensagem,
-        lida,
-        link,
-        criado_em
-      `)
+      .select("*")
       .eq(
         "usuario_id",
-        currentUser.id
+        user.id
       )
       .order(
-        "criado_em",
+        "created_at",
         {
           ascending: false
         }
@@ -1734,7 +1719,7 @@ async function loadNotifications() {
   if (!data?.length) {
 
     container.innerHTML = `
-      <div class="empty-state">
+      <div class="empty">
         Nenhuma notificação.
       </div>
     `;
@@ -1747,197 +1732,2076 @@ async function loadNotifications() {
     data
       .map((notification) => {
 
+        const title =
+          notification.titulo ||
+          "Notificação";
+
+
+        const message =
+          notification.mensagem ||
+          notification.conteudo ||
+          "";
+
+
+        const read =
+          notification.lida === true;
+
+
         return `
 
-          <a
-            href="${
-              notification.link
-                ? esc(notification.link)
-                : "#"
+          <div
+            class="notification-card ${
+              read ? "read" : "unread"
             }"
-            class="
-              notification-card
-              ${notification.lida
-                ? "is-read"
-                : "is-unread"}
-            "
-            data-notification-id="${esc(
-              notification.id
-            )}"
           >
 
             <div>
 
               <strong>
-                ${esc(
-                  notification.titulo ||
-                  "Notificação"
-                )}
+                ${esc(title)}
               </strong>
 
               <p>
-                ${esc(
-                  notification.mensagem ||
-                  ""
-                )}
+                ${esc(message)}
               </p>
 
             </div>
 
-            <time>
+            <small>
               ${formatDateTime(
-                notification.criado_em
+                notification.created_at
               )}
-            </time>
+            </small>
 
-          </a>
+          </div>
 
         `;
       })
       .join("");
-
-
-  bindNotificationActions();
 }
 
 
 /* =========================================================
-   23. MARCAR NOTIFICAÇÃO COMO LIDA
+   22. MARCAR NOTIFICAÇÃO COMO LIDA
    ========================================================= */
 
-function bindNotificationActions() {
+async function markNotificationAsRead(
+  notificationId
+) {
+
+  if (!notificationId) return;
+
+
+  const {
+    data: { user },
+    error: userError
+  } =
+    await supabase.auth.getUser();
+
+
+  if (userError || !user) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabase
+      .from(TABLES.NOTIFICACOES)
+      .update({
+        lida: true
+      })
+      .eq(
+        "id",
+        notificationId
+      )
+      .eq(
+        "usuario_id",
+        user.id
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao marcar notificação:",
+      error
+    );
+
+    return;
+  }
+
+
+  await loadNotifications();
+}
+
+
+/* =========================================================
+   23. SOLICITAÇÃO DE SERVIÇO
+   ========================================================= */
+
+async function createServiceRequest(
+  serviceId = null
+) {
+
+  const form =
+    qs(
+      "#serviceRequestForm",
+      "#formSolicitacao",
+      "#requestForm"
+    );
+
+
+  if (!form) return;
+
+
+  const {
+    data: { user },
+    error: userError
+  } =
+    await supabase.auth.getUser();
+
+
+  if (userError || !user) {
+
+    alert(
+      "Você precisa estar logado para solicitar atendimento."
+    );
+
+    window.location.href =
+      "login.html";
+
+    return;
+  }
+
+
+  const nome =
+    qs(
+      "#requestNome",
+      "#nomeSolicitante"
+    )?.value?.trim() || "";
+
+
+  const telefone =
+    qs(
+      "#requestTelefone",
+      "#telefone"
+    )?.value?.trim() || "";
+
+
+  const descricao =
+    qs(
+      "#requestDescricao",
+      "#descricao",
+      "#mensagem"
+    )?.value?.trim() || "";
+
+
+  const dataSolicitada =
+    qs(
+      "#requestData",
+      "#dataSolicitada"
+    )?.value || null;
+
+
+  const observacoes =
+    qs(
+      "#requestObservacoes",
+      "#observacoes"
+    )?.value?.trim() || "";
+
+
+  const serviceSelect =
+    qs(
+      "#requestServico",
+      "#servico",
+      "#servicoId"
+    );
+
+
+  const selectedService =
+    serviceId ||
+    serviceSelect?.value ||
+    null;
+
+
+  const payload = {
+
+    usuario_id:
+      user.id,
+
+    servico_id:
+      selectedService,
+
+    nome:
+      nome || null,
+
+    telefone:
+      telefone || null,
+
+    descricao:
+      descricao || null,
+
+    data_solicitada:
+      dataSolicitada,
+
+    observacoes:
+      observacoes || null,
+
+    status:
+      "pendente"
+
+  };
+
+
+  const {
+    error
+  } =
+    await supabase
+      .from(TABLES.SOLICITACOES)
+      .insert(
+        payload
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao criar solicitação:",
+      error
+    );
+
+    alert(
+      "Não foi possível enviar a solicitação."
+    );
+
+    return;
+  }
+
+
+  alert(
+    "Solicitação enviada com sucesso!"
+  );
+
+
+  form.reset();
+}
+
+
+/* =========================================================
+   24. CONFIGURAÇÃO DO FORMULÁRIO
+   ========================================================= */
+
+function setupServiceRequestForm() {
+
+  const form =
+    qs(
+      "#serviceRequestForm",
+      "#formSolicitacao",
+      "#requestForm"
+    );
+
+
+  if (!form) return;
+
+
+  if (
+    form.dataset.bound === "true"
+  ) {
+    return;
+  }
+
+
+  form.dataset.bound = "true";
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const serviceFromUrl =
+    params.get("servico") ||
+    params.get("service");
+
+
+  if (serviceFromUrl) {
+
+    const select =
+      qs(
+        "#requestServico",
+        "#servico",
+        "#servicoId"
+      );
+
+
+    if (select) {
+
+      select.value =
+        serviceFromUrl;
+    }
+  }
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      await createServiceRequest(
+        serviceFromUrl
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   25. PRODUTOS PÚBLICOS
+   ========================================================= */
+
+async function loadProducts() {
+
+  const containers =
+    document.querySelectorAll(
+      "#productsGrid, #produtosGrid"
+    );
+
+
+  if (!containers.length) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.PRODUTOS)
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar produtos:",
+      error
+    );
+
+    containers.forEach(
+      (container) => {
+
+        container.innerHTML = `
+          <div class="empty">
+            Não foi possível carregar os produtos.
+          </div>
+        `;
+      }
+    );
+
+    return;
+  }
+
+
+  const products =
+    data || [];
+
+
+  containers.forEach(
+    (container) => {
+
+      if (!products.length) {
+
+        container.innerHTML = `
+          <div class="empty">
+            Nenhum produto disponível no momento.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML =
+        products
+          .map(
+            (product) => {
+
+              const image =
+                product.imagem_url ||
+                product.imagem ||
+                product.foto_url ||
+                "";
+
+
+              const name =
+                product.nome ||
+                product.name ||
+                "Produto";
+
+
+              const description =
+                product.descricao ||
+                product.description ||
+                "Confira as informações deste produto.";
+
+
+              return `
+
+                <article
+                  class="product-card"
+                >
+
+                  ${
+                    image
+
+                      ? `
+                        <img
+                          src="${esc(image)}"
+                          alt="${esc(name)}"
+                        >
+                      `
+
+                      : `
+                        <div
+                          class="product-image"
+                        >
+                          Max Som
+                        </div>
+                      `
+                  }
+
+
+                  <div
+                    class="product-info"
+                  >
+
+                    ${
+                      product.marca
+
+                        ? `
+                          <span>
+                            ${esc(product.marca)}
+                          </span>
+                        `
+
+                        : ""
+                    }
+
+
+                    <h3>
+                      ${esc(name)}
+                    </h3>
+
+
+                    <p>
+                      ${esc(description)}
+                    </p>
+
+
+                  </div>
+
+                </article>
+
+              `;
+            }
+          )
+          .join("");
+    }
+  );
+}
+
+
+/* =========================================================
+   26. SERVIÇOS PÚBLICOS
+   ========================================================= */
+
+async function loadServices() {
+
+  const containers =
+    document.querySelectorAll(
+      "#servicesGrid, #servicosGrid"
+    );
+
+
+  if (!containers.length) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.SERVICOS)
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar serviços:",
+      error
+    );
+
+    containers.forEach(
+      (container) => {
+
+        container.innerHTML = `
+          <div class="empty">
+            Não foi possível carregar os serviços.
+          </div>
+        `;
+      }
+    );
+
+    return;
+  }
+
+
+  const services =
+    data || [];
+
+
+  containers.forEach(
+    (container) => {
+
+      if (!services.length) {
+
+        container.innerHTML = `
+          <div class="empty">
+            Nenhum serviço disponível no momento.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML =
+        services
+          .map(
+            (service) => {
+
+              const image =
+                service.imagem_url ||
+                service.imagem ||
+                service.foto_url ||
+                "";
+
+
+              const name =
+                service.nome ||
+                service.name ||
+                "Serviço";
+
+
+              const description =
+                service.descricao ||
+                service.description ||
+                "Conheça este serviço da Max Som.";
+
+
+              const id =
+                service.id || "";
+
+
+              return `
+
+                <article
+                  class="service-card"
+                >
+
+                  ${
+                    image
+
+                      ? `
+                        <img
+                          src="${esc(image)}"
+                          alt="${esc(name)}"
+                        >
+                      `
+
+                      : ""
+                  }
+
+
+                  <div>
+
+                    <h3>
+                      ${esc(name)}
+                    </h3>
+
+
+                    <p>
+                      ${esc(description)}
+                    </p>
+
+
+                    <a
+                      href="atendimento.html?servico=${encodeURIComponent(
+                        id
+                      )}"
+                    >
+                      Solicitar atendimento →
+                    </a>
+
+                  </div>
+
+                </article>
+
+              `;
+            }
+          )
+          .join("");
+    }
+  );
+}
+/* =========================================================
+   27. PROJETOS PÚBLICOS
+   ========================================================= */
+
+async function loadProjects() {
+
+  const containers =
+    document.querySelectorAll(
+      "#projectsGrid, #projetosGrid"
+    );
+
+
+  if (!containers.length) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from("projetos")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar projetos:",
+      error
+    );
+
+    containers.forEach(
+      (container) => {
+
+        container.innerHTML = `
+          <div class="empty">
+            Não foi possível carregar os projetos.
+          </div>
+        `;
+      }
+    );
+
+    return;
+  }
+
+
+  const projects =
+    data || [];
+
+
+  containers.forEach(
+    (container) => {
+
+      if (!projects.length) {
+
+        container.innerHTML = `
+          <div class="empty">
+            Nenhum projeto disponível no momento.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML =
+        projects
+          .map(
+            (project) => {
+
+              const image =
+                project.imagem_url ||
+                project.imagem ||
+                project.foto_url ||
+                "";
+
+
+              const name =
+                project.nome ||
+                project.titulo ||
+                project.name ||
+                "Projeto";
+
+
+              const description =
+                project.descricao ||
+                project.description ||
+                "";
+
+
+              return `
+
+                <article
+                  class="project-card"
+                >
+
+                  ${
+                    image
+
+                      ? `
+                        <img
+                          src="${esc(image)}"
+                          alt="${esc(name)}"
+                        >
+                      `
+
+                      : `
+                        <div
+                          class="project-image"
+                        >
+                          Max Som
+                        </div>
+                      `
+                  }
+
+
+                  <div
+                    class="project-info"
+                  >
+
+                    ${
+                      project.categoria
+
+                        ? `
+                          <span>
+                            ${esc(
+                              project.categoria
+                            )}
+                          </span>
+                        `
+
+                        : ""
+                    }
+
+
+                    <h3>
+                      ${esc(name)}
+                    </h3>
+
+
+                    ${
+                      description
+
+                        ? `
+                          <p>
+                            ${esc(
+                              description
+                            )}
+                          </p>
+                        `
+
+                        : ""
+                    }
+
+                  </div>
+
+                </article>
+
+              `;
+            }
+          )
+          .join("");
+    }
+  );
+}
+
+
+/* =========================================================
+   28. PUBLICAÇÕES
+   ========================================================= */
+
+async function loadPosts() {
+
+  const containers =
+    document.querySelectorAll(
+      "#postsGrid, #publicacoesGrid"
+    );
+
+
+  if (!containers.length) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from("publicacoes")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar publicações:",
+      error
+    );
+
+    containers.forEach(
+      (container) => {
+
+        container.innerHTML = `
+          <div class="empty">
+            Não foi possível carregar as publicações.
+          </div>
+        `;
+      }
+    );
+
+    return;
+  }
+
+
+  const posts =
+    data || [];
+
+
+  containers.forEach(
+    (container) => {
+
+      if (!posts.length) {
+
+        container.innerHTML = `
+          <div class="empty">
+            Nenhuma publicação disponível no momento.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML =
+        posts
+          .map(
+            (post) => {
+
+              const image =
+                post.imagem_url ||
+                post.imagem ||
+                post.foto_url ||
+                "";
+
+
+              const title =
+                post.titulo ||
+                post.nome ||
+                "Publicação";
+
+
+              const description =
+                post.resumo ||
+                post.descricao ||
+                post.conteudo ||
+                "";
+
+
+              return `
+
+                <article
+                  class="post-card"
+                >
+
+                  ${
+                    image
+
+                      ? `
+                        <img
+                          src="${esc(image)}"
+                          alt="${esc(title)}"
+                        >
+                      `
+
+                      : `
+                        <div
+                          class="post-image"
+                        >
+                          Max Som
+                        </div>
+                      `
+                  }
+
+
+                  <div
+                    class="post-info"
+                  >
+
+                    ${
+                      post.categoria
+
+                        ? `
+                          <span>
+                            ${esc(
+                              post.categoria
+                            )}
+                          </span>
+                        `
+
+                        : ""
+                    }
+
+
+                    <h3>
+                      ${esc(title)}
+                    </h3>
+
+
+                    ${
+                      description
+
+                        ? `
+                          <p>
+                            ${esc(
+                              description
+                            )}
+                          </p>
+                        `
+
+                        : ""
+                    }
+
+
+                    ${
+                      post.url
+
+                        ? `
+                          <a
+                            href="${esc(
+                              post.url
+                            )}"
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            Ver publicação →
+                          </a>
+                        `
+
+                        : ""
+                    }
+
+                  </div>
+
+                </article>
+
+              `;
+            }
+          )
+          .join("");
+    }
+  );
+}
+
+
+/* =========================================================
+   29. LINKS DE SERVIÇOS
+   ========================================================= */
+
+function setupServiceLinks() {
 
   document
     .querySelectorAll(
-      "[data-notification-id]"
+      "[data-service-id]"
     )
-    .forEach((element) => {
+    .forEach(
+      (element) => {
 
-      element.addEventListener(
-        "click",
-        async () => {
-
-          const id =
-            element.dataset
-              .notificationId;
+        const serviceId =
+          element.dataset.serviceId;
 
 
-          if (!id) return;
-
-
-          await supabase
-            .from(TABLES.NOTIFICACOES)
-            .update({
-              lida: true
-            })
-            .eq(
-              "id",
-              id
-            );
+        if (!serviceId) {
+          return;
         }
-      );
-    });
+
+
+        element.addEventListener(
+          "click",
+          () => {
+
+            const url =
+              `atendimento.html?servico=${encodeURIComponent(
+                serviceId
+              )}`;
+
+
+            if (
+              element.tagName === "A"
+            ) {
+
+              element.href =
+                url;
+
+            } else {
+
+              window.location.href =
+                url;
+            }
+          }
+        );
+      }
+    );
 }
 
 
 /* =========================================================
-   24. PÁGINA ADMIN
+   30. WHATSAPP
+   ========================================================= */
+
+function setupWhatsAppLinks() {
+
+  const phone =
+    "5565996262514";
+
+
+  document
+    .querySelectorAll(
+      "[data-whatsapp]"
+    )
+    .forEach(
+      (element) => {
+
+        if (
+          element.dataset.whatsappBound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        element.dataset.whatsappBound =
+          "true";
+
+
+        element.addEventListener(
+          "click",
+          (event) => {
+
+            event.preventDefault();
+
+
+            const message =
+              element.dataset.whatsappMessage ||
+              "Olá! Gostaria de falar com a Max Som.";
+
+
+            const url =
+              `https://wa.me/${phone}?text=${encodeURIComponent(
+                message
+              )}`;
+
+
+            window.open(
+              url,
+              "_blank",
+              "noopener"
+            );
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   31. FORMULÁRIO DE CONTATO
+   ========================================================= */
+
+function setupContactForm() {
+
+  const form =
+    qs(
+      "#contactForm",
+      "#formContato"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.bound ===
+    "true"
+  ) {
+    return;
+  }
+
+
+  form.dataset.bound =
+    "true";
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      const nome =
+        qs(
+          "#contactNome",
+          "#nome"
+        )?.value?.trim() || "";
+
+
+      const email =
+        qs(
+          "#contactEmail",
+          "#email"
+        )?.value?.trim() || "";
+
+
+      const telefone =
+        qs(
+          "#contactTelefone",
+          "#telefone"
+        )?.value?.trim() || "";
+
+
+      const mensagem =
+        qs(
+          "#contactMensagem",
+          "#mensagem"
+        )?.value?.trim() || "";
+
+
+      if (
+        !nome ||
+        !email ||
+        !mensagem
+      ) {
+
+        alert(
+          "Preencha nome, e-mail e mensagem."
+        );
+
+        return;
+      }
+
+
+      const {
+        data: { user }
+      } =
+        await supabase.auth.getUser();
+
+
+      /*
+       * O formulário público não cria uma
+       * solicitação automaticamente caso
+       * não exista usuário autenticado.
+       *
+       * Nesse caso, o contato continua sendo
+       * encaminhado pelo WhatsApp.
+       */
+
+
+      const whatsappMessage =
+        [
+          `Olá! Meu nome é ${nome}.`,
+          `E-mail: ${email}.`,
+          telefone
+            ? `Telefone: ${telefone}.`
+            : "",
+          `Mensagem: ${mensagem}`
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+
+      const url =
+        `https://wa.me/5565996262514?text=${encodeURIComponent(
+          whatsappMessage
+        )}`;
+
+
+      window.open(
+        url,
+        "_blank",
+        "noopener"
+      );
+
+
+      form.reset();
+    }
+  );
+}
+
+
+/* =========================================================
+   32. MENU / PÁGINA ATUAL
+   ========================================================= */
+
+function markCurrentPage() {
+
+  const current =
+    window.location.pathname
+      .split("/")
+      .pop() ||
+    "index.html";
+
+
+  document
+    .querySelectorAll(
+      "nav a[href]"
+    )
+    .forEach(
+      (link) => {
+
+        const href =
+          link.getAttribute(
+            "href"
+          );
+
+
+        if (!href) {
+          return;
+        }
+
+
+        const cleanHref =
+          href
+            .split("?")[0]
+            .split("#")[0];
+
+
+        if (
+          cleanHref === current
+        ) {
+
+          link.classList.add(
+            "nav-current"
+          );
+        }
+      }
+    );
+}
+
+
+/* =========================================================
+   33. BOTÕES DE CANCELAR FORMULÁRIOS
+   ========================================================= */
+
+function setupCancelButtons() {
+
+  document
+    .querySelectorAll(
+      "[id$='Cancelar'], [data-cancel]"
+    )
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.cancelBound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        button.dataset.cancelBound =
+          "true";
+
+
+        button.addEventListener(
+          "click",
+          (event) => {
+
+            event.preventDefault();
+
+
+            const form =
+              button.closest(
+                "form"
+              );
+
+
+            if (form) {
+
+              form.reset();
+            }
+
+
+            /*
+             * Remove possíveis estados
+             * de edição.
+             */
+
+            delete button.dataset.editing;
+
+
+            document
+              .querySelectorAll(
+                "[data-editing]"
+              )
+              .forEach(
+                (element) => {
+
+                  delete element.dataset.editing;
+                }
+              );
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   34. ADMIN — CARREGAMENTO PRINCIPAL
    ========================================================= */
 
 async function loadAdminPage() {
+
+  const adminContainer =
+    document.querySelector(
+      "#adminUsuariosLista"
+    );
+
+
+  if (!adminContainer) {
+    return;
+  }
+
 
   const allowed =
     await requireAdmin();
 
 
-  if (!allowed) return;
+  if (!allowed) {
+    return;
+  }
 
 
   await adminStats();
 
   await adminUsers();
-
-  /*
-    Futuramente:
-
-    await adminProducts();
-    await adminServices();
-    await adminProjects();
-    await adminPosts();
-    await adminRequests();
-    await adminConversations();
-  */
 }
 
 
 /* =========================================================
-   25. INICIALIZAÇÃO
+   35. VERIFICAÇÃO DE ACESSO
    ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
+async function checkLoggedPage() {
 
-    await updateNav();
-
-    await setupLogin();
-
-    await setupSignup();
-
-    setupAdminRequestButton();
-
-    await account();
-
-    await loadConversations();
-
-    await loadConversation();
-
-    await loadNotifications();
+  const loggedElements =
+    document.querySelectorAll(
+      "[data-requires-login]"
+    );
 
 
-    if (
-      document.querySelector(
-        "#adminUsuariosLista"
-      )
-    ) {
-
-      await loadAdminPage();
-    }
-
-
-    const logoutButton =
-      document.querySelector(
-        "#logoutButton"
-      );
-
-
-    if (
-      logoutButton &&
-      !logoutButton.dataset.bound
-    ) {
-
-      logoutButton.dataset.bound =
-        "true";
-
-
-      logoutButton.addEventListener(
-        "click",
-        logout
-      );
-    }
-
+  if (!loggedElements.length) {
+    return;
   }
-);
+
+
+  const {
+    data: { user }
+  } =
+    await supabase.auth.getUser();
+
+
+  if (!user) {
+
+    window.location.href =
+      "login.html";
+  }
+}
 
 
 /* =========================================================
-   26. MUDANÇA DE AUTENTICAÇÃO
+   36. REDIRECIONAMENTO DE ADMIN
    ========================================================= */
 
-supabase.auth.onAuthStateChange(
-  async () => {
+async function redirectAdminIfNeeded() {
 
-    await updateNav();
+  const adminPage =
+    window.location.pathname
+      .endsWith(
+        "/admin.html"
+      );
 
+
+  if (!adminPage) {
+    return;
   }
-);
+
+
+  const profile =
+    await ensureProfile();
+
+
+  if (
+    !profile ||
+    !isAdmin(profile)
+  ) {
+
+    window.location.href =
+      "index.html";
+  }
+}
+
+
+/* =========================================================
+   37. AUTENTICAÇÃO ATUAL
+   ========================================================= */
+
+async function initializeAuth() {
+
+  const {
+    data: {
+      session
+    },
+    error
+  } =
+    await supabase.auth.getSession();
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao verificar sessão:",
+      error
+    );
+
+    return;
+  }
+
+
+  if (session?.user) {
+
+    currentUser =
+      session.user;
+
+    await ensureProfile();
+
+  } else {
+
+    currentUser = null;
+    currentProfile = null;
+  }
+}
+
+
+/* =========================================================
+   38. EVENTOS DE AUTENTICAÇÃO
+   ========================================================= */
+
+function setupAuthListener() {
+
+  supabase.auth.onAuthStateChange(
+    () => {
+
+      setTimeout(
+        () => {
+
+          updateNav();
+
+        },
+        0
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   39. REALTIME DAS MENSAGENS
+   ========================================================= */
+
+function setupMessageRealtime() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const conversationId =
+    params.get("conversa") ||
+    params.get("conversation");
+
+
+  if (!conversationId) {
+    return;
+  }
+
+
+  const container =
+    document.querySelector(
+      "#chatMessages"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  supabase
+    .channel(
+      `mensagens-${conversationId}`
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: TABLES.MENSAGENS,
+        filter:
+          `conversa_id=eq.${conversationId}`
+      },
+      async () => {
+
+        await loadMessages(
+          conversationId
+        );
+      }
+    )
+    .subscribe();
+}
+
+
+/* =========================================================
+   40. REALTIME DAS NOTIFICAÇÕES
+   ========================================================= */
+
+function setupNotificationRealtime() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const container =
+    document.querySelector(
+      "#notificationsList"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  supabase
+    .channel(
+      `notificacoes-${currentUser.id}`
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: TABLES.NOTIFICACOES,
+        filter:
+          `usuario_id=eq.${currentUser.id}`
+      },
+      async () => {
+
+        await loadNotifications();
+      }
+    )
+    .subscribe();
+}
+
+
+/* =========================================================
+   41. ATALHOS DE TECLADO
+   ========================================================= */
+
+function setupKeyboardShortcuts() {
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+
+      /*
+       * ESC fecha elementos que
+       * utilizarem data-close.
+       */
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        document
+          .querySelectorAll(
+            "[data-close]"
+          )
+          .forEach(
+            (element) => {
+
+              element.click();
+            }
+          );
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   42. FORMULÁRIOS ADMIN
+   ========================================================= */
+
+function setupAdminForms() {
+
+  const forms =
+    document.querySelectorAll(
+      "[data-admin-form]"
+    );
+
+
+  if (!forms.length) {
+    return;
+  }
+
+
+  forms.forEach(
+    (form) => {
+
+      if (
+        form.dataset.bound ===
+        "true"
+      ) {
+        return;
+      }
+
+
+      form.dataset.bound =
+        "true";
+
+
+      form.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+
+          const table =
+            form.dataset.adminForm;
+
+
+          if (!table) {
+            return;
+          }
+
+
+          const formData =
+            new FormData(form);
+
+
+          const payload = {};
+
+
+          formData.forEach(
+            (value, key) => {
+
+              payload[key] =
+                value;
+            }
+          );
+
+
+          const id =
+            form.dataset.id;
+
+
+          let query;
+
+
+          if (id) {
+
+            query =
+              supabase
+                .from(table)
+                .update(payload)
+                .eq(
+                  "id",
+                  id
+                );
+
+          } else {
+
+            query =
+              supabase
+                .from(table)
+                .insert(
+                  payload
+                );
+          }
+
+
+          const {
+            error
+          } =
+            await query;
+
+
+          if (error) {
+
+            console.error(
+              "Erro ao salvar:",
+              error
+            );
+
+            alert(
+              "Não foi possível salvar os dados."
+            );
+
+            return;
+          }
+
+
+          alert(
+            "Dados salvos com sucesso."
+          );
+
+
+          form.reset();
+
+          delete form.dataset.id;
+
+
+          /*
+           * Atualiza a página
+           * correspondente quando
+           * houver uma função pública.
+           */
+
+          await loadProducts();
+          await loadServices();
+          await loadProjects();
+          await loadPosts();
+        }
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   43. EXCLUSÃO ADMIN
+   ========================================================= */
+
+function setupDeleteButtons() {
+
+  document
+    .querySelectorAll(
+      "[data-delete-table]"
+    )
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.deleteBound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        button.dataset.deleteBound =
+          "true";
+
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const table =
+              button.dataset.deleteTable;
+
+
+            const id =
+              button.dataset.deleteId;
+
+
+            if (!table || !id) {
+              return;
+            }
+
+
+            const confirmed =
+              window.confirm(
+                "Tem certeza que deseja excluir este item?"
+              );
+
+
+            if (!confirmed) {
+              return;
+            }
+
+
+            const {
+              error
+            } =
+              await supabase
+                .from(table)
+                .delete()
+                .eq(
+                  "id",
+                  id
+                );
+
+
+            if (error) {
+
+              console.error(
+                "Erro ao excluir:",
+                error
+              );
+
+              alert(
+                "Não foi possível excluir o item."
+              );
+
+              return;
+            }
+
+
+            button
+              .closest(
+                "[data-row], tr, article, .admin-item"
+              )
+              ?.remove();
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   44. ATUALIZAÇÃO DE LINKS DE CONTA
+   ========================================================= */
+
+function setupAccountLinks() {
+
+  document
+    .querySelectorAll(
+      "[data-account-link]"
+    )
+    .forEach(
+      (link) => {
+
+        link.addEventListener(
+          "click",
+          async (event) => {
+
+            const {
+              data: { user }
+            } =
+              await supabase.auth.getUser();
+
+
+            if (!user) {
+
+              event.preventDefault();
+
+              window.location.href =
+                "login.html";
+            }
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   45. ATUALIZAÇÃO DE LINKS DE ADMIN
+   ========================================================= */
+
+function setupAdminLinks() {
+
+  document
+    .querySelectorAll(
+      "[data-admin-only]"
+    )
+    .forEach(
+      (link) => {
+
+        link.addEventListener(
+          "click",
+          async (event) => {
+
+            const profile =
+              await ensureProfile();
+
+
+            if (
+              !profile ||
+              !isAdmin(profile)
+            ) {
+
+              event.preventDefault();
+
+              window.location.href =
+                "index.html";
+            }
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   46. INICIALIZAÇÃO DOS COMPONENTES
+   ========================================================= */
+
+async function initializeComponents() {
+
+  await initializeAuth();
+
+  await updateNav();
+
+  markCurrentPage();
+
+  setupAuthListener();
+
+  setupLogin();
+
+  setupSignup();
+
+  setupAdminRequestButton();
+
+  setupServiceRequestForm();
+
+  setupServiceLinks();
+
+  setupWhatsAppLinks();
+
+  setupContactForm();
+
+  setupCancelButtons();
+
+  setupAdminForms();
+
+  setupDeleteButtons();
+
+  setupAccountLinks();
+
+  setupAdminLinks();
+
+  setupKeyboardShortcuts();
+
+  await checkLoggedPage();
+
+  await redirectAdminIfNeeded();
+
+  await account();
+
+  await loadConversations();
+
+  await loadConversation();
+
+  await loadNotifications();
+
+  await loadProducts();
+
+  await loadServices();
+
+  await loadProjects();
+
+  await loadPosts();
+
+  await loadAdminPage();
+
+  setupMessageRealtime();
+
+  setupNotificationRealtime();
+}
+
+
+/* =========================================================
+   47. INICIALIZAÇÃO FINAL
+   ========================================================= */
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeComponents
+  );
+
+} else {
+
+  initializeComponents();
+}
+/* =========================================================
+   48. FINALIZAÇÃO
+   ========================================================= */
+
+/*
+ * O arquivo termina aqui.
+ *
+ * A inicialização principal é feita por
+ * initializeComponents(), chamada quando
+ * o DOM estiver pronto.
+ */
+
+
+/* =========================================================
+   FIM DO MAIN.JS
+   ========================================================= */
