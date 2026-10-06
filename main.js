@@ -66,7 +66,6 @@ function qs(...selectors) {
   );
 }
 
-
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -206,16 +205,10 @@ async function updateNav() {
     qs("#loginLink", "[data-guest-only]");
 
   const conversationsLink =
-    qs(
-      "#conversationsLink",
-      "[data-conversations-link]"
-    );
+    qs("#conversationsLink", "[data-conversations-link]");
 
   const signupLink =
-    qs(
-      "#signupLink",
-      "[data-signup-link]"
-    );
+    qs("#signupLink", "[data-signup-link]");
 
   const logoutLinks =
     document.querySelectorAll(
@@ -273,26 +266,16 @@ async function updateNav() {
     }
   }
 
-
   logoutLinks.forEach((element) => {
-
-    element.style.display =
-      profile ? "" : "none";
+    element.style.display = profile ? "" : "none";
 
     if (!element.dataset.logoutBound) {
+      element.dataset.logoutBound = "true";
 
-      element.dataset.logoutBound =
-        "true";
-
-      element.addEventListener(
-        "click",
-        (event) => {
-
-          event.preventDefault();
-
-          logout();
-        }
-      );
+      element.addEventListener("click", (event) => {
+        event.preventDefault();
+        logout();
+      });
     }
   });
 }
@@ -305,10 +288,7 @@ async function updateNav() {
 async function setupLogin() {
 
   const form =
-    qs(
-      "#loginForm",
-      "#formLogin"
-    );
+    qs("#loginForm", "#formLogin");
 
   if (!form) return;
 
@@ -319,25 +299,16 @@ async function setupLogin() {
       event.preventDefault();
 
       const email =
-        qs(
-          "#loginEmail",
-          "#email"
-        )
+        qs("#loginEmail", "#email")
           ?.value
           .trim();
 
       const password =
-        qs(
-          "#loginPassword",
-          "#senha"
-        )
+        qs("#loginPassword", "#senha")
           ?.value;
 
       const errorBox =
-        qs(
-          "#loginError",
-          "#mensagemLogin"
-        );
+        qs("#loginError", "#mensagemLogin");
 
 
       if (errorBox) {
@@ -408,10 +379,7 @@ async function setupLogin() {
 async function setupSignup() {
 
   const form =
-    qs(
-      "#signupForm",
-      "#formCadastro"
-    );
+    qs("#signupForm", "#formCadastro");
 
   if (!form) return;
 
@@ -424,33 +392,21 @@ async function setupSignup() {
 
 
       const nome =
-        qs(
-          "#signupNome",
-          "#nome"
-        )
+        qs("#signupNome", "#nome")
           ?.value
           .trim();
 
       const email =
-        qs(
-          "#signupEmail",
-          "#email"
-        )
+        qs("#signupEmail", "#email")
           ?.value
           .trim();
 
       const password =
-        qs(
-          "#signupPassword",
-          "#senha"
-        )
+        qs("#signupPassword", "#senha")
           ?.value;
 
       const errorBox =
-        qs(
-          "#signupError",
-          "#mensagemCadastro"
-        );
+        qs("#signupError", "#mensagemCadastro");
 
 
       if (errorBox) {
@@ -1439,7 +1395,6 @@ async function loadMessages(
 
 
   if (userError || !user) {
-
     return;
   }
 
@@ -3790,18 +3745,1415 @@ if (
   initializeComponents();
 }
 /* =========================================================
-   48. FINALIZAÇÃO
+   48. CONTA DO USUÁRIO
    ========================================================= */
 
-/*
- * O arquivo termina aqui.
- *
- * A inicialização principal é feita por
- * initializeComponents(), chamada quando
- * o DOM estiver pronto.
- */
+async function account() {
+
+  const accountPage =
+    document.querySelector(
+      "[data-account-page]"
+    );
+
+
+  if (!accountPage) {
+    return;
+  }
+
+
+  const profile =
+    await ensureProfile();
+
+
+  if (!profile) {
+    return;
+  }
+
+
+  const nome =
+    document.querySelector(
+      "[data-account-name]"
+    );
+
+
+  const tipo =
+    document.querySelector(
+      "[data-account-type]"
+    );
+
+
+  const email =
+    document.querySelector(
+      "[data-account-email]"
+    );
+
+
+  if (nome) {
+    nome.textContent =
+      profile.nome ||
+      currentUser?.email ||
+      "Usuário";
+  }
+
+
+  if (tipo) {
+    tipo.textContent =
+      profile.tipo_usuario ||
+      "cliente";
+  }
+
+
+  if (email) {
+    email.textContent =
+      currentUser?.email ||
+      "";
+  }
+}
 
 
 /* =========================================================
-   FIM DO MAIN.JS
+   49. CONVERSAS
    ========================================================= */
+
+async function loadConversations() {
+
+  const container =
+    document.querySelector(
+      "#conversationsList"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  if (!currentUser) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Faça login para visualizar suas conversas.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.CONVERSAS)
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar conversas:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty">
+        Não foi possível carregar suas conversas.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const conversations =
+    data || [];
+
+
+  if (!conversations.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Você ainda não possui conversas.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    conversations
+      .map(
+        (conversation) => {
+
+          const title =
+            conversation.titulo ||
+            conversation.assunto ||
+            "Atendimento";
+
+
+          return `
+
+            <article
+              class="conversation-card"
+            >
+
+              <h3>
+                ${esc(title)}
+              </h3>
+
+              ${
+                conversation.status
+                  ? `
+                    <p class="muted">
+                      Status:
+                      ${esc(
+                        conversation.status
+                      )}
+                    </p>
+                  `
+                  : ""
+              }
+
+              <div class="actions">
+
+                <a
+                  class="btn btn-primary"
+                  href="atendimento.html?conversa=${encodeURIComponent(
+                    conversation.id
+                  )}"
+                >
+                  Abrir conversa
+                </a>
+
+              </div>
+
+            </article>
+
+          `;
+        }
+      )
+      .join("");
+}
+
+
+/* =========================================================
+   50. CONVERSA INDIVIDUAL
+   ========================================================= */
+
+async function loadConversation() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const conversationId =
+    params.get("conversa") ||
+    params.get("conversation");
+
+
+  const container =
+    document.querySelector(
+      "#chatMessages"
+    );
+
+
+  if (
+    !conversationId ||
+    !container
+  ) {
+    return;
+  }
+
+
+  if (!currentUser) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Faça login para acessar esta conversa.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  await loadMessages(
+    conversationId
+  );
+
+
+  const form =
+    document.querySelector(
+      "#chatForm"
+    );
+
+
+  if (
+    !form ||
+    form.dataset.bound ===
+    "true"
+  ) {
+    return;
+  }
+
+
+  form.dataset.bound =
+    "true";
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      const input =
+        document.querySelector(
+          "#chatMessage"
+        );
+
+
+      const message =
+        input?.value?.trim();
+
+
+      if (!message) {
+        return;
+      }
+
+
+      const {
+        error
+      } =
+        await supabase
+          .from(TABLES.MENSAGENS)
+          .insert({
+            conversa_id:
+              conversationId,
+
+            remetente_id:
+              currentUser.id,
+
+            mensagem:
+              message
+          });
+
+
+      if (error) {
+
+        console.error(
+          "Erro ao enviar mensagem:",
+          error
+        );
+
+        alert(
+          "Não foi possível enviar a mensagem."
+        );
+
+        return;
+      }
+
+
+      input.value = "";
+
+
+      await loadMessages(
+        conversationId
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   51. MENSAGENS
+   ========================================================= */
+
+async function loadMessages(
+  conversationId
+) {
+
+  const container =
+    document.querySelector(
+      "#chatMessages"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.MENSAGENS)
+      .select("*")
+      .eq(
+        "conversa_id",
+        conversationId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar mensagens:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty">
+        Não foi possível carregar as mensagens.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const messages =
+    data || [];
+
+
+  if (!messages.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Nenhuma mensagem ainda.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    messages
+      .map(
+        (message) => {
+
+          const mine =
+            message.remetente_id ===
+            currentUser?.id;
+
+
+          const text =
+            message.mensagem ||
+            message.conteudo ||
+            "";
+
+
+          const date =
+            message.created_at
+              ? new Date(
+                  message.created_at
+                ).toLocaleString(
+                  "pt-BR"
+                )
+              : "";
+
+
+          return `
+
+            <div
+              class="chat-message ${
+                mine
+                  ? "mine"
+                  : ""
+              }"
+            >
+
+              <div>
+                ${esc(text)}
+              </div>
+
+              ${
+                date
+                  ? `
+                    <small>
+                      ${esc(date)}
+                    </small>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          `;
+        }
+      )
+      .join("");
+
+
+  container.scrollTop =
+    container.scrollHeight;
+}
+
+
+/* =========================================================
+   52. NOTIFICAÇÕES
+   ========================================================= */
+
+async function loadNotifications() {
+
+  const container =
+    document.querySelector(
+      "#notificationsList"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  if (!currentUser) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Faça login para visualizar suas notificações.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.NOTIFICACOES)
+      .select("*")
+      .eq(
+        "usuario_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar notificações:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty">
+        Não foi possível carregar as notificações.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const notifications =
+    data || [];
+
+
+  if (!notifications.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Nenhuma notificação.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    notifications
+      .map(
+        (notification) => {
+
+          const title =
+            notification.titulo ||
+            "Notificação";
+
+
+          const message =
+            notification.mensagem ||
+            notification.conteudo ||
+            "";
+
+
+          const date =
+            notification.created_at
+              ? new Date(
+                  notification.created_at
+                ).toLocaleString(
+                  "pt-BR"
+                )
+              : "";
+
+
+          return `
+
+            <article
+              class="account-card"
+            >
+
+              <strong>
+                ${esc(title)}
+              </strong>
+
+              ${
+                message
+                  ? `
+                    <p class="muted">
+                      ${esc(message)}
+                    </p>
+                  `
+                  : ""
+              }
+
+              ${
+                date
+                  ? `
+                    <small class="muted">
+                      ${esc(date)}
+                    </small>
+                  `
+                  : ""
+              }
+
+            </article>
+
+          `;
+        }
+      )
+      .join("");
+}
+
+
+/* =========================================================
+   53. SOLICITAÇÃO DE SERVIÇO
+   ========================================================= */
+
+function setupServiceRequestForm() {
+
+  const form =
+    document.querySelector(
+      "#serviceRequestForm"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.bound ===
+    "true"
+  ) {
+    return;
+  }
+
+
+  form.dataset.bound =
+    "true";
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const service =
+    params.get("servico");
+
+
+  if (service) {
+
+    const select =
+      form.querySelector(
+        "[name='servico_id'], [name='servico']"
+      );
+
+
+    if (select) {
+
+      select.value =
+        service;
+    }
+  }
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      if (!currentUser) {
+
+        alert(
+          "Faça login para solicitar um atendimento."
+        );
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      const formData =
+        new FormData(form);
+
+
+      const servicoId =
+        formData.get(
+          "servico_id"
+        ) ||
+        formData.get(
+          "servico"
+        );
+
+
+      const descricao =
+        formData.get(
+          "descricao"
+        ) ||
+        formData.get(
+          "mensagem"
+        ) ||
+        "";
+
+
+      const dataSolicitada =
+        formData.get(
+          "data_solicitada"
+        ) ||
+        null;
+
+
+      const horario =
+        formData.get(
+          "horario"
+        ) ||
+        null;
+
+
+      const payload = {
+
+        usuario_id:
+          currentUser.id,
+
+        servico_id:
+          servicoId ||
+          null,
+
+        descricao:
+          descricao,
+
+        data_solicitada:
+          dataSolicitada,
+
+        horario:
+          horario,
+
+        status:
+          "pendente"
+      };
+
+
+      /*
+       * A tabela real do projeto possui
+       * acento:
+       *
+       * solicitações_servico
+       */
+
+      const {
+        error
+      } =
+        await supabase
+          .from(
+            TABLES.SOLICITACOES
+          )
+          .insert(
+            payload
+          );
+
+
+      if (error) {
+
+        console.error(
+          "Erro ao criar solicitação:",
+          error
+        );
+
+        alert(
+          "Não foi possível enviar sua solicitação."
+        );
+
+        return;
+      }
+
+
+      const whatsappMessage =
+        [
+          "Olá! Quero solicitar um serviço.",
+          `Descrição: ${descricao}`,
+          dataSolicitada
+            ? `Data: ${dataSolicitada}`
+            : "",
+          horario
+            ? `Horário: ${horario}`
+            : ""
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+
+      const whatsapp =
+        `https://wa.me/5565996262514?text=${encodeURIComponent(
+          whatsappMessage
+        )}`;
+
+
+      alert(
+        "Solicitação enviada com sucesso!"
+      );
+
+
+      form.reset();
+
+
+      window.open(
+        whatsapp,
+        "_blank",
+        "noopener"
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   54. SOLICITAÇÃO DE ADMIN
+   ========================================================= */
+
+function setupAdminRequestButton() {
+
+  const button =
+    document.querySelector(
+      "[data-request-admin]"
+    );
+
+
+  if (!button) {
+    return;
+  }
+
+
+  if (
+    button.dataset.bound ===
+    "true"
+  ) {
+    return;
+  }
+
+
+  button.dataset.bound =
+    "true";
+
+
+  button.addEventListener(
+    "click",
+    async () => {
+
+      if (!currentUser) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      const profile =
+        await ensureProfile();
+
+
+      if (!profile) {
+        return;
+      }
+
+
+      if (
+        isAdmin(profile)
+      ) {
+
+        alert(
+          "Sua conta já possui acesso de administrador."
+        );
+
+        return;
+      }
+
+
+      if (
+        profile.tipo_usuario ===
+        "solicitante_admin"
+      ) {
+
+        alert(
+          "Sua solicitação de administrador já foi enviada."
+        );
+
+        return;
+      }
+
+
+      const {
+        error
+      } =
+        await supabase
+          .from(TABLES.USUARIO)
+          .update({
+            tipo_usuario:
+              "solicitante_admin"
+          })
+          .eq(
+            "id",
+            currentUser.id
+          );
+
+
+      if (error) {
+
+        console.error(
+          "Erro ao solicitar administrador:",
+          error
+        );
+
+        alert(
+          "Não foi possível enviar a solicitação."
+        );
+
+        return;
+      }
+
+
+      currentProfile =
+        {
+          ...profile,
+          tipo_usuario:
+            "solicitante_admin"
+        };
+
+
+      alert(
+        "Solicitação enviada para análise."
+      );
+
+
+      updateNav();
+    }
+  );
+}
+
+
+/* =========================================================
+   55. ADMIN — ESTATÍSTICAS
+   ========================================================= */
+
+async function adminStats() {
+
+  const counters =
+    document.querySelectorAll(
+      "[data-admin-count]"
+    );
+
+
+  if (!counters.length) {
+    return;
+  }
+
+
+  const tables = {
+
+    usuarios:
+      TABLES.USUARIO,
+
+    produtos:
+      TABLES.PRODUTOS,
+
+    servicos:
+      TABLES.SERVICOS,
+
+    projetos:
+      TABLES.PROJETOS
+  };
+
+
+  for (
+    const [key, table]
+    of Object.entries(tables)
+  ) {
+
+    const element =
+      document.querySelector(
+        `[data-admin-count="${key}"]`
+      );
+
+
+    if (!element) {
+      continue;
+    }
+
+
+    const {
+      count,
+      error
+    } =
+      await supabase
+        .from(table)
+        .select(
+          "*",
+          {
+            count:
+              "exact",
+            head:
+              true
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        `Erro ao contar ${key}:`,
+        error
+      );
+
+      element.textContent =
+        "—";
+
+      continue;
+    }
+
+
+    element.textContent =
+      count ??
+      0;
+  }
+}
+
+
+/* =========================================================
+   56. ADMIN — USUÁRIOS
+   ========================================================= */
+
+async function adminUsers() {
+
+  const container =
+    document.querySelector(
+      "#adminUsuariosLista"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(
+        TABLES.USUARIO
+      )
+      .select(
+        "id,nome,tipo_usuario"
+      )
+      .order(
+        "nome",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar usuários:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty">
+        Não foi possível carregar os usuários.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const users =
+    data || [];
+
+
+  if (!users.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Nenhum usuário encontrado.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    users
+      .map(
+        (user) => {
+
+          const admin =
+            user.tipo_usuario ===
+            "admin";
+
+
+          const request =
+            user.tipo_usuario ===
+            "solicitante_admin";
+
+
+          return `
+
+            <div
+              class="admin-request"
+            >
+
+              <div>
+
+                <strong>
+                  ${esc(
+                    user.nome ||
+                    "Usuário"
+                  )}
+                </strong>
+
+                <small>
+                  ${esc(
+                    user.tipo_usuario ||
+                    "cliente"
+                  )}
+                </small>
+
+              </div>
+
+
+              <div
+                class="admin-actions"
+              >
+
+                ${
+                  request
+                    ? `
+                      <button
+                        type="button"
+                        class="btn btn-green"
+                        data-approve-admin
+                        data-user-id="${esc(
+                          user.id
+                        )}"
+                      >
+                        Aprovar administrador
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-reject-admin
+                        data-user-id="${esc(
+                          user.id
+                        )}"
+                      >
+                        Recusar
+                      </button>
+                    `
+                    : ""
+                }
+
+
+                ${
+                  admin
+                    ? `
+                      <span
+                        class="muted"
+                      >
+                        Administrador
+                      </span>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </div>
+
+          `;
+        }
+      )
+      .join("");
+
+
+  setupAdminUserActions();
+}
+
+
+/* =========================================================
+   57. ADMIN — APROVAR / RECUSAR
+   ========================================================= */
+
+function setupAdminUserActions() {
+
+  document
+    .querySelectorAll(
+      "[data-approve-admin]"
+    )
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.bound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        button.dataset.bound =
+          "true";
+
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const userId =
+              button.dataset.userId;
+
+
+            if (!userId) {
+              return;
+            }
+
+
+            const {
+              error
+            } =
+              await supabase
+                .from(
+                  TABLES.USUARIO
+                )
+                .update({
+                  tipo_usuario:
+                    "admin"
+                })
+                .eq(
+                  "id",
+                  userId
+                );
+
+
+            if (error) {
+
+              console.error(
+                "Erro ao aprovar administrador:",
+                error
+              );
+
+              alert(
+                "Não foi possível aprovar o usuário."
+              );
+
+              return;
+            }
+
+
+            await adminUsers();
+
+            await adminStats();
+          }
+        );
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      "[data-reject-admin]"
+    )
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.bound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        button.dataset.bound =
+          "true";
+
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const userId =
+              button.dataset.userId;
+
+
+            if (!userId) {
+              return;
+            }
+
+
+            const {
+              error
+            } =
+              await supabase
+                .from(
+                  TABLES.USUARIO
+                )
+                .update({
+                  tipo_usuario:
+                    "cliente"
+                })
+                .eq(
+                  "id",
+                  userId
+                );
+
+
+            if (error) {
+
+              console.error(
+                "Erro ao recusar solicitação:",
+                error
+              );
+
+              alert(
+                "Não foi possível recusar a solicitação."
+              );
+
+              return;
+            }
+
+
+            await adminUsers();
+          }
+        );
+      }
+    );
+}
+
+
+/* =========================================================
+   58. ADMIN — PROTEÇÃO FINAL
+   ========================================================= */
+
+async function requireAdmin() {
+
+  if (!currentUser) {
+
+    window.location.href =
+      "login.html";
+
+    return false;
+  }
+
+
+  const profile =
+    await ensureProfile();
+
+
+  if (
+    !profile ||
+    !isAdmin(profile)
+  ) {
+
+    window.location.href =
+      "index.html";
+
+    return false;
+  }
+
+
+  return true;
+}
+
+
+/* =========================================================
+   59. FINALIZAÇÃO
+   ========================================================= */
+
+window.MaxSom = {
+
+  reload: initializeComponents,
+
+  loadProducts,
+
+  loadServices,
+
+  loadProjects,
+
+  loadPosts,
+
+  loadConversations,
+
+  loadMessages,
+
+  loadNotifications,
+
+  ensureProfile,
+
+  requireAdmin
+
+};
