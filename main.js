@@ -1938,31 +1938,10 @@ async function redirectAuthenticatedUser() {
 
   }
 
+await ensureProfile();
 
-  const profile =
-    await ensureProfile();
-
-
-  if (
-    isAdmin(
-      profile
-    )
-  ) {
-
-    window.location.href =
-      "admin.html";
-
-  } else {
-
-    window.location.href =
-      "conta.html";
-
-  }
-
-}
-
-
-
+window.location.href =
+  "conta.html";
 /* =========================================================
    14. PROTEÇÃO DAS PÁGINAS DE CONTA
    ========================================================= */
