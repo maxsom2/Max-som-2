@@ -1,10 +1,8 @@
- <!-- =========================
-       ADMIN
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -14,60 +12,113 @@
 
   <title>Painel Max Som</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- =========================
-       CABEÇALHO
-  ========================== -->
 
-  <header class="header">
+  <!-- =========================================================
+       CABEÇALHO
+  ========================================================== -->
+
+  <header>
 
     <div class="container header-content">
 
+
       <a
         href="index.html"
-        class="logo-link"
+        class="logo"
+        aria-label="Max Som - Início"
       >
+
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
-          class="logo"
         >
+
       </a>
 
-      <div class="header-contact">
 
-        <a
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="whatsapp-link"
-        >
-          WhatsApp
-        </a>
+      <a
+        href="https://wa.me/5565996262514"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="header-whatsapp"
+      >
+        WhatsApp
+      </a>
 
-        <span class="header-phone">
-          +55 65 99626-2514
-        </span>
 
-      </div>
+      <span class="phone">
+        65 99626-2514
+      </span>
 
-      <nav class="nav">
+
+      <nav>
+
 
         <a href="index.html">
           Ver site
         </a>
+
+
+        <a
+          href="produtos.html"
+        >
+          Produtos
+        </a>
+
+
+        <a
+          href="servicos.html"
+        >
+          Serviços
+        </a>
+
+
+        <a
+          href="projetos.html"
+        >
+          Projetos
+        </a>
+
+
+        <a
+          href="publicacoes.html"
+        >
+          Publicações
+        </a>
+
+
+        <a
+          href="atendimento.html"
+        >
+          Atendimento
+        </a>
+
 
         <a
           href="admin.html"
@@ -76,12 +127,14 @@
           ⚙ Painel
         </a>
 
+
         <a
           href="conta.html"
           data-logged-only
         >
           Minha conta
         </a>
+
 
         <a
           href="conversas.html"
@@ -90,6 +143,7 @@
         >
           Minhas conversas
         </a>
+
 
         <button
           class="btn btn-outline"
@@ -100,6 +154,7 @@
           Sair
         </button>
 
+
       </nav>
 
     </div>
@@ -107,15 +162,19 @@
   </header>
 
 
-  <!-- =========================
+
+  <!-- =========================================================
        CONTEÚDO
-  ========================== -->
+  ========================================================== -->
 
   <main class="admin-page">
 
     <div class="container">
 
-      <!-- TÍTULO -->
+
+      <!-- =====================================================
+           TÍTULO
+      ====================================================== -->
 
       <div class="section-title">
 
@@ -134,7 +193,10 @@
       </div>
 
 
-      <!-- MENSAGEM DO PAINEL -->
+
+      <!-- =====================================================
+           MENSAGEM
+      ====================================================== -->
 
       <div
         id="adminMensagem"
@@ -142,16 +204,17 @@
       ></div>
 
 
-      <!-- =========================
-           ESTRUTURA DO PAINEL
-      ========================== -->
+
+      <!-- =====================================================
+           PAINEL
+      ====================================================== -->
 
       <div class="admin-shell">
 
 
-        <!-- =========================
-             MENU LATERAL
-        ========================== -->
+        <!-- ===================================================
+             MENU
+        ==================================================== -->
 
         <aside class="admin-sidebar">
 
@@ -166,6 +229,7 @@
 
           <div class="admin-menu">
 
+
             <button
               class="active"
               data-panel="resumo"
@@ -174,12 +238,14 @@
               🏠 Resumo
             </button>
 
+
             <button
               data-panel="produtosAdmin"
               type="button"
             >
               📦 Produtos
             </button>
+
 
             <button
               data-panel="servicosAdmin"
@@ -188,12 +254,14 @@
               🔧 Serviços
             </button>
 
+
             <button
               data-panel="projetosAdmin"
               type="button"
             >
               📸 Projetos
             </button>
+
 
             <button
               data-panel="publicacoesAdmin"
@@ -202,12 +270,14 @@
               📰 Publicações
             </button>
 
+
             <button
               data-panel="usuariosAdmin"
               type="button"
             >
               👥 Usuários
             </button>
+
 
             <button
               data-panel="solicitacoesAdmin"
@@ -216,21 +286,23 @@
               💬 Solicitações
             </button>
 
+
           </div>
 
         </aside>
 
 
-        <!-- =========================
-             CONTEÚDO DOS PAINÉIS
-        ========================== -->
+
+        <!-- ===================================================
+             CONTEÚDO
+        ==================================================== -->
 
         <section class="admin-content">
 
 
-          <!-- =========================
+          <!-- =================================================
                RESUMO
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel active"
@@ -262,9 +334,10 @@
           </div>
 
 
-          <!-- =========================
+
+          <!-- =================================================
                PRODUTOS
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -277,9 +350,13 @@
                 Produtos
               </h2>
 
+
               <div class="admin-help">
+
                 Cadastre produtos apenas para divulgação.
+
                 O site não possui carrinho nem venda online.
+
               </div>
 
 
@@ -287,6 +364,7 @@
                 id="produtoForm"
                 class="admin-form"
               >
+
 
                 <input
                   type="hidden"
@@ -383,12 +461,14 @@
 
                 <div class="admin-form-actions">
 
+
                   <button
                     class="btn btn-primary"
                     type="submit"
                   >
                     Salvar produto
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -397,6 +477,7 @@
                   >
                     Limpar
                   </button>
+
 
                 </div>
 
@@ -408,14 +489,16 @@
                 style="margin-top:24px"
               ></div>
 
+
             </div>
 
           </div>
 
 
-          <!-- =========================
+
+          <!-- =================================================
                SERVIÇOS
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -424,14 +507,18 @@
 
             <div class="account-card">
 
+
               <h2>
                 Serviços
               </h2>
 
+
               <div class="admin-help">
+
                 Quando o valor depender do projeto,
                 o serviço será apresentado como
                 <strong>Sob orçamento</strong>.
+
               </div>
 
 
@@ -439,6 +526,7 @@
                 id="servicoForm"
                 class="admin-form"
               >
+
 
                 <input
                   type="hidden"
@@ -520,12 +608,14 @@
 
                 <div class="admin-form-actions">
 
+
                   <button
                     class="btn btn-primary"
                     type="submit"
                   >
                     Salvar serviço
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -534,6 +624,7 @@
                   >
                     Limpar
                   </button>
+
 
                 </div>
 
@@ -545,14 +636,16 @@
                 style="margin-top:24px"
               ></div>
 
+
             </div>
 
           </div>
 
 
-          <!-- =========================
+
+          <!-- =================================================
                PROJETOS
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -560,6 +653,7 @@
           >
 
             <div class="account-card">
+
 
               <h2>
                 Projetos
@@ -570,6 +664,7 @@
                 id="projetoForm"
                 class="admin-form"
               >
+
 
                 <input
                   type="hidden"
@@ -650,12 +745,14 @@
 
                 <div class="admin-form-actions">
 
+
                   <button
                     class="btn btn-primary"
                     type="submit"
                   >
                     Salvar projeto
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -664,6 +761,7 @@
                   >
                     Limpar
                   </button>
+
 
                 </div>
 
@@ -675,14 +773,16 @@
                 style="margin-top:24px"
               ></div>
 
+
             </div>
 
           </div>
 
 
-          <!-- =========================
+
+          <!-- =================================================
                PUBLICAÇÕES
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -690,6 +790,7 @@
           >
 
             <div class="account-card">
+
 
               <h2>
                 Publicações
@@ -700,6 +801,7 @@
                 id="publicacaoForm"
                 class="admin-form"
               >
+
 
                 <input
                   type="hidden"
@@ -780,12 +882,14 @@
 
                 <div class="admin-form-actions">
 
+
                   <button
                     class="btn btn-primary"
                     type="submit"
                   >
                     Salvar publicação
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -794,6 +898,7 @@
                   >
                     Limpar
                   </button>
+
 
                 </div>
 
@@ -805,14 +910,16 @@
                 style="margin-top:24px"
               ></div>
 
+
             </div>
 
           </div>
 
 
-          <!-- =========================
+
+          <!-- =================================================
                USUÁRIOS
-          ========================== -->
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -821,13 +928,17 @@
 
             <div class="account-card">
 
+
               <h2>
                 Usuários e pedidos de administrador
               </h2>
 
+
               <p class="muted">
+
                 Consulte os usuários cadastrados e gerencie
                 as solicitações de acesso administrativo.
+
               </p>
 
 
@@ -835,14 +946,16 @@
                 Carregando...
               </div>
 
+
             </div>
 
           </div>
 
 
-          <!-- =========================
-               SOLICITAÇÕES E CONVERSAS
-          ========================== -->
+
+          <!-- =================================================
+               SOLICITAÇÕES
+          ================================================== -->
 
           <div
             class="admin-panel"
@@ -856,12 +969,16 @@
 
               <div class="account-card">
 
+
                 <h2>
                   Solicitações de serviço
                 </h2>
 
+
                 <p class="muted">
+
                   Solicitações enviadas pelos clientes.
+
                 </p>
 
 
@@ -869,19 +986,25 @@
                   Carregando...
                 </div>
 
+
               </div>
+
 
 
               <!-- CONVERSAS -->
 
               <div class="account-card">
 
+
                 <h2>
                   Conversas
                 </h2>
 
+
                 <p class="muted">
+
                   Atendimentos e conversas com clientes.
+
                 </p>
 
 
@@ -889,7 +1012,9 @@
                   Carregando...
                 </div>
 
+
               </div>
+
 
             </div>
 
@@ -905,133 +1030,170 @@
   </main>
 
 
-  <!-- =========================
+
+  <!-- =========================================================
        RODAPÉ
-  ========================== -->
+  ========================================================== -->
 
   <footer class="footer footer-v2">
 
-    <div class="container">
-
-      <div class="footer-grid">
+    <div class="container footer-content">
 
 
-        <!-- SOBRE -->
+      <div class="footer-column footer-brand">
 
-        <div class="footer-column">
+
+        <a
+          class="logo"
+          href="index.html"
+        >
 
           <img
             src="logo-maxsom-white.png"
             alt="Max Som"
-            class="footer-logo"
           >
 
-          <p>
-            Painel administrativo da Max Som
-            para gerenciamento do site.
-          </p>
-
-        </div>
+        </a>
 
 
-        <!-- NAVEGAÇÃO -->
-
-        <div class="footer-column">
-
-          <h3>
-            Navegação
-          </h3>
-
-          <a href="index.html">
-            Ver site
-          </a>
-
-          <a href="produtos.html">
-            Produtos
-          </a>
-
-          <a href="servicos.html">
-            Serviços
-          </a>
-
-          <a href="projetos.html">
-            Projetos
-          </a>
-
-          <a href="publicacoes.html">
-            Publicações
-          </a>
-
-        </div>
+        <p>
+          Painel administrativo da Max Som
+          para gerenciamento do site.
+        </p>
 
 
-        <!-- ADMINISTRAÇÃO -->
+        <a
+          class="footer-whatsapp"
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
 
-        <div class="footer-column">
-
-          <h3>
-            Administração
-          </h3>
-
-          <a
-            href="admin.html"
-            data-admin-only
-          >
-            ⚙ Painel
-          </a>
-
-          <a
-            href="conta.html"
-            data-logged-only
-          >
-            Minha conta
-          </a>
-
-          <a
-            href="conversas.html"
-            data-conversations-link
-            data-logged-only
-          >
-            Minhas conversas
-          </a>
-
-        </div>
-
-
-        <!-- CONTATO -->
-
-        <div class="footer-column">
-
-          <h3>
-            Contato
-          </h3>
-
-          <a href="tel:+5565996262514">
-            +55 65 99626-2514
-          </a>
-
-          <a
-            href="https://wa.me/5565996262514"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp: (65) 99626-2514
-          </a>
-
-          <a href="mailto:lojamaxsom2@gmail.com">
-            lojamaxsom2@gmail.com
-          </a>
-
-        </div>
 
       </div>
 
 
-      <div class="footer-bottom">
 
-        <p>
-          © 2026 Max Som. Todos os direitos reservados.
-        </p>
+      <div class="footer-column">
+
+
+        <h3>
+          Navegação
+        </h3>
+
+
+        <a href="index.html">
+          Ver site
+        </a>
+
+
+        <a href="produtos.html">
+          Produtos
+        </a>
+
+
+        <a href="servicos.html">
+          Serviços
+        </a>
+
+
+        <a href="projetos.html">
+          Projetos
+        </a>
+
+
+        <a href="publicacoes.html">
+          Publicações
+        </a>
+
+
+        <a href="atendimento.html">
+          Atendimento
+        </a>
+
+
+      </div>
+
+
+
+      <div class="footer-column">
+
+
+        <h3>
+          Administração
+        </h3>
+
+
+        <a
+          href="admin.html"
+          data-admin-only
+        >
+          ⚙ Painel
+        </a>
+
+
+        <a
+          href="conta.html"
+          data-logged-only
+        >
+          Minha conta
+        </a>
+
+
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+        >
+          Minhas conversas
+        </a>
+
+
+      </div>
+
+
+
+      <div class="footer-column">
+
+
+        <h3>
+          Contato
+        </h3>
+
+
+        <a href="tel:+5565996262514">
+          +55 65 99626-2514
+        </a>
+
+
+        <a
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
+
+
+        <a href="mailto:lojamaxsom2@gmail.com">
+          lojamaxsom2@gmail.com
+        </a>
+
+
+      </div>
+
+
+    </div>
+
+
+
+    <div class="footer-bottom">
+
+      <div class="container">
+
+        © 2026 Max Som. Todos os direitos reservados.
 
       </div>
 
@@ -1040,13 +1202,15 @@
   </footer>
 
 
-  <!-- =========================
+
+  <!-- =========================================================
        SCRIPTS
-  ========================== -->
+  ========================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script src="main.js"></script>
+
 
 </body>
 
