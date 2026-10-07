@@ -36,12 +36,15 @@
         href="index.html"
         class="logo-link"
       >
+
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
           class="logo"
         >
+
       </a>
+
 
       <div class="header-contact">
 
@@ -59,6 +62,7 @@
         </span>
 
       </div>
+
 
       <nav class="nav">
 
@@ -87,13 +91,6 @@
         </a>
 
         <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-        <a
           href="conta.html"
           data-logged-only
         >
@@ -109,24 +106,17 @@
         </a>
 
         <a
-          href="login.html"
-          data-guest-only
+          href="admin.html"
+          data-admin-only
         >
-          Entrar
-        </a>
-
-        <a
-          href="cadastro.html"
-          data-guest-only
-        >
-          Criar conta
+          ⚙ Painel
         </a>
 
         <button
-          type="button"
           class="btn btn-outline"
           data-logout
           data-logged-only
+          type="button"
         >
           Sair
         </button>
@@ -144,135 +134,507 @@
 
   <main>
 
-    <!-- Cabeçalho da página -->
+    <!-- =========================
+         HERO
+    ========================== -->
 
-    <section class="page-header">
+    <section class="hero">
 
       <div class="container">
 
-        <span class="eyebrow">
-          Atendimento
-        </span>
+        <div class="hero-content">
 
-        <h1>
-          Fale com a Max Som
-        </h1>
+          <span class="hero-kicker">
+            ATENDIMENTO MAX SOM
+          </span>
 
-        <p class="muted">
-          Preencha os dados abaixo. Ao enviar, o WhatsApp abre
-          com a mensagem pronta para a equipe.
-        </p>
+          <h1>
+            Como podemos ajudar?
+          </h1>
+
+          <p>
+            Envie sua solicitação para a equipe Max Som.
+            Conte o que você precisa e entraremos em contato
+            para entender melhor o seu projeto.
+          </p>
+
+
+          <div class="hero-actions">
+
+            <a
+              href="#solicitacao"
+              class="btn btn-primary"
+            >
+              Solicitar atendimento
+            </a>
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-outline"
+            >
+              Falar pelo WhatsApp
+            </a>
+
+          </div>
+
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- Formulário -->
+    <!-- =========================
+         OPÇÕES DE ATENDIMENTO
+    ========================== -->
 
-    <section>
+    <section class="section">
 
       <div class="container">
 
-        <div class="form-card">
+        <div class="section-title">
 
-          <form
-            id="formAtendimento"
-            class="login-form"
-          >
+          <span>
+            Atendimento
+          </span>
 
-            <div class="form-group">
+          <h2>
+            Escolha a melhor forma de falar conosco
+          </h2>
 
-              <label for="nomeContato">
-                Seu nome
-              </label>
+          <p>
+            Você pode enviar uma solicitação pelo site
+            ou falar diretamente com a Max Som pelo WhatsApp.
+          </p>
 
-              <input
-                id="nomeContato"
-                type="text"
-                required
-                placeholder="Digite seu nome"
-              >
+        </div>
 
+
+        <div class="cards-grid">
+
+
+          <!-- SOLICITAÇÃO -->
+
+          <div class="account-card">
+
+            <div class="card-icon">
+              💬
             </div>
 
+            <h3>
+              Solicitar atendimento
+            </h3>
 
-            <div class="form-group">
+            <p class="muted">
+              Envie os detalhes do que você precisa
+              e nossa equipe poderá analisar sua solicitação.
+            </p>
 
-              <label for="telefoneContato">
-                Seu telefone/WhatsApp
-              </label>
-
-              <input
-                id="telefoneContato"
-                type="tel"
-                placeholder="(00) 00000-0000"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="servico">
-                O que você precisa?
-              </label>
-
-              <select id="servico">
-
-                <option value="">
-                  Carregando serviços...
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="equipamento">
-                Produto ou equipamento
-              </label>
-
-              <input
-                id="equipamento"
-                type="text"
-                placeholder="Ex.: caixa de som, projeto, instalação..."
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="descricao">
-                Mensagem
-              </label>
-
-              <textarea
-                id="descricao"
-                required
-                placeholder="Explique o que você precisa ou peça um orçamento."
-              ></textarea>
-
-            </div>
-
-
-            <button
+            <a
+              href="#solicitacao"
               class="btn btn-primary"
-              type="submit"
             >
-              Enviar para o WhatsApp
-            </button>
+              Enviar solicitação
+            </a>
 
-          </form>
+          </div>
 
 
-          <div
-            id="mensagemAtendimento"
-            class="message hidden"
-          ></div>
+          <!-- WHATSAPP -->
+
+          <div class="account-card">
+
+            <div class="card-icon">
+              📱
+            </div>
+
+            <h3>
+              WhatsApp
+            </h3>
+
+            <p class="muted">
+              Se preferir, entre em contato diretamente
+              pelo WhatsApp da Max Som.
+            </p>
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-outline"
+            >
+              Abrir WhatsApp
+            </a>
+
+          </div>
+
+
+          <!-- CONVERSAS -->
+
+          <div class="account-card">
+
+            <div class="card-icon">
+              📩
+            </div>
+
+            <h3>
+              Minhas conversas
+            </h3>
+
+            <p class="muted">
+              Acompanhe seus atendimentos e veja
+              as conversas realizadas com a equipe.
+            </p>
+
+            <a
+              href="conversas.html"
+              class="btn btn-outline"
+              data-logged-only
+            >
+              Ver conversas
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         SOLICITAÇÃO
+    ========================== -->
+
+    <section
+      class="section"
+      id="solicitacao"
+    >
+
+      <div class="container">
+
+        <div class="section-title">
+
+          <span>
+            Nova solicitação
+          </span>
+
+          <h2>
+            Envie sua solicitação
+          </h2>
+
+          <p>
+            Preencha os dados abaixo para entrar em contato
+            com a equipe Max Som.
+          </p>
+
+        </div>
+
+
+        <div class="account-layout">
+
+
+          <!-- FORMULÁRIO -->
+
+          <div class="account-card">
+
+            <form
+              id="solicitacaoForm"
+              class="admin-form"
+            >
+
+              <div class="form-group">
+
+                <label for="solicitacaoNome">
+                  Nome
+                </label>
+
+                <input
+                  type="text"
+                  id="solicitacaoNome"
+                  name="nome"
+                  placeholder="Seu nome"
+                  required
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="solicitacaoEmail">
+                  E-mail
+                </label>
+
+                <input
+                  type="email"
+                  id="solicitacaoEmail"
+                  name="email"
+                  placeholder="seuemail@email.com"
+                  required
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="solicitacaoTelefone">
+                  Telefone / WhatsApp
+                </label>
+
+                <input
+                  type="tel"
+                  id="solicitacaoTelefone"
+                  name="telefone"
+                  placeholder="(65) 99999-9999"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="solicitacaoTipo">
+                  Tipo de atendimento
+                </label>
+
+                <select
+                  id="solicitacaoTipo"
+                  name="tipo"
+                  required
+                >
+
+                  <option value="">
+                    Selecione uma opção
+                  </option>
+
+                  <option value="servico">
+                    Serviço
+                  </option>
+
+                  <option value="projeto">
+                    Projeto
+                  </option>
+
+                  <option value="duvida">
+                    Dúvida
+                  </option>
+
+                  <option value="orcamento">
+                    Solicitação de orçamento
+                  </option>
+
+                  <option value="outro">
+                    Outro
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group full">
+
+                <label for="solicitacaoAssunto">
+                  Assunto
+                </label>
+
+                <input
+                  type="text"
+                  id="solicitacaoAssunto"
+                  name="assunto"
+                  placeholder="Sobre o que você precisa?"
+                  required
+                >
+
+              </div>
+
+
+              <div class="form-group full">
+
+                <label for="solicitacaoDescricao">
+                  Descrição
+                </label>
+
+                <textarea
+                  id="solicitacaoDescricao"
+                  name="descricao"
+                  rows="7"
+                  placeholder="Explique como podemos ajudar..."
+                  required
+                ></textarea>
+
+              </div>
+
+
+              <div
+                id="solicitacaoMensagem"
+                class="message hidden"
+              ></div>
+
+
+              <div class="admin-form-actions">
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                >
+                  Enviar solicitação
+                </button>
+
+                <a
+                  href="https://wa.me/5565996262514"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-outline"
+                >
+                  Falar pelo WhatsApp
+                </a>
+
+              </div>
+
+            </form>
+
+          </div>
+
+
+          <!-- INFORMAÇÕES -->
+
+          <div>
+
+            <div class="account-card">
+
+              <h2>
+                Atendimento Max Som
+              </h2>
+
+              <p class="muted">
+                Nossa equipe está disponível para entender
+                sua necessidade e orientar você da melhor forma.
+              </p>
+
+
+              <div class="info-list">
+
+                <div class="info-item">
+
+                  <strong>
+                    WhatsApp
+                  </strong>
+
+                  <a
+                    href="https://wa.me/5565996262514"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    (65) 99626-2514
+                  </a>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <strong>
+                    E-mail
+                  </strong>
+
+                  <a href="mailto:lojamaxsom2@gmail.com">
+                    lojamaxsom2@gmail.com
+                  </a>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <strong>
+                    Atendimento
+                  </strong>
+
+                  <span>
+                    Solicitações pelo site ou WhatsApp
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="account-card"
+              style="margin-top:16px"
+            >
+
+              <h3>
+                Já enviou uma solicitação?
+              </h3>
+
+              <p class="muted">
+                Acesse sua conta para acompanhar
+                suas solicitações e conversas.
+              </p>
+
+              <a
+                href="conta.html"
+                class="btn btn-outline"
+                data-logged-only
+              >
+                Minha conta
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CHAMADA FINAL
+    ========================== -->
+
+    <section class="section">
+
+      <div class="container">
+
+        <div class="account-card">
+
+          <div class="section-title">
+
+            <span>
+              Precisa de atendimento rápido?
+            </span>
+
+            <h2>
+              Fale diretamente com a Max Som
+            </h2>
+
+            <p>
+              Para uma conversa mais rápida,
+              você também pode entrar em contato pelo WhatsApp.
+            </p>
+
+          </div>
+
+          <a
+            href="https://wa.me/5565996262514"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary"
+          >
+            Chamar no WhatsApp
+          </a>
 
         </div>
 
@@ -293,7 +655,8 @@
 
       <div class="footer-grid">
 
-        <!-- Sobre -->
+
+        <!-- SOBRE -->
 
         <div class="footer-column">
 
@@ -304,14 +667,14 @@
           >
 
           <p>
-            Atendimento simples e direto para
-            projetos e soluções em som.
+            Divulgação, atendimento e apresentação
+            dos serviços da Max Som.
           </p>
 
         </div>
 
 
-        <!-- Navegação -->
+        <!-- NAVEGAÇÃO -->
 
         <div class="footer-column">
 
@@ -339,19 +702,26 @@
             Publicações
           </a>
 
+          <a href="atendimento.html">
+            Atendimento
+          </a>
+
         </div>
 
 
-        <!-- Atendimento -->
+        <!-- CONTA -->
 
         <div class="footer-column">
 
           <h3>
-            Atendimento
+            Minha conta
           </h3>
 
-          <a href="atendimento.html">
-            Solicitar atendimento
+          <a
+            href="conta.html"
+            data-logged-only
+          >
+            Minha conta
           </a>
 
           <a
@@ -363,16 +733,16 @@
           </a>
 
           <a
-            href="conta.html"
-            data-logged-only
+            href="admin.html"
+            data-admin-only
           >
-            Minha conta
+            ⚙ Painel
           </a>
 
         </div>
 
 
-        <!-- Contato -->
+        <!-- CONTATO -->
 
         <div class="footer-column">
 
@@ -420,11 +790,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="supabase.js"></script>
-
   <script src="main.js"></script>
 
 </body>
 
 </html>
-
