@@ -396,21 +396,16 @@ async function setupLogin() {
         await ensureProfile();
 
 
-      if (isAdmin(profile)) {
+if (isAdmin(profile)) {
 
-        window.location.href =
-          "admin.html";
+  window.location.href =
+    "admin.html";
 
-      } else {
+} else {
 
-        window.location.href =
-          "index.html";
-      }
-
-    }
-  );
+  window.location.href =
+    "conta.html";
 }
-
 /* =========================================================
    8. CADASTRO
    ========================================================= */
