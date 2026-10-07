@@ -1,10 +1,8 @@
- <!-- =========================
-       CONVERSAs
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -14,36 +12,53 @@
 
   <title>Minhas conversas | Max Som</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- =====================================================
+
+  <!-- =========================================================
        CABEÇALHO
-       ===================================================== -->
+  ========================================================== -->
 
   <header>
 
     <div class="container header-content">
+
 
       <a
         class="logo"
         href="index.html"
         aria-label="Max Som - Início"
       >
+
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
         >
+
       </a>
 
 
@@ -51,18 +66,18 @@
         class="header-whatsapp"
         href="https://wa.me/5565996262514"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
       >
         WhatsApp
       </a>
 
 
       <span class="phone">
-        +55 65 99626-2514
+        65 99626-2514
       </span>
 
 
-      <nav aria-label="Navegação principal">
+      <nav>
 
         <a href="index.html">
           Início
@@ -107,10 +122,26 @@
 
         <a
           href="conversas.html"
+          class="active"
           data-conversations-link
           data-logged-only
         >
           Minhas conversas
+        </a>
+
+
+        <a
+          href="login.html"
+          data-guest-only
+        >
+          Entrar
+        </a>
+
+        <a
+          href="cadastro.html"
+          data-guest-only
+        >
+          Criar conta
         </a>
 
 
@@ -130,19 +161,21 @@
   </header>
 
 
-  <!-- =====================================================
-       CONTEÚDO PRINCIPAL
-       ===================================================== -->
 
-  <main>
+  <!-- =========================================================
+       CONTEÚDO
+  ========================================================== -->
 
-    <!-- TÍTULO DA PÁGINA -->
+  <main class="account-page">
 
-    <section class="page-header">
+    <div class="container">
 
-      <div class="container">
 
-        <span class="eyebrow">
+      <!-- TÍTULO -->
+
+      <div class="section-title">
+
+        <span>
           Atendimento
         </span>
 
@@ -151,109 +184,171 @@
         </h1>
 
         <p class="muted">
-          Acompanhe suas conversas com a equipe da Max Som.
+          Acompanhe suas conversas e atendimentos com a equipe Max Som.
         </p>
 
       </div>
 
-    </section>
 
 
-    <!-- LISTA DE CONVERSAS -->
+      <!-- =======================================================
+           AÇÕES
+      ======================================================== -->
 
-    <section>
+      <div class="account-card">
 
-      <div class="container">
+        <div class="account-header">
 
-        <div class="account-layout">
+          <div>
 
-          <div class="account-card">
+            <h2>
+              Atendimento Max Som
+            </h2>
 
-            <div class="section-title">
-
-              <span>
-                Conversas
-              </span>
-
-              <h2>
-                Seus atendimentos
-              </h2>
-
-              <p class="muted">
-                Aqui aparecem as conversas relacionadas aos seus atendimentos.
-              </p>
-
-            </div>
-
-
-            <!-- INICIAR NOVA CONVERSA -->
-
-            <div
-              style="
-                display:flex;
-                justify-content:flex-end;
-                margin-bottom:24px;
-              "
-            >
-
-              <button
-                class="btn btn-primary"
-                type="button"
-                onclick="openConversation('Atendimento geral')"
-              >
-                Iniciar nova conversa
-              </button>
-
-            </div>
-
-
-            <!-- LISTA -->
-
-            <div
-              id="conversasLista"
-              class="conversation-list"
-              aria-live="polite"
-            >
-
-              <div class="empty">
-                Carregando conversas...
-              </div>
-
-            </div>
+            <p class="muted">
+              Inicie um novo atendimento ou abra uma conversa existente.
+            </p>
 
           </div>
+
+
+          <a
+            href="atendimento.html"
+            class="btn btn-primary"
+          >
+            Novo atendimento
+          </a>
 
         </div>
 
       </div>
 
-    </section>
+
+
+      <!-- =======================================================
+           LISTA DE CONVERSAS
+      ======================================================== -->
+
+      <section class="section">
+
+        <div class="section-title">
+
+          <span>
+            Histórico
+          </span>
+
+          <h2>
+            Conversas abertas
+          </h2>
+
+        </div>
+
+
+        <div
+          id="conversationsList"
+          class="conversation-list"
+        >
+
+          <div class="empty">
+            Carregando conversas...
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =======================================================
+           AJUDA
+      ======================================================== -->
+
+      <section class="section">
+
+        <div class="account-layout">
+
+
+          <div class="account-card">
+
+            <div class="card-icon">
+              💬
+            </div>
+
+            <h3>
+              Precisa de atendimento?
+            </h3>
+
+            <p class="muted">
+              Envie uma nova solicitação para a equipe da Max Som.
+            </p>
+
+            <a
+              href="atendimento.html"
+              class="btn btn-primary"
+            >
+              Solicitar atendimento
+            </a>
+
+          </div>
+
+
+          <div class="account-card">
+
+            <div class="card-icon">
+              📱
+            </div>
+
+            <h3>
+              Falar pelo WhatsApp
+            </h3>
+
+            <p class="muted">
+              Para um contato direto, fale com a Max Som pelo WhatsApp.
+            </p>
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline"
+            >
+              Abrir WhatsApp
+            </a>
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+    </div>
 
   </main>
 
 
-  <!-- =====================================================
+
+  <!-- =========================================================
        RODAPÉ
-       ===================================================== -->
+  ========================================================== -->
 
   <footer class="footer footer-v2">
 
     <div class="container footer-content">
 
 
-      <!-- SOBRE -->
-
-      <div class="footer-column">
+      <div class="footer-column footer-brand">
 
         <a
           class="logo"
           href="index.html"
-          aria-label="Max Som - Início"
         >
+
           <img
             src="logo-maxsom-white.png"
             alt="Max Som"
           >
+
         </a>
 
         <p>
@@ -261,10 +356,19 @@
           serviços e atendimento.
         </p>
 
+
+        <a
+          class="footer-whatsapp"
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
+
       </div>
 
 
-      <!-- NAVEGAÇÃO -->
 
       <div class="footer-column">
 
@@ -292,20 +396,19 @@
           Publicações
         </a>
 
+        <a href="atendimento.html">
+          Atendimento
+        </a>
+
       </div>
 
 
-      <!-- ATENDIMENTO -->
 
       <div class="footer-column">
 
         <h3>
-          Atendimento
+          Minha conta
         </h3>
-
-        <a href="atendimento.html">
-          Solicitar atendimento
-        </a>
 
         <a
           href="conta.html"
@@ -316,16 +419,22 @@
 
         <a
           href="conversas.html"
-          data-conversations-link
           data-logged-only
+          data-conversations-link
         >
           Minhas conversas
+        </a>
+
+        <a
+          href="admin.html"
+          data-admin-only
+        >
+          ⚙ Painel
         </a>
 
       </div>
 
 
-      <!-- CONTATO -->
 
       <div class="footer-column">
 
@@ -333,33 +442,34 @@
           Contato
         </h3>
 
-        <p>
-          Telefone: +55 65 99626-2514
-        </p>
+        <a href="tel:+5565996262514">
+          +55 65 99626-2514
+        </a>
 
         <a
           href="https://wa.me/5565996262514"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener"
         >
           WhatsApp: (65) 99626-2514
         </a>
 
-        <p>
-          E-mail: lojamaxsom2@gmail.com
-        </p>
+        <a href="mailto:lojamaxsom2@gmail.com">
+          lojamaxsom2@gmail.com
+        </a>
 
       </div>
 
     </div>
 
 
-    <!-- COPYRIGHT -->
 
     <div class="footer-bottom">
 
       <div class="container">
+
         © 2026 Max Som. Todos os direitos reservados.
+
       </div>
 
     </div>
@@ -367,15 +477,15 @@
   </footer>
 
 
-  <!-- =====================================================
+
+  <!-- =========================================================
        SCRIPTS
-       ===================================================== -->
+  ========================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="supabase.js"></script>
-
   <script src="main.js"></script>
+
 
 </body>
 
