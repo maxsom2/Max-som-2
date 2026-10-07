@@ -1,62 +1,662 @@
- <!-- =========================
-       SERVIÇOS
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serviços | Max Som</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Serviços | Max Som
+    </title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
+
 <body>
 
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
 <header>
-  <div class="container header-content">
-    <a class="logo" href="index.html"><img src="logo-maxsom-white.png" alt="Max Som"></a>
-    <a class="header-whatsapp" href="https://wa.me/5565996262514" target="_blank" rel="noopener">WhatsApp</a>
-    <nav>
-      <a href="index.html">Início</a>
-      <a href="produtos.html">Produtos</a>
-      <a href="servicos.html">Serviços</a>
-      <a href="projetos.html">Projetos</a>
-      <a href="publicacoes.html">Publicações</a>
-      <a href="atendimento.html">Atendimento</a>
-      <a href="admin.html" data-admin-only>⚙ Painel</a>
-      <a href="conta.html" data-logged-only>Minha conta</a>
-      <a href="login.html" data-guest-only>Entrar</a>
-      <a href="cadastro.html" data-guest-only>Criar conta</a>
-      <button class="btn btn-outline" data-logout data-logged-only type="button">Sair</button>
-    </nav>
-  </div>
+
+    <div class="container header-content">
+
+
+        <!-- LOGO -->
+
+        <a
+            class="logo"
+            href="index.html"
+        >
+
+            <img
+                src="logo-maxsom-white.png"
+                alt="Max Som"
+            >
+
+        </a>
+
+
+
+        <!-- WHATSAPP -->
+
+        <a
+            class="header-whatsapp"
+            href="https://wa.me/5565996262514"
+            target="_blank"
+            rel="noopener"
+        >
+            WhatsApp
+        </a>
+
+
+        <span class="phone">
+            65 99626-2514
+        </span>
+
+
+
+        <!-- MENU -->
+
+        <nav>
+
+            <a href="index.html">
+                Início
+            </a>
+
+            <a href="produtos.html">
+                Produtos
+            </a>
+
+            <a href="servicos.html">
+                Serviços
+            </a>
+
+            <a href="projetos.html">
+                Projetos
+            </a>
+
+            <a href="publicacoes.html">
+                Publicações
+            </a>
+
+            <a href="atendimento.html">
+                Atendimento
+            </a>
+
+
+            <a
+                href="admin.html"
+                data-admin-only
+            >
+                ⚙ Painel
+            </a>
+
+
+            <a
+                href="conta.html"
+                data-logged-only
+            >
+                Minha conta
+            </a>
+
+
+            <a
+                href="login.html"
+                data-guest-only
+            >
+                Entrar
+            </a>
+
+
+            <a
+                href="cadastro.html"
+                data-guest-only
+            >
+                Criar conta
+            </a>
+
+
+            <button
+                class="btn btn-outline"
+                data-logout
+                data-logged-only
+                type="button"
+            >
+                Sair
+            </button>
+
+        </nav>
+
+    </div>
+
 </header>
-<main><section class="page-header"><div class="container"><h1>Serviços</h1><p class="muted">Conheça as soluções oferecidas pela Max Som.</p></div></section>
-<section><div class="container"><div class="services-grid" id="servicesGrid"><div class="empty">Carregando serviços...</div></div></div></section></main>
+
+
+
+<!-- =========================================================
+     CONTEÚDO
+========================================================= -->
+
+<main>
+
+
+<!-- =========================================================
+     CABEÇALHO
+========================================================= -->
+
+<section class="page-header">
+
+    <div class="container">
+
+
+        <h1>
+            Serviços
+        </h1>
+
+
+        <p class="muted">
+
+            Conheça as soluções oferecidas
+            pela Max Som.
+
+        </p>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     SERVIÇOS
+========================================================= -->
+
+<section>
+
+    <div class="container">
+
+
+        <div class="section-title">
+
+
+            <span>
+                Soluções em áudio
+            </span>
+
+
+            <h2>
+                Serviços para diferentes necessidades.
+            </h2>
+
+
+            <p>
+
+                Conheça os serviços cadastrados pela
+                Max Som e fale com nossa equipe para
+                saber mais.
+
+            </p>
+
+
+        </div>
+
+
+
+        <!--
+            O main.js carrega os serviços
+            ativos diretamente do Supabase.
+        -->
+
+        <div
+            class="services-grid services-v2"
+            id="servicesGrid"
+        >
+
+            <div class="empty">
+
+                Carregando serviços...
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ATENDIMENTO
+========================================================= -->
+
+<section class="about-visual">
+
+    <div class="container about-grid">
+
+
+        <div class="about-image">
+
+
+            <img
+                src="projeto-02.png"
+                alt="Equipamento de som Max Som"
+            >
+
+
+            <div class="about-image-label">
+
+                MAX SOM
+
+                <br>
+
+                <span>
+                    Atendimento especializado
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="about-copy">
+
+
+            <span class="hero-label">
+                ATENDIMENTO
+            </span>
+
+
+            <h2>
+
+                Explique o que você precisa.
+                A equipe ajuda no próximo passo.
+
+            </h2>
+
+
+            <p>
+
+                Cada necessidade pode ser diferente.
+                Por isso, o atendimento da Max Som
+                começa entendendo o que você procura,
+                seja um serviço, equipamento ou projeto.
+
+            </p>
+
+
+            <div class="about-points">
+
+
+                <div>
+
+                    <strong>
+                        01
+                    </strong>
+
+                    <span>
+                        Atendimento direto
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        02
+                    </strong>
+
+                    <span>
+                        Serviços sob orçamento
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        03
+                    </strong>
+
+                    <span>
+                        Contato pelo site e WhatsApp
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <a
+                class="btn btn-light"
+                href="atendimento.html"
+            >
+                Solicitar atendimento
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     CTA
+========================================================= -->
+
+<section class="cta-section">
+
+    <div class="container cta-box">
+
+
+        <div>
+
+
+            <span class="hero-label">
+                MAX SOM
+            </span>
+
+
+            <h2>
+
+                Precisa de um serviço?
+
+            </h2>
+
+
+            <p>
+
+                Envie sua necessidade e fale diretamente
+                com a equipe da Max Som.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="cta-actions">
+
+
+            <a
+                class="btn btn-light btn-large"
+                href="atendimento.html"
+            >
+                Solicitar atendimento
+            </a>
+
+
+            <a
+                class="btn btn-outline-dark btn-large"
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
+                WhatsApp
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
 
 <footer class="footer footer-v2">
-  <div class="container footer-content">
-    <div class="footer-column">
-      <a class="logo" href="index.html"><img src="logo-maxsom-white.png" alt="Max Som"></a>
-      <p>Soluções em som, equipamentos, serviços e atendimento.</p>
+
+
+    <div class="container footer-content">
+
+
+        <!-- SOBRE -->
+
+        <div class="footer-column footer-brand">
+
+
+            <a
+                class="logo"
+                href="index.html"
+            >
+
+                <img
+                    src="logo-maxsom-white.png"
+                    alt="Max Som"
+                >
+
+            </a>
+
+
+            <p>
+
+                Soluções em som, equipamentos,
+                serviços e atendimento.
+
+            </p>
+
+
+            <a
+                class="footer-whatsapp"
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
+
+                WhatsApp: (65) 99626-2514
+
+            </a>
+
+
+        </div>
+
+
+
+        <!-- NAVEGAÇÃO -->
+
+        <div class="footer-column">
+
+
+            <h3>
+                Navegação
+            </h3>
+
+
+            <a href="index.html">
+                Início
+            </a>
+
+
+            <a href="produtos.html">
+                Produtos
+            </a>
+
+
+            <a href="servicos.html">
+                Serviços
+            </a>
+
+
+            <a href="projetos.html">
+                Projetos
+            </a>
+
+
+            <a href="publicacoes.html">
+                Publicações
+            </a>
+
+
+            <a href="atendimento.html">
+                Atendimento
+            </a>
+
+
+        </div>
+
+
+
+        <!-- ATENDIMENTO -->
+
+        <div class="footer-column">
+
+
+            <h3>
+                Atendimento
+            </h3>
+
+
+            <a href="atendimento.html">
+                Solicitar atendimento
+            </a>
+
+
+            <a
+                href="conta.html"
+                data-logged-only
+            >
+                Minha conta
+            </a>
+
+
+            <a
+                href="conversas.html"
+                data-conversations-link
+                data-logged-only
+            >
+                Minhas conversas
+            </a>
+
+
+            <a
+                href="login.html"
+                data-guest-only
+            >
+                Entrar
+            </a>
+
+
+        </div>
+
+
+
+        <!-- CONTATO -->
+
+        <div class="footer-column">
+
+
+            <h3>
+                Contato
+            </h3>
+
+
+            <a href="tel:+5565996262514">
+                (65) 99626-2514
+            </a>
+
+
+            <a
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
+                WhatsApp: (65) 99626-2514
+            </a>
+
+
+            <a href="mailto:lojamaxsom2@gmail.com">
+                lojamaxsom2@gmail.com
+            </a>
+
+
+        </div>
+
+
     </div>
-    <div class="footer-column">
-      <h3>Navegação</h3>
-      <a href="index.html">Início</a><a href="produtos.html">Produtos</a><a href="servicos.html">Serviços</a>
-      <a href="projetos.html">Projetos</a><a href="publicacoes.html">Publicações</a>
+
+
+
+    <div class="footer-bottom">
+
+
+        <div class="container">
+
+            © 2026 Max Som.
+            Todos os direitos reservados.
+
+        </div>
+
+
     </div>
-    <div class="footer-column">
-      <h3>Atendimento</h3>
-      <a href="atendimento.html">Solicitar atendimento</a><a href="conta.html">Minha conta</a>
-      <a href="login.html">Entrar</a>
-    </div>
-    <div class="footer-column">
-      <h3>Contato</h3>
-      <p>Telefone: (65) 99626-2514</p><p>WhatsApp: (65) 99626-2514</p><p>Email: contato@maxsom.com.br</p>
-    </div>
-  </div>
-  <div class="footer-bottom"><div class="container">© 2026 Max Som. Todos os direitos reservados.</div></div>
+
+
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script><script src="main.js"></script>
-</body></html>
+
+
+
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+<script
+    src="main.js"
+></script>
+
+
+</body>
+
+</html>
