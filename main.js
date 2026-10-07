@@ -301,27 +301,41 @@ async function setupLogin() {
 
   if (!form) return;
 
+
+  if (form.dataset.loginBound === "true") {
+    return;
+  }
+
+  form.dataset.loginBound = "true";
+
+
   form.addEventListener(
     "submit",
     async (event) => {
 
       event.preventDefault();
 
+
       const email =
         qs("#loginEmail", "#email")
           ?.value
           .trim();
 
+
       const password =
         qs("#loginPassword", "#senha")
           ?.value;
+
 
       const errorBox =
         qs("#loginError", "#mensagemLogin");
 
 
       if (errorBox) {
+
         errorBox.textContent = "";
+
+        errorBox.classList.add("hidden");
       }
 
 
@@ -331,6 +345,8 @@ async function setupLogin() {
 
           errorBox.textContent =
             "Preencha o e-mail e a senha.";
+
+          errorBox.classList.remove("hidden");
         }
 
         return;
@@ -349,16 +365,30 @@ async function setupLogin() {
 
       if (error) {
 
-        console.error(error);
+        console.error(
+          "Erro no login:",
+          error
+        );
+
 
         if (errorBox) {
 
           errorBox.textContent =
-            error.message ||
-            "Não foi possível entrar.";
+            "E-mail ou senha incorretos. Verifique os dados e tente novamente.";
+
+          errorBox.classList.remove("hidden");
         }
 
         return;
+      }
+
+
+      if (errorBox) {
+
+        errorBox.textContent =
+          "Login realizado com sucesso!";
+
+        errorBox.classList.remove("hidden");
       }
 
 
@@ -376,10 +406,10 @@ async function setupLogin() {
         window.location.href =
           "index.html";
       }
+
     }
   );
 }
-
 
 /* =========================================================
    8. CADASTRO
