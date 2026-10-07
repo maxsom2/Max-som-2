@@ -1,38 +1,66 @@
- <!-- =========================
-       LOGIN
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Entrar | Max Som</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- CABEÇALHO -->
+
+  <!-- =========================================================
+       CABEÇALHO
+  ========================================================== -->
+
   <header>
+
     <div class="container header-content">
 
-      <a class="logo" href="index.html">
+
+      <a
+        class="logo"
+        href="index.html"
+        aria-label="Max Som - Início"
+      >
+
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
         >
+
       </a>
+
 
       <a
         class="header-whatsapp"
@@ -43,13 +71,38 @@
         WhatsApp
       </a>
 
+
+      <span class="phone">
+        65 99626-2514
+      </span>
+
+
       <nav>
-        <a href="index.html">Início</a>
-        <a href="produtos.html">Produtos</a>
-        <a href="servicos.html">Serviços</a>
-        <a href="projetos.html">Projetos</a>
-        <a href="publicacoes.html">Publicações</a>
-        <a href="atendimento.html">Atendimento</a>
+
+        <a href="index.html">
+          Início
+        </a>
+
+        <a href="produtos.html">
+          Produtos
+        </a>
+
+        <a href="servicos.html">
+          Serviços
+        </a>
+
+        <a href="projetos.html">
+          Projetos
+        </a>
+
+        <a href="publicacoes.html">
+          Publicações
+        </a>
+
+        <a href="atendimento.html">
+          Atendimento
+        </a>
+
 
         <a
           href="admin.html"
@@ -58,6 +111,7 @@
           ⚙ Painel
         </a>
 
+
         <a
           href="conta.html"
           data-logged-only
@@ -65,21 +119,32 @@
           Minha conta
         </a>
 
+
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+        >
+          Minhas conversas
+        </a>
+
+
         <a
           href="login.html"
+          class="active"
           data-guest-only
         >
           Entrar
         </a>
 
+
         <a
           href="cadastro.html"
           data-guest-only
         >
-          <div id="mensagemLogin" class="message hidden"></div>
-          
           Criar conta
         </a>
+
 
         <button
           class="btn btn-outline"
@@ -89,107 +154,261 @@
         >
           Sair
         </button>
+
       </nav>
 
     </div>
+
   </header>
 
 
-  <!-- CONTEÚDO PRINCIPAL -->
+
+  <!-- =========================================================
+       CONTEÚDO
+  ========================================================== -->
+
   <main>
 
-    <section class="page-header">
+    <section class="auth-page">
 
-      <div class="container">
-
-        <h1>
-          Entrar
-        </h1>
-
-        <p class="muted">
-          Acesse sua conta Max Som.
-        </p>
-
-      </div>
-
-    </section>
+      <div class="container auth-container">
 
 
-    <section>
+        <!-- =====================================================
+             LOGIN
+        ====================================================== -->
 
-      <div class="form-card">
+        <div class="form-card auth-card">
 
-        <form
-          id="formLogin"
-          class="login-form"
-        >
 
-          <!-- E-MAIL -->
-          <div class="form-group">
+          <div class="section-title">
 
-            <label for="email">
-              E-mail
-            </label>
+            <span>
+              Max Som
+            </span>
 
-            <input
-              id="email"
-              type="email"
-              required
-              autocomplete="email"
-            >
+            <h1>
+              Entrar na conta
+            </h1>
+
+            <p>
+              Acesse sua conta para acompanhar seus atendimentos
+              e conversar com a equipe Max Som.
+            </p>
 
           </div>
 
 
-          <!-- SENHA -->
-          <div class="form-group">
+          <!-- MENSAGEM -->
 
-            <label for="senha">
-              Senha
-            </label>
+          <div
+            id="loginError"
+            class="message hidden"
+            role="alert"
+          ></div>
 
-            <input
-              id="senha"
-              type="password"
-              required
-              autocomplete="current-password"
+
+          <!-- FORMULÁRIO -->
+
+          <form
+            id="loginForm"
+            class="login-form"
+          >
+
+
+            <!-- E-MAIL -->
+
+            <div class="form-group">
+
+              <label for="loginEmail">
+                E-mail
+              </label>
+
+              <input
+                type="email"
+                id="loginEmail"
+                name="email"
+                placeholder="Digite seu e-mail"
+                autocomplete="email"
+                required
+              >
+
+            </div>
+
+
+
+            <!-- SENHA -->
+
+            <div class="form-group">
+
+              <label for="loginPassword">
+                Senha
+              </label>
+
+              <input
+                type="password"
+                id="loginPassword"
+                name="senha"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+                required
+              >
+
+            </div>
+
+
+
+            <!-- BOTÃO -->
+
+            <div class="form-actions">
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-large"
+              >
+                Entrar
+              </button>
+
+            </div>
+
+
+          </form>
+
+
+          <!-- CADASTRO -->
+
+          <div class="auth-footer">
+
+            <p class="muted">
+              Ainda não possui uma conta?
+            </p>
+
+            <a
+              href="cadastro.html"
+              class="text-link"
             >
+              Criar minha conta →
+            </a>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             LADO INFORMATIVO
+        ====================================================== -->
+
+        <div class="auth-side">
+
+
+          <div class="account-card">
+
+            <span class="account-label">
+              Área do cliente
+            </span>
+
+            <h2>
+              Seu atendimento em um só lugar
+            </h2>
+
+            <p class="muted">
+              Depois de entrar, você poderá acompanhar suas
+              solicitações e acessar suas conversas com a equipe.
+            </p>
+
+
+            <div class="account-item">
+
+              <strong>
+                Solicitações
+              </strong>
+
+              <span>
+                Acompanhe seus pedidos de atendimento.
+              </span>
+
+            </div>
+
+
+            <div class="account-item">
+
+              <strong>
+                Conversas
+              </strong>
+
+              <span>
+                Continue o atendimento com a equipe Max Som.
+              </span>
+
+            </div>
+
+
+            <div class="account-item">
+
+              <strong>
+                Conta
+              </strong>
+
+              <span>
+                Consulte suas informações cadastradas.
+              </span>
+
+            </div>
 
           </div>
 
 
-          <!-- BOTÃO -->
-          <button
-            class="btn btn-dark"
-            type="submit"
-          >
-            Entrar
-          </button>
+          <div class="account-card">
 
-        </form>
+            <span class="account-label">
+              Ainda não tem cadastro?
+            </span>
 
+            <h3>
+              Crie sua conta gratuitamente
+            </h3>
 
-        <!-- MENSAGEM DE LOGIN -->
-        <div
-          id="mensagemLogin"
-          class="message hidden"
-        ></div>
+            <p class="muted">
+              O cadastro permite acessar as áreas de atendimento
+              e acompanhamento do site.
+            </p>
 
 
-        <!-- CADASTRO -->
-        <p
-          class="muted"
-          style="margin-top:18px"
-        >
-          Ainda não tem conta?
+            <a
+              href="cadastro.html"
+              class="btn btn-outline"
+            >
+              Criar conta
+            </a>
 
-          <a
-            href="cadastro.html"
-            style="color:var(--secondary);font-weight:800"
-          >
-            Criar conta
-          </a>
-        </p>
+          </div>
+
+
+          <div class="account-card">
+
+            <span class="account-label">
+              Atendimento direto
+            </span>
+
+            <h3>
+              Prefere falar pelo WhatsApp?
+            </h3>
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline"
+            >
+              Abrir WhatsApp
+            </a>
+
+          </div>
+
+
+        </div>
 
       </div>
 
@@ -198,23 +417,28 @@
   </main>
 
 
-  <!-- RODAPÉ -->
+
+  <!-- =========================================================
+       RODAPÉ
+  ========================================================== -->
+
   <footer class="footer footer-v2">
 
     <div class="container footer-content">
 
 
-      <!-- SOBRE -->
-      <div class="footer-column">
+      <div class="footer-column footer-brand">
 
         <a
           class="logo"
           href="index.html"
         >
+
           <img
             src="logo-maxsom-white.png"
             alt="Max Som"
           >
+
         </a>
 
         <p>
@@ -222,10 +446,20 @@
           serviços e atendimento.
         </p>
 
+
+        <a
+          class="footer-whatsapp"
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
+
       </div>
 
 
-      <!-- NAVEGAÇÃO -->
+
       <div class="footer-column">
 
         <h3>
@@ -252,60 +486,87 @@
           Publicações
         </a>
 
+        <a href="atendimento.html">
+          Atendimento
+        </a>
+
       </div>
 
 
-      <!-- ATENDIMENTO -->
+
       <div class="footer-column">
 
         <h3>
-          Atendimento
+          Minha conta
         </h3>
 
-        <a href="atendimento.html">
-          Solicitar atendimento
-        </a>
-
-        <a href="conta.html">
+        <a
+          href="conta.html"
+          data-logged-only
+        >
           Minha conta
         </a>
 
-        <a href="login.html">
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+        >
+          Minhas conversas
+        </a>
+
+        <a
+          href="login.html"
+          data-guest-only
+        >
           Entrar
+        </a>
+
+        <a
+          href="cadastro.html"
+          data-guest-only
+        >
+          Criar conta
         </a>
 
       </div>
 
 
-      <!-- CONTATO -->
+
       <div class="footer-column">
 
         <h3>
           Contato
         </h3>
 
-        <p>
-          Telefone: +55 65 99626-2514
-        </p>
+        <a href="tel:+5565996262514">
+          +55 65 99626-2514
+        </a>
 
-        <p>
+        <a
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
           WhatsApp: (65) 99626-2514
-        </p>
+        </a>
 
-        <p>
-          E-mail: lojamaxsom2@gmail.com
-        </p>
+        <a href="mailto:lojamaxsom2@gmail.com">
+          lojamaxsom2@gmail.com
+        </a>
 
       </div>
 
     </div>
 
 
-    <!-- COPYRIGHT -->
+
     <div class="footer-bottom">
 
       <div class="container">
+
         © 2026 Max Som. Todos os direitos reservados.
+
       </div>
 
     </div>
@@ -313,9 +574,13 @@
   </footer>
 
 
-  <!-- SCRIPTS -->
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="main.js"></script>
 
 
