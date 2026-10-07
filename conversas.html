@@ -1,9 +1,14 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Minhas conversas | Max Som</title>
 
@@ -98,6 +103,15 @@
         </a>
 
 
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+        >
+          Minhas conversas
+        </a>
+
+
         <button
           class="btn btn-outline"
           data-logout
@@ -169,6 +183,29 @@
 
             </div>
 
+
+            <!-- INICIAR NOVA CONVERSA -->
+
+            <div
+              style="
+                display:flex;
+                justify-content:flex-end;
+                margin-bottom:24px;
+              "
+            >
+
+              <button
+                class="btn btn-primary"
+                type="button"
+                onclick="openConversation('Atendimento geral')"
+              >
+                Iniciar nova conversa
+              </button>
+
+            </div>
+
+
+            <!-- LISTA -->
 
             <div
               id="conversasLista"
@@ -268,11 +305,18 @@
           Solicitar atendimento
         </a>
 
-        <a href="conta.html">
+        <a
+          href="conta.html"
+          data-logged-only
+        >
           Minha conta
         </a>
 
-        <a href="conversas.html">
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+        >
           Minhas conversas
         </a>
 
@@ -334,3 +378,4 @@
 </body>
 
 </html>
+```
