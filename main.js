@@ -1,7 +1,7 @@
 /* =========================================================
    MAX SOM
-   MAIN.JS
-   Sistema principal
+   MAIN.JS — PARTE 1
+   Base, Supabase, configurações e funções auxiliares
    ========================================================= */
 
 
@@ -15,11 +15,34 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_GrFU5c86UZESBh3qs1znQw__ZMNVAnC";
 
-var supabase =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
+
+if (
+  !window.supabase ||
+  typeof window.supabase.createClient !== "function"
+) {
+
+  console.error(
+    "Supabase JS não foi carregado."
   );
+
+}
+
+
+var supabase =
+  window.supabase?.createClient
+    ? window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      )
+    : null;
+
 
 
 /* =========================================================
@@ -27,118 +50,469 @@ var supabase =
    ========================================================= */
 
 const ADMIN_TYPES = [
+
   "admin",
+
   "funcionario",
+
   "funcionário",
+
   "dono",
+
   "administrador"
+
 ];
 
+
 const TABLES = {
-  USUARIO: "usuario",
-  PRODUTOS: "produtos",
-  SERVICOS: "servicos",
-  SOLICITACOES: "solicitações_servico",
-  CONVERSAS: "conversas",
-  MENSAGENS: "mensagens",
-  ARQUIVOS: "arquivos",
-  NOTIFICACOES: "notificacoes",
-  PROJETOS: "projetos",
-  PUBLICACOES: "publicacoes"
+
+  USUARIO:
+    "usuario",
+
+  PRODUTOS:
+    "produtos",
+
+  SERVICOS:
+    "servicos",
+
+  SOLICITACOES:
+    "solicitações_servico",
+
+  CONVERSAS:
+    "conversas",
+
+  MENSAGENS:
+    "mensagem",
+
+  ARQUIVOS:
+    "arquivos",
+
+  NOTIFICACOES:
+    "notificacao",
+
+  PROJETOS:
+    "projetos",
+
+  PUBLICACOES:
+    "publicacoes"
+
 };
+
 
 
 /* =========================================================
    3. ESTADO ATUAL
    ========================================================= */
 
-let currentUser = null;
-let currentProfile = null;
+let currentUser =
+  null;
+
+let currentProfile =
+  null;
+
 
 
 /* =========================================================
    4. FUNÇÕES AUXILIARES
    ========================================================= */
 
-function qs(...selectors) {
+
+/*
+ * Procura o primeiro elemento existente
+ * entre os seletores informados.
+ */
+
+function qs(
+  ...selectors
+) {
+
   return (
+
     selectors
-      .map((selector) => document.querySelector(selector))
-      .find(Boolean) || null
+
+      .map(
+        (selector) =>
+          document.querySelector(
+            selector
+          )
+      )
+
+      .find(Boolean)
+
+      || null
+
   );
+
 }
 
 
-function esc(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+
+/*
+ * Protege textos antes de colocar
+ * valores do banco dentro do HTML.
+ */
+
+function esc(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
 }
 
 
-function normalizeType(type) {
-  return String(type || "")
+
+/*
+ * Padroniza o tipo do usuário.
+ */
+
+function normalizeType(
+  type
+) {
+
+  return String(
+    type || ""
+  )
+
     .trim()
+
     .toLowerCase();
+
 }
 
 
-function isAdmin(profile = currentProfile) {
+
+/*
+ * Verifica se o perfil possui
+ * um tipo administrativo.
+ */
+
+function isAdmin(
+  profile = currentProfile
+) {
+
   const type =
-    normalizeType(profile?.tipo_usuario);
+    normalizeType(
+      profile?.tipo_usuario
+    );
 
-  return ADMIN_TYPES.includes(type);
+  return ADMIN_TYPES.includes(
+    type
+  );
+
 }
 
+
+
+/*
+ * Verifica se existe usuário logado.
+ */
 
 function isLoggedIn() {
+
   return !!currentUser;
+
 }
 
 
-function formatDate(date) {
-  if (!date) return "";
 
-  const value = new Date(date);
+/*
+ * Formata somente a data.
+ */
 
-  if (Number.isNaN(value.getTime())) {
+function formatDate(
+  value
+) {
+
+  if (!value) {
     return "";
   }
 
-  return value.toLocaleDateString(
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  return date.toLocaleDateString(
     "pt-BR",
     {
+
       day: "2-digit",
+
       month: "2-digit",
+
       year: "numeric"
+
     }
   );
+
 }
 
 
-function formatDateTime(date) {
-  if (!date) return "";
 
-  const value = new Date(date);
+/*
+ * Formata data e hora.
+ */
 
-  if (Number.isNaN(value.getTime())) {
+function formatDateTime(
+  value
+) {
+
+  if (!value) {
     return "";
   }
 
-  return value.toLocaleString(
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  return date.toLocaleString(
     "pt-BR",
     {
+
       day: "2-digit",
+
       month: "2-digit",
+
       year: "numeric",
+
       hour: "2-digit",
+
       minute: "2-digit"
+
     }
   );
+
 }
+
+
+
+/*
+ * Descobre qual página está aberta.
+ */
+
+function getCurrentPage() {
+
+  const path =
+    window.location.pathname
+
+      .split("/")
+
+      .pop()
+
+      .toLowerCase();
+
+
+  return (
+    path ||
+    "index.html"
+  );
+
+}
+
+
+
+/*
+ * Exibe uma mensagem dentro
+ * de um elemento do HTML.
+ */
+
+function showMessage(
+  element,
+  text,
+  type = "info"
+) {
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    text || "";
+
+
+  element.classList.remove(
+
+    "hidden",
+
+    "message-info",
+
+    "message-success",
+
+    "message-error"
+
+  );
+
+
+  element.classList.add(
+    `message-${type}`
+  );
+
+}
+
+
+
+/*
+ * Limpa uma mensagem.
+ */
+
+function clearMessage(
+  element
+) {
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    "";
+
+
+  element.classList.add(
+    "hidden"
+  );
+
+
+  element.classList.remove(
+
+    "message-info",
+
+    "message-success",
+
+    "message-error"
+
+  );
+
+}
+
+
+
+/*
+ * Coloca um botão em estado
+ * de carregamento.
+ */
+
+function setButtonLoading(
+  button,
+  loading,
+  normalText
+) {
+
+  if (!button) {
+    return;
+  }
+
+
+  button.disabled =
+    loading;
+
+
+  if (loading) {
+
+    button.dataset.originalText =
+      button.textContent.trim();
+
+    button.textContent =
+      "Aguarde...";
+
+    return;
+  }
+
+
+  button.textContent =
+
+    normalText ||
+
+    button.dataset.originalText ||
+
+    button.textContent;
+
+}
+
+
+
+/*
+ * Mostra um erro do Supabase
+ * de maneira mais útil.
+ */
+
+function dbError(
+  error,
+  fallback =
+    "Ocorreu um erro."
+) {
+
+  console.error(
+    error
+  );
+
+
+  return (
+
+    error?.message ||
+
+    error?.details ||
+
+    error?.hint ||
+
+    fallback
+
+  );
+
+}
+
 
 
 /* =========================================================
@@ -147,29 +521,67 @@ function formatDateTime(date) {
 
 async function ensureProfile() {
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-
-    currentUser = null;
-    currentProfile = null;
-
+  if (!supabase) {
     return null;
   }
 
-  currentUser = user;
 
   const {
+
+    data: {
+      user
+    },
+
+    error: userError
+
+  } =
+
+    await supabase.auth.getUser();
+
+
+  if (
+    userError ||
+    !user
+  ) {
+
+    currentUser =
+      null;
+
+    currentProfile =
+      null;
+
+    return null;
+
+  }
+
+
+  currentUser =
+    user;
+
+
+  const {
+
     data,
+
     error
-  } = await supabase
-    .from(TABLES.USUARIO)
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+
+  } =
+
+    await supabase
+
+      .from(
+        TABLES.USUARIO
+      )
+
+      .select("*")
+
+      .eq(
+        "id",
+        user.id
+      )
+
+      .maybeSingle();
+
 
   if (error) {
 
@@ -178,237 +590,596 @@ async function ensureProfile() {
       error
     );
 
-    currentProfile = null;
+    currentProfile =
+      null;
 
+    return null;
+
+  }
+
+
+  currentProfile =
+    data || null;
+
+
+  return currentProfile;
+
+}
+
+
+
+/*
+ * Retorna somente o usuário
+ * autenticado no Supabase Auth.
+ */
+
+async function getAuthenticatedUser() {
+
+  if (!supabase) {
     return null;
   }
 
-  currentProfile = data || null;
 
-  return currentProfile;
+  const {
+
+    data: {
+      user
+    },
+
+    error
+
+  } =
+
+    await supabase.auth.getUser();
+
+
+  if (
+    error ||
+    !user
+  ) {
+
+    return null;
+
+  }
+
+
+  currentUser =
+    user;
+
+
+  return user;
+
 }
+
+
+
+/* =========================================================
+   FIM DA PARTE 1
+   ========================================================= */
 /* =========================================================
    6. NAVEGAÇÃO
    ========================================================= */
 
+
+/*
+ * Atualiza todos os elementos do menu conforme
+ * o estado atual do usuário.
+ */
+
 async function updateNav() {
+
+  if (!supabase) {
+    return;
+  }
+
 
   const profile =
     await ensureProfile();
 
-  const adminLink =
-    qs("#adminLink", "[data-admin-only]");
 
-  const accountLink =
-    qs("#accountLink", "[data-logged-only]");
+  const logged =
+    !!currentUser;
 
-  const loginLink =
-    qs("#loginLink", "[data-guest-only]");
 
-  const conversationsLink =
-    qs("#conversationsLink", "[data-conversations-link]");
+  const admin =
+    isAdmin(profile);
 
-  const signupLink =
-    qs("#signupLink", "[data-signup-link]");
 
-  const logoutLinks =
-    document.querySelectorAll(
-      "[data-logout], #logoutLink"
+
+  /* =====================================================
+     ELEMENTOS DE VISITANTE
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-guest-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? "none"
+            : "";
+
+      }
     );
 
 
-  /* ADMIN */
+
+  /* =====================================================
+     ELEMENTOS DE USUÁRIO LOGADO
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-logged-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     ELEMENTOS EXCLUSIVOS DO ADMIN
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-admin-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          admin
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     LINKS DE CONVERSAS
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-conversations-link]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     SAIR
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-logout]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+
+        if (
+          element.dataset.logoutBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        element.dataset.logoutBound =
+          "true";
+
+
+        element.addEventListener(
+          "click",
+          async (event) => {
+
+            event.preventDefault();
+
+            await logout();
+
+          }
+        );
+
+      }
+    );
+
+
+
+  /* =====================================================
+     ATUALIZA LINK ADMIN ESPECÍFICO
+     ===================================================== */
+
+  const adminLink =
+    qs(
+      "#adminLink"
+    );
+
 
   if (adminLink) {
 
     adminLink.style.display =
-      isAdmin(profile)
+      admin
         ? ""
         : "none";
+
   }
 
 
-  /* LOGIN / CONTA / CADASTRO */
 
-  if (profile) {
+  /* =====================================================
+     ATUALIZA LINK DA CONTA
+     ===================================================== */
 
-    if (loginLink) {
-      loginLink.style.display = "none";
-    }
+  const accountLink =
+    qs(
+      "#accountLink"
+    );
 
-    if (signupLink) {
-      signupLink.style.display = "none";
-    }
 
-    if (accountLink) {
-      accountLink.style.display = "";
-    }
+  if (accountLink) {
 
-    if (conversationsLink) {
-      conversationsLink.style.display = "";
-    }
+    accountLink.style.display =
+      logged
+        ? ""
+        : "none";
 
-  } else {
-
-    if (loginLink) {
-      loginLink.style.display = "";
-    }
-
-    if (signupLink) {
-      signupLink.style.display = "";
-    }
-
-    if (accountLink) {
-      accountLink.style.display = "none";
-    }
-
-    if (conversationsLink) {
-      conversationsLink.style.display = "none";
-    }
   }
 
-  logoutLinks.forEach((element) => {
 
-    element.style.display =
-      profile ? "" : "none";
 
-    if (!element.dataset.logoutBound) {
+  /* =====================================================
+     ATUALIZA LINK LOGIN
+     ===================================================== */
 
-      element.dataset.logoutBound = "true";
+  const loginLink =
+    qs(
+      "#loginLink"
+    );
 
-      element.addEventListener(
-        "click",
-        (event) => {
 
-          event.preventDefault();
+  if (loginLink) {
 
-          logout();
-        }
-      );
-    }
-  });
+    loginLink.style.display =
+      logged
+        ? "none"
+        : "";
+
+  }
+
+
+
+  /* =====================================================
+     ATUALIZA LINK CADASTRO
+     ===================================================== */
+
+  const signupLink =
+    qs(
+      "#signupLink"
+    );
+
+
+  if (signupLink) {
+
+    signupLink.style.display =
+      logged
+        ? "none"
+        : "";
+
+  }
+
 }
 
 
+
 /* =========================================================
-   7. LOGIN
+   7. SINCRONIZAÇÃO DO PERFIL
    ========================================================= */
 
-async function setupLogin() {
 
-  const form =
-    qs("#loginForm", "#formLogin");
+/*
+ * Garante que os dados informados no cadastro
+ * sejam gravados na tabela usuario.
+ */
 
-  if (!form) return;
+async function syncProfileData(
+  user,
+  values = {}
+) {
 
+  if (
+    !user ||
+    !supabase
+  ) {
 
-  if (form.dataset.loginBound === "true") {
-    return;
+    return null;
+
   }
 
-  form.dataset.loginBound = "true";
+
+  const nome =
+    String(
+      values.nome ||
+      user.user_metadata?.nome ||
+      user.email?.split("@")[0] ||
+      "Cliente"
+    )
+      .trim();
 
 
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      const email =
-        qs("#loginEmail", "#email")
-          ?.value
-          .trim();
+  const telefone =
+    String(
+      values.telefone ||
+      user.user_metadata?.telefone ||
+      ""
+    )
+      .trim();
 
 
-      const password =
-        qs("#loginPassword", "#senha")
-          ?.value;
+  const whatsapp =
+    String(
+      values.whatsapp ||
+      user.user_metadata?.whatsapp ||
+      ""
+    )
+      .trim();
 
 
-      const errorBox =
-        qs("#loginError", "#mensagemLogin");
+
+  /*
+   * Primeiro tenta localizar
+   * o perfil existente.
+   */
+
+  const {
+    data: existing,
+    error: readError
+  } =
+
+    await supabase
+
+      .from(
+        TABLES.USUARIO
+      )
+
+      .select("*")
+
+      .eq(
+        "id",
+        user.id
+      )
+
+      .maybeSingle();
 
 
-      if (errorBox) {
 
-        errorBox.textContent = "";
+  if (readError) {
 
-        errorBox.classList.add("hidden");
-      }
+    console.error(
+      "Erro ao consultar perfil:",
+      readError
+    );
+
+    return null;
+
+  }
 
 
-      if (!email || !password) {
 
-        if (errorBox) {
+  /* =====================================================
+     PERFIL JÁ EXISTE
+     ===================================================== */
 
-          errorBox.textContent =
-            "Preencha o e-mail e a senha.";
+  if (existing) {
 
-          errorBox.classList.remove("hidden");
-        }
+    const updateData = {};
 
-        return;
-      }
 
+    if (
+      nome &&
+      !existing.nome
+    ) {
+
+      updateData.nome =
+        nome;
+
+    }
+
+
+    if (
+      telefone &&
+      !existing.telefone
+    ) {
+
+      updateData.telefone =
+        telefone;
+
+    }
+
+
+    if (
+      whatsapp &&
+      !existing.whatsapp
+    ) {
+
+      updateData.whatsapp =
+        whatsapp;
+
+    }
+
+
+    if (
+      Object.keys(
+        updateData
+      ).length
+    ) {
 
       const {
         data,
         error
       } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
+
+        await supabase
+
+          .from(
+            TABLES.USUARIO
+          )
+
+          .update(
+            updateData
+          )
+
+          .eq(
+            "id",
+            user.id
+          )
+
+          .select("*")
+
+          .single();
 
 
       if (error) {
 
         console.error(
-          "Erro no login:",
+          "Erro ao atualizar perfil:",
           error
         );
 
+        return existing;
 
-        if (errorBox) {
-
-          errorBox.textContent =
-            "E-mail ou senha incorretos. Verifique os dados e tente novamente.";
-
-          errorBox.classList.remove("hidden");
-        }
-
-        return;
       }
 
 
-      if (errorBox) {
-
-        errorBox.textContent =
-          "Login realizado com sucesso!";
-
-        errorBox.classList.remove("hidden");
-      }
+      currentProfile =
+        data || existing;
 
 
-      const profile =
-        await ensureProfile();
+      currentUser =
+        user;
 
 
-if (isAdmin(profile)) {
+      return currentProfile;
 
-  window.location.href =
-    "admin.html";
+    }
 
-} else {
 
-  window.location.href =
-    "conta.html";
+    currentProfile =
+      existing;
+
+
+    currentUser =
+      user;
+
+
+    return existing;
+
+  }
+
+
+
+  /* =====================================================
+     PERFIL AINDA NÃO EXISTE
+     ===================================================== */
+
+  const newProfile = {
+
+    id:
+      user.id,
+
+    nome:
+      nome,
+
+    telefone:
+      telefone || null,
+
+    whatsapp:
+      whatsapp || null,
+
+    tipo_usuario:
+      "cliente"
+
+  };
+
+
+
+  const {
+    data,
+    error
+  } =
+
+    await supabase
+
+      .from(
+        TABLES.USUARIO
+      )
+
+      .insert(
+        newProfile
+      )
+
+      .select("*")
+
+      .single();
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao criar perfil:",
+      error
+    );
+
+    return null;
+
+  }
+
+
+
+  currentUser =
+    user;
+
+
+  currentProfile =
+    data || null;
+
+
+  return currentProfile;
+
 }
 
-  });
-}
 
 
 /* =========================================================
@@ -418,9 +1189,30 @@ if (isAdmin(profile)) {
 async function setupSignup() {
 
   const form =
-    qs("#signupForm", "#formCadastro");
+    qs(
+      "#signupForm",
+      "#formCadastro"
+    );
 
-  if (!form) return;
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.signupBound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  form.dataset.signupBound =
+    "true";
+
 
 
   form.addEventListener(
@@ -430,132 +1222,496 @@ async function setupSignup() {
       event.preventDefault();
 
 
+
       const nome =
-        qs("#signupNome", "#nome")
+        qs(
+          "#signupNome",
+          "#nome"
+        )
           ?.value
           .trim();
+
+
+      const telefone =
+        qs(
+          "#signupTelefone",
+          "#telefone"
+        )
+          ?.value
+          .trim();
+
+
+      const whatsapp =
+        qs(
+          "#signupWhatsapp",
+          "#whatsapp"
+        )
+          ?.value
+          .trim();
+
 
       const email =
-        qs("#signupEmail", "#email")
+        qs(
+          "#signupEmail",
+          "#email"
+        )
           ?.value
-          .trim();
+          .trim()
+          .toLowerCase();
+
 
       const password =
-        qs("#signupPassword", "#senha")
+        qs(
+          "#signupPassword",
+          "#senha"
+        )
           ?.value;
 
-      const errorBox =
-        qs("#signupError", "#mensagemCadastro");
 
 
-      if (errorBox) {
-        errorBox.textContent = "";
-      }
+      const message =
+        qs(
+          "#signupError",
+          "#mensagemCadastro"
+        );
 
 
-      if (!nome || !email || !password) {
-
-        if (errorBox) {
-
-          errorBox.textContent =
-            "Preencha todos os campos.";
-        }
-
-        return;
-      }
+      const button =
+        form.querySelector(
+          "button[type='submit']"
+        );
 
 
-      const {
-        data,
-        error
-      } =
-        await supabase.auth.signUp({
-          email,
-          password
-        });
+
+      clearMessage(
+        message
+      );
 
 
-      if (error) {
+      if (
+        !nome ||
+        !email ||
+        !password
+      ) {
 
-        console.error(error);
-
-        if (errorBox) {
-
-          errorBox.textContent =
-            error.message ||
-            "Erro ao criar conta.";
-        }
+        showMessage(
+          message,
+          "Preencha seu nome, e-mail e senha.",
+          "error"
+        );
 
         return;
+
       }
 
 
-      const user =
-        data?.user;
+
+      setButtonLoading(
+        button,
+        true,
+        "Criar conta"
+      );
 
 
-      if (!user) {
 
-        if (errorBox) {
+      try {
 
-          errorBox.textContent =
-            "Não foi possível criar o usuário.";
-        }
+        const profileValues = {
 
-        return;
-      }
+          nome:
+            nome,
+
+          telefone:
+            telefone,
+
+          whatsapp:
+            whatsapp
+
+        };
 
 
-      const {
-        error: profileError
-      } =
-        await supabase
-          .from(TABLES.USUARIO)
-          .insert({
 
-            id: user.id,
+        const {
+          data,
+          error
+        } =
 
-            nome: nome,
+          await supabase.auth.signUp({
 
-            tipo_usuario: "cliente"
+            email:
+              email,
+
+            password:
+              password,
+
+            options: {
+
+              data: {
+
+                nome:
+                  nome,
+
+                telefone:
+                  telefone,
+
+                whatsapp:
+                  whatsapp
+
+              }
+
+            }
 
           });
 
 
-      if (profileError) {
 
-        console.error(
-          "Erro ao criar perfil:",
-          profileError
-        );
+        if (error) {
 
-        if (errorBox) {
+          throw error;
 
-          errorBox.textContent =
-            "Conta criada, mas houve um erro ao criar o perfil.";
         }
 
-        return;
+
+
+        const user =
+          data?.user;
+
+
+
+        if (!user) {
+
+          throw new Error(
+            "Não foi possível criar o usuário."
+          );
+
+        }
+
+
+
+        /*
+         * Se o Supabase criou uma sessão imediatamente,
+         * podemos criar/atualizar o perfil agora.
+         */
+
+        if (
+          data?.session
+        ) {
+
+          await syncProfileData(
+            user,
+            profileValues
+          );
+
+
+          showMessage(
+            message,
+            "Conta criada com sucesso. Entrando...",
+            "success"
+          );
+
+
+          setTimeout(
+            () => {
+
+              window.location.href =
+                "conta.html";
+
+            },
+            500
+          );
+
+
+          return;
+
+        }
+
+
+
+        /*
+         * Quando a confirmação de e-mail está ativa,
+         * o usuário ainda não terá sessão.
+         */
+
+        showMessage(
+          message,
+          "Conta criada. Confirme seu e-mail e depois faça login para acessar sua conta.",
+          "success"
+        );
+
+
+        form.reset();
+
+
+
+      } catch (error) {
+
+        console.error(
+          "Erro no cadastro:",
+          error
+        );
+
+
+        showMessage(
+          message,
+          dbError(
+            error,
+            "Não foi possível criar a conta."
+          ),
+          "error"
+        );
+
+      } finally {
+
+        setButtonLoading(
+          button,
+          false,
+          "Criar conta"
+        );
+
       }
 
-
-      window.location.href =
-        "login.html";
     }
   );
+
 }
 
 
+
 /* =========================================================
-   9. LOGOUT
+   9. LOGIN
+   ========================================================= */
+
+async function setupLogin() {
+
+  const form =
+    qs(
+      "#loginForm",
+      "#formLogin"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.loginBound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  form.dataset.loginBound =
+    "true";
+
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+
+      const email =
+        qs(
+          "#loginEmail",
+          "#email"
+        )
+          ?.value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        qs(
+          "#loginPassword",
+          "#senha"
+        )
+          ?.value;
+
+
+
+      const message =
+        qs(
+          "#loginError",
+          "#mensagemLogin"
+        );
+
+
+      const button =
+        form.querySelector(
+          "button[type='submit']"
+        );
+
+
+
+      clearMessage(
+        message
+      );
+
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        showMessage(
+          message,
+          "Preencha o e-mail e a senha.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+
+      setButtonLoading(
+        button,
+        true,
+        "Entrar"
+      );
+
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+
+          await supabase.auth.signInWithPassword({
+
+            email:
+              email,
+
+            password:
+              password
+
+          });
+
+
+
+        if (error) {
+
+          throw error;
+
+        }
+
+
+
+        if (
+          !data?.user
+        ) {
+
+          throw new Error(
+            "A sessão não foi criada."
+          );
+
+        }
+
+
+
+        /*
+         * Recupera os dados do perfil.
+         */
+
+        const profile =
+          await syncProfileData(
+            data.user
+          );
+
+
+
+        showMessage(
+          message,
+          "Login realizado com sucesso. Entrando...",
+          "success"
+        );
+
+
+
+        /*
+         * Redirecionamento correto:
+         *
+         * administrador → admin.html
+         * cliente → conta.html
+         */
+
+        if (
+          isAdmin(
+            profile
+          )
+        ) {
+
+          window.location.href =
+            "admin.html";
+
+        } else {
+
+          window.location.href =
+            "conta.html";
+
+        }
+
+
+
+      } catch (error) {
+
+        console.error(
+          "Erro no login:",
+          error
+        );
+
+
+        showMessage(
+          message,
+          "E-mail ou senha incorretos. Verifique os dados e tente novamente.",
+          "error"
+        );
+
+
+      } finally {
+
+        setButtonLoading(
+          button,
+          false,
+          "Entrar"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   10. LOGOUT
    ========================================================= */
 
 async function logout() {
+
+  if (!supabase) {
+    return;
+  }
+
 
   const {
     error
   } =
     await supabase.auth.signOut();
+
 
 
   if (error) {
@@ -565,20 +1721,140 @@ async function logout() {
       error
     );
 
+
+    alert(
+      "Não foi possível sair da conta."
+    );
+
+
+    return;
+
+  }
+
+
+
+  currentUser =
+    null;
+
+
+  currentProfile =
+    null;
+
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+
+/* =========================================================
+   11. LISTENER DE AUTENTICAÇÃO
+   ========================================================= */
+
+
+/*
+ * Mantém o menu sincronizado quando:
+ *
+ * login
+ * logout
+ * atualização de sessão
+ * recuperação de sessão
+ */
+
+function setupAuthListener() {
+
+  if (!supabase) {
     return;
   }
 
 
-  currentUser = null;
-  currentProfile = null;
+  if (
+    window.maxSomAuthListener
+  ) {
 
-  window.location.href =
-    "index.html";
+    return;
+
+  }
+
+
+  window.maxSomAuthListener =
+    true;
+
+
+
+  supabase.auth.onAuthStateChange(
+    async (
+      event,
+      session
+    ) => {
+
+      currentUser =
+        session?.user ||
+        null;
+
+
+      if (currentUser) {
+
+        await syncProfileData(
+          currentUser
+        );
+
+      } else {
+
+        currentProfile =
+          null;
+
+      }
+
+
+      await updateNav();
+
+
+      /*
+       * Páginas protegidas.
+       */
+
+      const page =
+        getCurrentPage();
+
+
+
+      if (
+        event ===
+        "SIGNED_OUT"
+      ) {
+
+        if (
+          page ===
+            "conta.html" ||
+
+          page ===
+            "conversas.html" ||
+
+          page ===
+            "conversa.html" ||
+
+          page ===
+            "admin.html"
+        ) {
+
+          window.location.href =
+            "login.html";
+
+        }
+
+      }
+
+    }
+  );
+
 }
 
 
+
 /* =========================================================
-   10. PROTEÇÃO DO PAINEL
+   12. PROTEÇÃO DO PAINEL ADMINISTRATIVO
    ========================================================= */
 
 async function requireAdmin() {
@@ -587,2343 +1863,108 @@ async function requireAdmin() {
     await ensureProfile();
 
 
-  if (!profile || !isAdmin(profile)) {
+
+  if (
+    !profile ||
+    !isAdmin(
+      profile
+    )
+  ) {
+
+    /*
+     * Se não estiver logado,
+     * manda para login.
+     */
+
+    if (!currentUser) {
+
+      window.location.href =
+        "login.html";
+
+      return false;
+
+    }
+
+
+
+    /*
+     * Se estiver logado mas não for admin,
+     * volta para a Home.
+     */
 
     window.location.href =
       "index.html";
 
     return false;
+
   }
 
 
   return true;
+
 }
 
 
-/* =========================================================
-   11. ESTATÍSTICAS DO ADMIN
-   ========================================================= */
-
-async function adminStats() {
-
-  const tables = [
-
-    {
-      table: TABLES.USUARIO,
-      selector: "usuario"
-    },
-
-    {
-      table: TABLES.PRODUTOS,
-      selector: "produtos"
-    },
-
-    {
-      table: TABLES.SERVICOS,
-      selector: "servicos"
-    },
-
-    {
-      table: TABLES.SOLICITACOES,
-      selector: "solicitações_servico"
-    },
-
-    {
-      table: TABLES.CONVERSAS,
-      selector: "conversas"
-    },
-
-    {
-      table: TABLES.MENSAGENS,
-      selector: "mensagens"
-    }
-  ];
-
-
-  for (const item of tables) {
-
-    const {
-      count,
-      error
-    } =
-      await supabase
-        .from(item.table)
-        .select("*", {
-          count: "exact",
-          head: true
-        });
-
-
-    if (error) {
-
-      console.error(
-        `Erro ao contar ${item.table}:`,
-        error
-      );
-
-      continue;
-    }
-
-
-    const element =
-      document.querySelector(
-        `[data-count="${item.selector}"]`
-      );
-
-
-    if (element) {
-
-      element.textContent =
-        count ?? 0;
-    }
-  }
-}
-
 
 /* =========================================================
-   12. USUÁRIOS DO ADMIN
+   13. REDIRECIONAMENTO APÓS LOGIN
    ========================================================= */
 
-async function adminUsers() {
-
-  const container =
-    document.querySelector(
-      "#adminUsuariosLista"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.USUARIO)
-      .select("*")
-      .order("nome", {
-        ascending: true
-      });
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar usuários:",
-      error
-    );
-
-    container.innerHTML =
-      "<p>Erro ao carregar usuários.</p>";
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML =
-      "<p>Nenhum usuário encontrado.</p>";
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map((user) => {
-
-        const type =
-          normalizeType(
-            user.tipo_usuario ||
-            "cliente"
-          );
-
-
-        const isSolicitante =
-          type ===
-          "solicitante_admin";
-
-
-        const userIsAdmin =
-          ADMIN_TYPES.includes(type);
-
-
-        let action = "";
-
-
-        if (isSolicitante) {
-
-          action = `
-
-            <div class="admin-user-actions">
-
-              <button
-                class="btn-aprovar-admin"
-                data-user-id="${esc(user.id)}"
-                data-action="aprovar"
-              >
-                Aprovar administrador
-              </button>
-
-              <button
-                class="btn-recusar-admin"
-                data-user-id="${esc(user.id)}"
-                data-action="recusar"
-              >
-                Recusar
-              </button>
-
-            </div>
-
-          `;
-        }
-
-
-        return `
-
-          <div class="admin-user-card">
-
-            <div class="admin-user-info">
-
-              <strong>
-                ${esc(
-                  user.nome ||
-                  "Sem nome"
-                )}
-              </strong>
-
-              <span>
-                ${esc(
-                  user.tipo_usuario ||
-                  "cliente"
-                )}
-              </span>
-
-            </div>
-
-
-            ${
-              userIsAdmin
-
-                ? `
-                  <span class="admin-badge">
-                    Administrador
-                  </span>
-                `
-
-                : action
-            }
-
-          </div>
-
-        `;
-      })
-      .join("");
-
-
-  bindUserActions();
-}
-
-
-/* =========================================================
-   13. AÇÕES DOS USUÁRIOS
-   ========================================================= */
-
-function bindUserActions() {
-
-  document
-    .querySelectorAll(
-      "[data-action]"
-    )
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        async () => {
-
-          const userId =
-            button.dataset.userId;
-
-          const action =
-            button.dataset.action;
-
-
-          if (!userId || !action) {
-            return;
-          }
-
-
-          let newType =
-            "cliente";
-
-
-          if (action === "aprovar") {
-            newType = "admin";
-          }
-
-
-          const {
-            error
-          } =
-            await supabase
-              .from(TABLES.USUARIO)
-              .update({
-                tipo_usuario: newType
-              })
-              .eq("id", userId);
-
-
-          if (error) {
-
-            console.error(
-              "Erro ao atualizar usuário:",
-              error
-            );
-
-            alert(
-              "Não foi possível atualizar o usuário."
-            );
-
-            return;
-          }
-
-
-          await adminUsers();
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   14. CONTA DO CLIENTE
-   ========================================================= */
-
-async function account() {
-
-  const legacyContainer =
-    document.querySelector("#accountContent");
-
-  const accountPage =
-    document.querySelector(".account-page") ||
-    document.querySelector("[data-account-page]");
-
-  if (!legacyContainer && !accountPage) return;
-
-
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile || !currentUser) {
-
-    if (legacyContainer) {
-
-      legacyContainer.innerHTML = `
-        <p>Você precisa estar logado.</p>
-      `;
-    }
-
-    return;
-  }
-
-
-  const type =
-    normalizeType(
-      profile.tipo_usuario ||
-      "cliente"
-    );
-
-
-  let typeLabel =
-    "Cliente";
-
-
-  if (isAdmin(profile)) {
-
-    typeLabel =
-      "Administrador";
-
-  } else if (
-    type ===
-    "solicitante_admin"
-  ) {
-
-    typeLabel =
-      "Solicitação de administrador";
-  }
-
-
-  /*
-   * A conta atual usa elementos já existentes
-   * no HTML. Não substituímos o conteúdo da página,
-   * para não apagar as solicitações e conversas.
-   */
-
-  const title =
-    document.querySelector(
-      "#contaNomeTitulo"
-    );
-
-  const name =
-    document.querySelector(
-      "#contaNome"
-    );
-
-  const email =
-    document.querySelector(
-      "#contaEmail"
-    );
-
-  const phone =
-    document.querySelector(
-      "#contaTelefone"
-    );
-
-  const typeElement =
-    document.querySelector(
-      "#contaTipo"
-    );
-
-
-  const displayName =
-    profile.nome ||
-    currentUser.email ||
-    "Usuário";
-
-
-  if (title) {
-    title.textContent =
-      displayName;
-  }
-
-  if (name) {
-    name.textContent =
-      displayName;
-  }
-
-  if (email) {
-    email.textContent =
-      currentUser.email ||
-      "-";
-  }
-
-  if (phone) {
-
-    phone.textContent =
-      profile.telefone ||
-      profile.whatsapp ||
-      "-";
-  }
-
-  if (typeElement) {
-
-    typeElement.textContent =
-      typeLabel;
-  }
-
-
-  /* Compatibilidade com versões antigas da conta */
-
-  if (legacyContainer) {
-
-    legacyContainer.innerHTML = `
-      <div class="account-card">
-
-        <div class="account-header">
-
-          <div>
-
-            <span class="account-label">
-              Minha conta
-            </span>
-
-            <h2>
-              ${esc(displayName)}
-            </h2>
-
-          </div>
-
-        </div>
-
-
-        <div class="account-info">
-
-          <p>
-            <strong>E-mail</strong>
-            ${esc(currentUser.email || "")}
-          </p>
-
-          <p>
-            <strong>Tipo de conta</strong>
-            ${esc(typeLabel)}
-          </p>
-
-        </div>
-
-
-        <div class="account-actions">
-
-          <a
-            href="conversas.html"
-            class="btn-primary"
-          >
-            Minhas conversas
-          </a>
-
-          <button
-            id="logoutButton"
-            class="btn-secondary"
-            type="button"
-          >
-            Sair
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }
-}
-
-
-/* =========================================================
-   15. SOLICITAÇÃO DE ADMINISTRADOR
-   ========================================================= */
-
-async function requestAdminAccess() {
-
-  const {
-    data: { user },
-    error
-  } =
-    await supabase.auth.getUser();
-
-
-  if (error || !user) {
-
-    alert(
-      "Você precisa estar logado para solicitar acesso."
-    );
-
-    return;
-  }
-
-
-  const {
-    error: updateError
-  } =
-    await supabase
-      .from(TABLES.USUARIO)
-      .update({
-        tipo_usuario:
-          "solicitante_admin"
-      })
-      .eq("id", user.id);
-
-
-  if (updateError) {
-
-    console.error(
-      "Erro ao solicitar administrador:",
-      updateError
-    );
-
-    alert(
-      "Não foi possível enviar a solicitação."
-    );
-
-    return;
-  }
-
-
-  alert(
-    "Sua solicitação de administrador foi enviada."
-  );
-
-
-  await account();
-}
-
-
-/* =========================================================
-   16. BOTÃO DE SOLICITAÇÃO
-   ========================================================= */
-
-function setupAdminRequestButton() {
-
-  const button =
-    qs(
-      "#requestAdminButton",
-      "#btnAdminRequest",
-      "[data-request-admin]"
-    );
-
-  if (!button) return;
-
-  if (button.dataset.bound === "true") return;
-
-  button.dataset.bound = "true";
-
-  button.addEventListener(
-    "click",
-    requestAdminAccess
-  );
-}
-
-
-/* =========================================================
-   17. CONVERSAS
-   ========================================================= */
 
 /*
-  A privacidade das conversas não depende do JavaScript.
-  O Supabase RLS deve permitir somente que participantes
-  autorizados leiam cada conversa e suas mensagens.
-*/
-
-async function loadConversations() {
-
-  const container =
-    qs(
-      "#conversasLista",
-      "#conversationsList",
-      "#conversationList"
-    );
-
-  if (!container) return;
-
-
-  const profile =
-    await ensureProfile();
-
-  if (!profile || !currentUser) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Faça login para visualizar suas conversas.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .select(`
-        id,
-        cliente_id,
-        funcionario_id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
-      .order(
-        "atualizado_em",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar conversas:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar suas conversas.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhuma conversa ainda
-        </h3>
-
-        <p>
-          Quando você iniciar um atendimento,
-          sua conversa aparecerá aqui.
-        </p>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (conversation) => `
-
-          <a
-            href="conversa.html?id=${encodeURIComponent(
-              conversation.id
-            )}"
-            class="conversation-card"
-          >
-
-            <div class="conversation-card-content">
-
-              <div>
-
-                <h3>
-                  ${esc(
-                    conversation.assunto ||
-                    "Atendimento Max Som"
-                  )}
-                </h3>
-
-                <span>
-                  ${esc(
-                    conversation.status ||
-                    "aberta"
-                  )}
-                </span>
-
-              </div>
-
-
-              <time>
-                ${esc(
-                  formatDateTime(
-                    conversation.atualizado_em ||
-                    conversation.criado_em
-                  )
-                )}
-              </time>
-
-            </div>
-
-          </a>
-
-        `
-      )
-      .join("");
-}
-/* =========================================================
-   18. CONVERSA INDIVIDUAL
-   ========================================================= */
-
-async function loadConversation() {
-
-  const container =
-    qs(
-      "#conversaContainer",
-      "#conversationContainer",
-      "#conversa"
-    );
-
-  if (!container) return;
-
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  const conversationId =
-    params.get("id");
-
-
-  if (!conversationId) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Conversa não encontrada
-        </h3>
-
-        <p>
-          Nenhuma conversa foi selecionada.
-        </p>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile || !currentUser) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Faça login
-        </h3>
-
-        <p>
-          Você precisa estar logado para acessar esta conversa.
-        </p>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const {
-    data: conversation,
-    error
-  } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .select(`
-        id,
-        cliente_id,
-        funcionario_id,
-        assunto,
-        status,
-        criado_em,
-        atualizado_em
-      `)
-      .eq(
-        "id",
-        conversationId
-      )
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao buscar conversa:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Erro ao carregar conversa
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  if (!conversation) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Conversa não encontrada
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const participant =
-    conversation.cliente_id === currentUser.id ||
-    conversation.funcionario_id === currentUser.id;
-
-
-  if (!participant && !isAdmin(profile)) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Acesso não permitido
-        </h3>
-
-        <p>
-          Você não participa desta conversa.
-        </p>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML = `
-
-    <div class="conversation-header">
-
-      <div>
-
-        <a
-          href="conversas.html"
-          class="conversation-back"
-        >
-          ← Voltar
-        </a>
-
-        <h1>
-          ${esc(
-            conversation.assunto ||
-            "Atendimento Max Som"
-          )}
-        </h1>
-
-        <span class="conversation-status">
-          ${esc(
-            conversation.status ||
-            "aberta"
-          )}
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="mensagensLista"
-      class="messages-list"
-    ></div>
-
-
-    <form
-      id="mensagemForm"
-      class="message-form"
-    >
-
-      <textarea
-        id="mensagemConteudo"
-        name="mensagem"
-        rows="3"
-        placeholder="Digite sua mensagem..."
-        required
-      ></textarea>
-
-
-      <button
-        type="submit"
-        class="btn-primary"
-      >
-        Enviar mensagem
-      </button>
-
-    </form>
-
-  `;
-
-
-  await loadMessages(
-    conversationId
-  );
-
-
-  setupMessageForm(
-    conversationId
-  );
-}
-
-
-/* =========================================================
-   19. MENSAGENS
-   ========================================================= */
-
-async function loadMessages(
-  conversationId
-) {
-
-  const container =
-    qs(
-      "#mensagensLista",
-      "#messagesList",
-      "#messagesContainer"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.MENSAGENS)
-      .select(`
-        id,
-        conversa_id,
-        remetente_id,
-        conteudo,
-        lida,
-        criado_em
-      `)
-      .eq(
-        "conversa_id",
-        conversationId
-      )
-      .order(
-        "criado_em",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar mensagens:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar as mensagens.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <p>
-          Nenhuma mensagem ainda.
-        </p>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (message) => {
-
-          const own =
-            message.remetente_id ===
-            currentUser?.id;
-
-
-          return `
-
-            <div
-              class="
-                message
-                ${own ? "message-own" : "message-other"}
-              "
-            >
-
-              <div class="message-bubble">
-
-                <p>
-                  ${esc(
-                    message.conteudo
-                  )}
-                </p>
-
-                <time>
-                  ${esc(
-                    formatDateTime(
-                      message.criado_em
-                    )
-                  )}
-                </time>
-
-              </div>
-
-            </div>
-
-          `;
-        }
-      )
-      .join("");
-
-
-  container.scrollTop =
-    container.scrollHeight;
-}
-
-
-/* =========================================================
-   20. ENVIO DE MENSAGEM
-   ========================================================= */
-
-function setupMessageForm(
-  conversationId
-) {
-
-  const form =
-    qs(
-      "#mensagemForm",
-      "#messageForm"
-    );
-
-  if (!form) return;
-
-
-  if (
-    form.dataset.bound ===
-    conversationId
-  ) {
-    return;
-  }
-
-
-  form.dataset.bound =
-    conversationId;
-
-
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      const input =
-        qs(
-          "#mensagemConteudo",
-          "#messageContent"
-        );
-
-
-      const content =
-        input?.value.trim();
-
-
-      if (!content) {
-        return;
-      }
-
-
-      if (!currentUser) {
-
-        alert(
-          "Você precisa estar logado."
-        );
-
-        return;
-      }
-
-
-      const button =
-        form.querySelector(
-          "button[type='submit']"
-        );
-
-
-      if (button) {
-        button.disabled = true;
-      }
-
-
-      const {
-        error
-      } =
-        await supabase
-          .from(TABLES.MENSAGENS)
-          .insert({
-
-            conversa_id:
-              conversationId,
-
-            remetente_id:
-              currentUser.id,
-
-            conteudo:
-              content,
-
-            lida:
-              false
-
-          });
-
-
-      if (error) {
-
-        console.error(
-          "Erro ao enviar mensagem:",
-          error
-        );
-
-        alert(
-          "Não foi possível enviar a mensagem."
-        );
-
-      } else {
-
-        input.value = "";
-
-        await loadMessages(
-          conversationId
-        );
-      }
-
-
-      if (button) {
-        button.disabled = false;
-      }
-    }
-  );
-}
-
-
-/* =========================================================
-   21. CRIAR CONVERSA
-   ========================================================= */
-
-async function createConversation(
-  assunto = "Atendimento Max Som"
-) {
-
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile || !currentUser) {
-
-    alert(
-      "Você precisa estar logado para iniciar uma conversa."
-    );
-
-    return null;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .insert({
-
-        cliente_id:
-          currentUser.id,
-
-        assunto:
-          assunto,
-
-        status:
-          "aberta"
-
-      })
-      .select()
-      .single();
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao criar conversa:",
-      error
-    );
-
-    alert(
-      "Não foi possível criar a conversa."
-    );
-
-    return null;
-  }
-
-
-  return data;
-}
-
-
-/* =========================================================
-   22. ABRIR CONVERSA
-   ========================================================= */
-
-async function openConversation(
-  assunto
-) {
-
-  const conversation =
-    await createConversation(
-      assunto
-    );
-
-
-  if (!conversation) {
-    return;
-  }
-
-
-  window.location.href =
-    `conversa.html?id=${encodeURIComponent(
-      conversation.id
-    )}`;
-}
-
-
-/* =========================================================
-   23. TEMPO REAL DAS MENSAGENS
-   ========================================================= */
-
-function setupMessageRealtime() {
-
-  if (!currentUser) return;
-
-
-  if (
-    window.maxSomMessageChannel
-  ) {
-
-    supabase.removeChannel(
-      window.maxSomMessageChannel
-    );
-  }
-
-
-  window.maxSomMessageChannel =
-    supabase
-      .channel(
-        "maxsom-mensagens"
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: TABLES.MENSAGENS
-        },
-        async (payload) => {
-
-          const params =
-            new URLSearchParams(
-              window.location.search
-            );
-
-          const conversationId =
-            params.get("id");
-
-
-          if (!conversationId) {
-            return;
-          }
-
-
-          const changedConversation =
-            payload.new?.conversa_id ||
-            payload.old?.conversa_id;
-
-
-          if (
-            changedConversation !==
-            conversationId
-          ) {
-            return;
-          }
-
-
-          await loadMessages(
-            conversationId
-          );
-        }
-      )
-      .subscribe();
-}
-
-
-/* =========================================================
-   24. TEMPO REAL DAS CONVERSAS
-   ========================================================= */
-
-function setupConversationRealtime() {
-
-  if (!currentUser) return;
-
-
-  if (
-    window.maxSomConversationChannel
-  ) {
-
-    supabase.removeChannel(
-      window.maxSomConversationChannel
-    );
-  }
-
-
-  window.maxSomConversationChannel =
-    supabase
-      .channel(
-        "maxsom-conversas"
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: TABLES.CONVERSAS
-        },
-        async () => {
-
-          if (
-            document.querySelector(
-              "#conversasLista"
-            ) ||
-            document.querySelector(
-              "#conversationsList"
-            )
-          ) {
-
-            await loadConversations();
-          }
-        }
-      )
-      .subscribe();
-}
-
-
-/* =========================================================
-   25. PRODUTOS PÚBLICOS
-   ========================================================= */
-
-async function loadPublicProducts() {
-
-  const container =
-    qs(
-      "#produtosLista",
-      "#productsList",
-      "#produtosContainer"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.PRODUTOS)
-      .select("*")
-      .order(
-        "nome",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar produtos:",
-      error
-    );
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhum produto cadastrado
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (product) => `
-
-          <article class="product-card">
-
-            ${
-              product.imagem_url
-
-                ? `
-                  <img
-                    src="${esc(
-                      product.imagem_url
-                    )}"
-                    alt="${esc(
-                      product.nome ||
-                      "Produto Max Som"
-                    )}"
-                    loading="lazy"
-                  >
-                `
-
-                : `
-                  <div class="product-placeholder">
-                    Max Som
-                  </div>
-                `
-            }
-
-
-            <div class="product-card-content">
-
-              <h3>
-                ${esc(
-                  product.nome ||
-                  "Produto"
-                )}
-              </h3>
-
-              ${
-                product.descricao
-
-                  ? `
-                    <p>
-                      ${esc(
-                        product.descricao
-                      )}
-                    </p>
-                  `
-
-                  : ""
-              }
-
-            </div>
-
-          </article>
-
-        `
-      )
-      .join("");
-}
-
-
-/* =========================================================
-   26. SERVIÇOS PÚBLICOS
-   ========================================================= */
-
-async function loadPublicServices() {
-
-  const container =
-    qs(
-      "#servicosLista",
-      "#servicesList",
-      "#servicosContainer"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.SERVICOS)
-      .select("*")
-      .order(
-        "nome",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar serviços:",
-      error
-    );
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhum serviço cadastrado
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (service) => `
-
-          <article class="service-card">
-
-            ${
-              service.imagem_url
-
-                ? `
-                  <img
-                    src="${esc(
-                      service.imagem_url
-                    )}"
-                    alt="${esc(
-                      service.nome ||
-                      "Serviço Max Som"
-                    )}"
-                    loading="lazy"
-                  >
-                `
-
-                : ""
-            }
-
-
-            <div class="service-card-content">
-
-              <h3>
-                ${esc(
-                  service.nome ||
-                  "Serviço"
-                )}
-              </h3>
-
-              ${
-                service.descricao
-
-                  ? `
-                    <p>
-                      ${esc(
-                        service.descricao
-                      )}
-                    </p>
-                  `
-
-                  : ""
-              }
-
-
-              <button
-                type="button"
-                class="btn-primary"
-                data-service-name="${esc(
-                  service.nome ||
-                  "Atendimento"
-                )}"
-              >
-                Solicitar atendimento
-              </button>
-
-            </div>
-
-          </article>
-
-        `
-      )
-      .join("");
-
-
-  container
-    .querySelectorAll(
-      "[data-service-name]"
-    )
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const serviceName =
-            button.dataset.serviceName ||
-            "Atendimento";
-
-          window.location.href =
-            `atendimento.html?servico=${encodeURIComponent(
-              serviceName
-            )}`;
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   27. PROJETOS PÚBLICOS
-   ========================================================= */
-
-async function loadPublicProjects() {
-
-  const container =
-    qs(
-      "#projetosLista",
-      "#projectsList",
-      "#projetosContainer"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.PROJETOS)
-      .select("*")
-      .order(
-        "criado_em",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar projetos:",
-      error
-    );
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhum projeto cadastrado
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (project) => `
-
-          <article class="project-card">
-
-            ${
-              project.imagem_url
-
-                ? `
-                  <img
-                    src="${esc(
-                      project.imagem_url
-                    )}"
-                    alt="${esc(
-                      project.nome ||
-                      "Projeto Max Som"
-                    )}"
-                    loading="lazy"
-                  >
-                `
-
-                : ""
-            }
-
-
-            <div class="project-card-content">
-
-              <h3>
-                ${esc(
-                  project.nome ||
-                  "Projeto"
-                )}
-              </h3>
-
-              ${
-                project.descricao
-
-                  ? `
-                    <p>
-                      ${esc(
-                        project.descricao
-                      )}
-                    </p>
-                  `
-
-                  : ""
-              }
-
-            </div>
-
-          </article>
-
-        `
-      )
-      .join("");
-}
-/* =========================================================
-   28. PUBLICAÇÕES
-   ========================================================= */
-
-async function loadPublications() {
-
-  const container =
-    qs(
-      "#publicacoesLista",
-      "#publicationsList",
-      "#publicacoesContainer"
-    );
-
-  if (!container) return;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.PUBLICACOES)
-      .select("*")
-      .order(
-        "criado_em",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar publicações:",
-      error
-    );
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <h3>
-          Nenhuma publicação cadastrada
-        </h3>
-
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (publication) => `
-
-          <article class="publication-card">
-
-            ${
-              publication.imagem_url
-
-                ? `
-                  <img
-                    src="${esc(
-                      publication.imagem_url
-                    )}"
-                    alt="${esc(
-                      publication.titulo ||
-                      "Publicação Max Som"
-                    )}"
-                    loading="lazy"
-                  >
-                `
-
-                : ""
-            }
-
-
-            <div class="publication-card-content">
-
-              <h3>
-                ${esc(
-                  publication.titulo ||
-                  "Publicação"
-                )}
-              </h3>
-
-
-              ${
-                publication.resumo
-
-                  ? `
-                    <p>
-                      ${esc(
-                        publication.resumo
-                      )}
-                    </p>
-                  `
-
-                  : publication.conteudo
-
-                    ? `
-                      <p>
-                        ${esc(
-                          publication.conteudo
-                        )}
-                      </p>
-                    `
-
-                    : ""
-              }
-
-
-              ${
-                publication.criado_em
-
-                  ? `
-                    <time>
-                      ${esc(
-                        formatDate(
-                          publication.criado_em
-                        )
-                      )}
-                    </time>
-                  `
-
-                  : ""
-              }
-
-            </div>
-
-          </article>
-
-        `
-      )
-      .join("");
-}
-
-
-/* =========================================================
-   29. LINKS DE SERVIÇOS
-   ========================================================= */
-
-function setupServiceLinks() {
-
-  document
-    .querySelectorAll(
-      "[data-service]"
-    )
-    .forEach((element) => {
-
-      if (
-        element.dataset.serviceBound ===
-        "true"
-      ) {
-        return;
-      }
-
-
-      element.dataset.serviceBound =
-        "true";
-
-
-      element.addEventListener(
-        "click",
-        (event) => {
-
-          event.preventDefault();
-
-
-          const service =
-            element.dataset.service ||
-            element.textContent.trim();
-
-
-          window.location.href =
-            `atendimento.html?servico=${encodeURIComponent(
-              service
-            )}`;
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   30. WHATSAPP
-   ========================================================= */
-
-function setupWhatsApp() {
-
-  const phone =
-    "5565996262514";
-
-
-  document
-    .querySelectorAll(
-      "[data-whatsapp]"
-    )
-    .forEach((element) => {
-
-      if (
-        element.dataset.whatsappBound ===
-        "true"
-      ) {
-        return;
-      }
-
-
-      element.dataset.whatsappBound =
-        "true";
-
-
-      element.addEventListener(
-        "click",
-        (event) => {
-
-          event.preventDefault();
-
-
-          const message =
-            element.dataset.whatsappMessage ||
-            "Olá! Gostaria de falar com a Max Som.";
-
-
-          const url =
-            `https://wa.me/${phone}?text=${encodeURIComponent(
-              message
-            )}`;
-
-
-          window.open(
-            url,
-            "_blank"
-          );
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   31. FORMULÁRIO DE CONTATO
-   ========================================================= */
-
-function setupContactForm() {
-
-  const form =
-    qs(
-      "#contactForm",
-      "#formContato",
-      "#contatoForm"
-    );
-
-  if (!form) return;
-
-
-  if (
-    form.dataset.bound ===
-    "true"
-  ) {
-    return;
-  }
-
-
-  form.dataset.bound =
-    "true";
-
-
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      const nome =
-        qs(
-          "#contactNome",
-          "#nomeContato",
-          "#nome"
-        )?.value.trim();
-
-
-      const email =
-        qs(
-          "#contactEmail",
-          "#emailContato",
-          "#email"
-        )?.value.trim();
-
-
-      const telefone =
-        qs(
-          "#contactTelefone",
-          "#telefoneContato",
-          "#telefone"
-        )?.value.trim();
-
-
-      const mensagem =
-        qs(
-          "#contactMensagem",
-          "#mensagemContato",
-          "#mensagem"
-        )?.value.trim();
-
-
-      const feedback =
-        qs(
-          "#contactFeedback",
-          "#mensagemContatoFeedback"
-        );
-
-
-      if (!mensagem) {
-
-        if (feedback) {
-
-          feedback.textContent =
-            "Digite uma mensagem.";
-        }
-
-        return;
-      }
-
-
-      /*
-       * O formulário de contato não envia
-       * automaticamente para uma tabela que
-       * não esteja confirmada no banco.
-       *
-       * Ele direciona o atendimento para
-       * o WhatsApp oficial da empresa.
-       */
-
-
-      const text =
-        [
-          "Olá! Vim pelo site da Max Som.",
-          nome
-            ? `Nome: ${nome}`
-            : "",
-          email
-            ? `E-mail: ${email}`
-            : "",
-          telefone
-            ? `Telefone: ${telefone}`
-            : "",
-          `Mensagem: ${mensagem}`
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-
-      const url =
-        `https://wa.me/5565996262514?text=${encodeURIComponent(
-          text
-        )}`;
-
-
-      window.open(
-        url,
-        "_blank"
-      );
-
-
-      if (feedback) {
-
-        feedback.textContent =
-          "Mensagem preparada para o WhatsApp.";
-      }
-    }
-  );
-}
-
-
-/* =========================================================
-   32. PÁGINA ATUAL
-   ========================================================= */
-
-function getCurrentPage() {
-
-  const path =
-    window.location.pathname
-      .split("/")
-      .pop()
-      .toLowerCase();
-
-
-  return path ||
-    "index.html";
-}
-
-
-/* =========================================================
-   33. BOTÕES CANCELAR
-   ========================================================= */
-
-function setupCancelButtons() {
-
-  const buttons = [
-
-    "#produtoCancelar",
-
-    "#servicoCancelar",
-
-    "#projetoCancelar",
-
-    "#publicacaoCancelar",
-
-    "#cancelarProduto",
-
-    "#cancelarServico",
-
-    "#cancelarProjeto",
-
-    "#cancelarPublicacao"
-
-  ];
-
-
-  buttons.forEach(
-    (selector) => {
-
-      const button =
-        document.querySelector(
-          selector
-        );
-
-
-      if (!button) return;
-
-
-      if (
-        button.dataset.cancelBound ===
-        "true"
-      ) {
-        return;
-      }
-
-
-      button.dataset.cancelBound =
-        "true";
-
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const form =
-            button.closest(
-              "form"
-            );
-
-
-          if (form) {
-            form.reset();
-          }
-
-
-          document
-            .querySelectorAll(
-              ".modal.open, .modal.active, .admin-modal.open"
-            )
-            .forEach(
-              (modal) => {
-
-                modal.classList.remove(
-                  "open",
-                  "active"
-                );
-              }
-            );
-        }
-      );
-    }
-  );
-}
-
-
-/* =========================================================
-   34. ADMIN
-   ========================================================= */
-
-async function adminMain() {
+ * Impede que um administrador já logado
+ * fique parado na tela de login.
+ */
+
+async function redirectAuthenticatedUser() {
 
   const page =
-    document.querySelector(
-      ".admin-page"
-    ) ||
-    document.querySelector(
-      "[data-admin-page]"
-    );
+    getCurrentPage();
 
 
-  if (!page) return;
+  if (
+    page !==
+    "login.html"
+  ) {
 
-
-  const allowed =
-    await requireAdmin();
-
-
-  if (!allowed) {
     return;
+
   }
 
 
-  await adminStats();
+  if (!currentUser) {
 
-  await adminUsers();
+    return;
 
-  setupCancelButtons();
+  }
+
+
+  const profile =
+    await ensureProfile();
+
+
+  if (
+    isAdmin(
+      profile
+    )
+  ) {
+
+    window.location.href =
+      "admin.html";
+
+  } else {
+
+    window.location.href =
+      "conta.html";
+
+  }
+
 }
 
 
+
 /* =========================================================
-   35. VERIFICAÇÃO DE PÁGINAS LOGADAS
+   14. PROTEÇÃO DAS PÁGINAS DE CONTA
    ========================================================= */
 
 async function checkLoggedPage() {
@@ -2948,29 +1989,35 @@ async function checkLoggedPage() {
       page
     )
   ) {
+
     return;
+
   }
 
 
-  const {
-    data: { user }
-  } =
-    await supabase.auth.getUser();
-
-
-  if (!user) {
+  if (
+    !currentUser
+  ) {
 
     window.location.href =
       "login.html";
+
+    return;
+
   }
+
+
+  await ensureProfile();
+
 }
 
 
+
 /* =========================================================
-   36. REDIRECIONAMENTO ADMIN
+   15. PROTEÇÃO DA PÁGINA ADMIN
    ========================================================= */
 
-async function redirectAdmin() {
+async function checkAdminPage() {
 
   const page =
     getCurrentPage();
@@ -2978,19 +2025,36 @@ async function redirectAdmin() {
 
   if (
     page !==
-    "login.html"
+    "admin.html"
   ) {
-    return;
+
+    return true;
+
   }
 
 
-  const {
-    data: { user }
-  } =
-    await supabase.auth.getUser();
+  return await requireAdmin();
+
+}
 
 
-  if (!user) {
+
+/* =========================================================
+   FIM DA PARTE 2
+   ========================================================= */
+/* =========================================================
+   6. NAVEGAÇÃO
+   ========================================================= */
+
+
+/*
+ * Atualiza todos os elementos do menu conforme
+ * o estado atual do usuário.
+ */
+
+async function updateNav() {
+
+  if (!supabase) {
     return;
   }
 
@@ -2999,69 +2063,1111 @@ async function redirectAdmin() {
     await ensureProfile();
 
 
-  if (isAdmin(profile)) {
+  const logged =
+    !!currentUser;
 
-    window.location.href =
-      "admin.html";
+
+  const admin =
+    isAdmin(profile);
+
+
+
+  /* =====================================================
+     ELEMENTOS DE VISITANTE
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-guest-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? "none"
+            : "";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     ELEMENTOS DE USUÁRIO LOGADO
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-logged-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     ELEMENTOS EXCLUSIVOS DO ADMIN
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-admin-only]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          admin
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     LINKS DE CONVERSAS
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-conversations-link]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+      }
+    );
+
+
+
+  /* =====================================================
+     SAIR
+     ===================================================== */
+
+  document
+    .querySelectorAll(
+      "[data-logout]"
+    )
+    .forEach(
+      (element) => {
+
+        element.style.display =
+          logged
+            ? ""
+            : "none";
+
+
+        if (
+          element.dataset.logoutBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        element.dataset.logoutBound =
+          "true";
+
+
+        element.addEventListener(
+          "click",
+          async (event) => {
+
+            event.preventDefault();
+
+            await logout();
+
+          }
+        );
+
+      }
+    );
+
+
+
+  /* =====================================================
+     ATUALIZA LINK ADMIN ESPECÍFICO
+     ===================================================== */
+
+  const adminLink =
+    qs(
+      "#adminLink"
+    );
+
+
+  if (adminLink) {
+
+    adminLink.style.display =
+      admin
+        ? ""
+        : "none";
+
   }
+
+
+
+  /* =====================================================
+     ATUALIZA LINK DA CONTA
+     ===================================================== */
+
+  const accountLink =
+    qs(
+      "#accountLink"
+    );
+
+
+  if (accountLink) {
+
+    accountLink.style.display =
+      logged
+        ? ""
+        : "none";
+
+  }
+
+
+
+  /* =====================================================
+     ATUALIZA LINK LOGIN
+     ===================================================== */
+
+  const loginLink =
+    qs(
+      "#loginLink"
+    );
+
+
+  if (loginLink) {
+
+    loginLink.style.display =
+      logged
+        ? "none"
+        : "";
+
+  }
+
+
+
+  /* =====================================================
+     ATUALIZA LINK CADASTRO
+     ===================================================== */
+
+  const signupLink =
+    qs(
+      "#signupLink"
+    );
+
+
+  if (signupLink) {
+
+    signupLink.style.display =
+      logged
+        ? "none"
+        : "";
+
+  }
+
 }
 
 
+
 /* =========================================================
-   37. AUTENTICAÇÃO ATUAL
+   7. SINCRONIZAÇÃO DO PERFIL
    ========================================================= */
 
-async function initializeAuth() {
+
+/*
+ * Garante que os dados informados no cadastro
+ * sejam gravados na tabela usuario.
+ */
+
+async function syncProfileData(
+  user,
+  values = {}
+) {
+
+  if (
+    !user ||
+    !supabase
+  ) {
+
+    return null;
+
+  }
+
+
+  const nome =
+    String(
+      values.nome ||
+      user.user_metadata?.nome ||
+      user.email?.split("@")[0] ||
+      "Cliente"
+    )
+      .trim();
+
+
+  const telefone =
+    String(
+      values.telefone ||
+      user.user_metadata?.telefone ||
+      ""
+    )
+      .trim();
+
+
+  const whatsapp =
+    String(
+      values.whatsapp ||
+      user.user_metadata?.whatsapp ||
+      ""
+    )
+      .trim();
+
+
+
+  /*
+   * Primeiro tenta localizar
+   * o perfil existente.
+   */
 
   const {
-    data: {
-      session
-    },
+    data: existing,
+    error: readError
+  } =
+
+    await supabase
+
+      .from(
+        TABLES.USUARIO
+      )
+
+      .select("*")
+
+      .eq(
+        "id",
+        user.id
+      )
+
+      .maybeSingle();
+
+
+
+  if (readError) {
+
+    console.error(
+      "Erro ao consultar perfil:",
+      readError
+    );
+
+    return null;
+
+  }
+
+
+
+  /* =====================================================
+     PERFIL JÁ EXISTE
+     ===================================================== */
+
+  if (existing) {
+
+    const updateData = {};
+
+
+    if (
+      nome &&
+      !existing.nome
+    ) {
+
+      updateData.nome =
+        nome;
+
+    }
+
+
+    if (
+      telefone &&
+      !existing.telefone
+    ) {
+
+      updateData.telefone =
+        telefone;
+
+    }
+
+
+    if (
+      whatsapp &&
+      !existing.whatsapp
+    ) {
+
+      updateData.whatsapp =
+        whatsapp;
+
+    }
+
+
+    if (
+      Object.keys(
+        updateData
+      ).length
+    ) {
+
+      const {
+        data,
+        error
+      } =
+
+        await supabase
+
+          .from(
+            TABLES.USUARIO
+          )
+
+          .update(
+            updateData
+          )
+
+          .eq(
+            "id",
+            user.id
+          )
+
+          .select("*")
+
+          .single();
+
+
+      if (error) {
+
+        console.error(
+          "Erro ao atualizar perfil:",
+          error
+        );
+
+        return existing;
+
+      }
+
+
+      currentProfile =
+        data || existing;
+
+
+      currentUser =
+        user;
+
+
+      return currentProfile;
+
+    }
+
+
+    currentProfile =
+      existing;
+
+
+    currentUser =
+      user;
+
+
+    return existing;
+
+  }
+
+
+
+  /* =====================================================
+     PERFIL AINDA NÃO EXISTE
+     ===================================================== */
+
+  const newProfile = {
+
+    id:
+      user.id,
+
+    nome:
+      nome,
+
+    telefone:
+      telefone || null,
+
+    whatsapp:
+      whatsapp || null,
+
+    tipo_usuario:
+      "cliente"
+
+  };
+
+
+
+  const {
+    data,
     error
   } =
-    await supabase.auth.getSession();
+
+    await supabase
+
+      .from(
+        TABLES.USUARIO
+      )
+
+      .insert(
+        newProfile
+      )
+
+      .select("*")
+
+      .single();
+
 
 
   if (error) {
 
     console.error(
-      "Erro ao recuperar sessão:",
+      "Erro ao criar perfil:",
       error
     );
 
     return null;
+
   }
 
-
-  if (!session) {
-
-    currentUser = null;
-    currentProfile = null;
-
-    await updateNav();
-
-    return null;
-  }
 
 
   currentUser =
-    session.user;
+    user;
 
 
-  await ensureProfile();
-
-  await updateNav();
+  currentProfile =
+    data || null;
 
 
   return currentProfile;
+
 }
 
 
+
 /* =========================================================
-   38. LISTENER DE AUTENTICAÇÃO
+   8. CADASTRO
    ========================================================= */
 
+async function setupSignup() {
+
+  const form =
+    qs(
+      "#signupForm",
+      "#formCadastro"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.signupBound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  form.dataset.signupBound =
+    "true";
+
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+
+      const nome =
+        qs(
+          "#signupNome",
+          "#nome"
+        )
+          ?.value
+          .trim();
+
+
+      const telefone =
+        qs(
+          "#signupTelefone",
+          "#telefone"
+        )
+          ?.value
+          .trim();
+
+
+      const whatsapp =
+        qs(
+          "#signupWhatsapp",
+          "#whatsapp"
+        )
+          ?.value
+          .trim();
+
+
+      const email =
+        qs(
+          "#signupEmail",
+          "#email"
+        )
+          ?.value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        qs(
+          "#signupPassword",
+          "#senha"
+        )
+          ?.value;
+
+
+
+      const message =
+        qs(
+          "#signupError",
+          "#mensagemCadastro"
+        );
+
+
+      const button =
+        form.querySelector(
+          "button[type='submit']"
+        );
+
+
+
+      clearMessage(
+        message
+      );
+
+
+      if (
+        !nome ||
+        !email ||
+        !password
+      ) {
+
+        showMessage(
+          message,
+          "Preencha seu nome, e-mail e senha.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+
+      setButtonLoading(
+        button,
+        true,
+        "Criar conta"
+      );
+
+
+
+      try {
+
+        const profileValues = {
+
+          nome:
+            nome,
+
+          telefone:
+            telefone,
+
+          whatsapp:
+            whatsapp
+
+        };
+
+
+
+        const {
+          data,
+          error
+        } =
+
+          await supabase.auth.signUp({
+
+            email:
+              email,
+
+            password:
+              password,
+
+            options: {
+
+              data: {
+
+                nome:
+                  nome,
+
+                telefone:
+                  telefone,
+
+                whatsapp:
+                  whatsapp
+
+              }
+
+            }
+
+          });
+
+
+
+        if (error) {
+
+          throw error;
+
+        }
+
+
+
+        const user =
+          data?.user;
+
+
+
+        if (!user) {
+
+          throw new Error(
+            "Não foi possível criar o usuário."
+          );
+
+        }
+
+
+
+        /*
+         * Se o Supabase criou uma sessão imediatamente,
+         * podemos criar/atualizar o perfil agora.
+         */
+
+        if (
+          data?.session
+        ) {
+
+          await syncProfileData(
+            user,
+            profileValues
+          );
+
+
+          showMessage(
+            message,
+            "Conta criada com sucesso. Entrando...",
+            "success"
+          );
+
+
+          setTimeout(
+            () => {
+
+              window.location.href =
+                "conta.html";
+
+            },
+            500
+          );
+
+
+          return;
+
+        }
+
+
+
+        /*
+         * Quando a confirmação de e-mail está ativa,
+         * o usuário ainda não terá sessão.
+         */
+
+        showMessage(
+          message,
+          "Conta criada. Confirme seu e-mail e depois faça login para acessar sua conta.",
+          "success"
+        );
+
+
+        form.reset();
+
+
+
+      } catch (error) {
+
+        console.error(
+          "Erro no cadastro:",
+          error
+        );
+
+
+        showMessage(
+          message,
+          dbError(
+            error,
+            "Não foi possível criar a conta."
+          ),
+          "error"
+        );
+
+      } finally {
+
+        setButtonLoading(
+          button,
+          false,
+          "Criar conta"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   9. LOGIN
+   ========================================================= */
+
+async function setupLogin() {
+
+  const form =
+    qs(
+      "#loginForm",
+      "#formLogin"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.loginBound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  form.dataset.loginBound =
+    "true";
+
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+
+      const email =
+        qs(
+          "#loginEmail",
+          "#email"
+        )
+          ?.value
+          .trim()
+          .toLowerCase();
+
+
+      const password =
+        qs(
+          "#loginPassword",
+          "#senha"
+        )
+          ?.value;
+
+
+
+      const message =
+        qs(
+          "#loginError",
+          "#mensagemLogin"
+        );
+
+
+      const button =
+        form.querySelector(
+          "button[type='submit']"
+        );
+
+
+
+      clearMessage(
+        message
+      );
+
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        showMessage(
+          message,
+          "Preencha o e-mail e a senha.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+
+      setButtonLoading(
+        button,
+        true,
+        "Entrar"
+      );
+
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+
+          await supabase.auth.signInWithPassword({
+
+            email:
+              email,
+
+            password:
+              password
+
+          });
+
+
+
+        if (error) {
+
+          throw error;
+
+        }
+
+
+
+        if (
+          !data?.user
+        ) {
+
+          throw new Error(
+            "A sessão não foi criada."
+          );
+
+        }
+
+
+
+        /*
+         * Recupera os dados do perfil.
+         */
+
+        const profile =
+          await syncProfileData(
+            data.user
+          );
+
+
+
+        showMessage(
+          message,
+          "Login realizado com sucesso. Entrando...",
+          "success"
+        );
+
+
+
+        /*
+         * Redirecionamento correto:
+         *
+         * administrador → admin.html
+         * cliente → conta.html
+         */
+
+        if (
+          isAdmin(
+            profile
+          )
+        ) {
+
+          window.location.href =
+            "admin.html";
+
+        } else {
+
+          window.location.href =
+            "conta.html";
+
+        }
+
+
+
+      } catch (error) {
+
+        console.error(
+          "Erro no login:",
+          error
+        );
+
+
+        showMessage(
+          message,
+          "E-mail ou senha incorretos. Verifique os dados e tente novamente.",
+          "error"
+        );
+
+
+      } finally {
+
+        setButtonLoading(
+          button,
+          false,
+          "Entrar"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   10. LOGOUT
+   ========================================================= */
+
+async function logout() {
+
+  if (!supabase) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabase.auth.signOut();
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao sair:",
+      error
+    );
+
+
+    alert(
+      "Não foi possível sair da conta."
+    );
+
+
+    return;
+
+  }
+
+
+
+  currentUser =
+    null;
+
+
+  currentProfile =
+    null;
+
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+
+/* =========================================================
+   11. LISTENER DE AUTENTICAÇÃO
+   ========================================================= */
+
+
+/*
+ * Mantém o menu sincronizado quando:
+ *
+ * login
+ * logout
+ * atualização de sessão
+ * recuperação de sessão
+ */
+
 function setupAuthListener() {
+
+  if (!supabase) {
+    return;
+  }
+
+
+  if (
+    window.maxSomAuthListener
+  ) {
+
+    return;
+
+  }
+
+
+  window.maxSomAuthListener =
+    true;
+
+
 
   supabase.auth.onAuthStateChange(
     async (
@@ -3076,15 +3182,28 @@ function setupAuthListener() {
 
       if (currentUser) {
 
-        await ensureProfile();
+        await syncProfileData(
+          currentUser
+        );
 
       } else {
 
-        currentProfile = null;
+        currentProfile =
+          null;
+
       }
 
 
       await updateNav();
+
+
+      /*
+       * Páginas protegidas.
+       */
+
+      const page =
+        getCurrentPage();
+
 
 
       if (
@@ -3092,8 +3211,4973 @@ function setupAuthListener() {
         "SIGNED_OUT"
       ) {
 
-        const page =
-          getCurrentPage();
+        if (
+          page ===
+            "conta.html" ||
+
+          page ===
+            "conversas.html" ||
+
+          page ===
+            "conversa.html" ||
+
+          page ===
+            "admin.html"
+        ) {
+
+          window.location.href =
+            "login.html";
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   12. PROTEÇÃO DO PAINEL ADMINISTRATIVO
+   ========================================================= */
+
+async function requireAdmin() {
+
+  const profile =
+    await ensureProfile();
+
+
+
+  if (
+    !profile ||
+    !isAdmin(
+      profile
+    )
+  ) {
+
+    /*
+     * Se não estiver logado,
+     * manda para login.
+     */
+
+    if (!currentUser) {
+
+      window.location.href =
+        "login.html";
+
+      return false;
+
+    }
+
+
+
+    /*
+     * Se estiver logado mas não for admin,
+     * volta para a Home.
+     */
+
+    window.location.href =
+      "index.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+
+/* =========================================================
+   13. REDIRECIONAMENTO APÓS LOGIN
+   ========================================================= */
+
+
+/*
+ * Impede que um administrador já logado
+ * fique parado na tela de login.
+ */
+
+async function redirectAuthenticatedUser() {
+
+  const page =
+    getCurrentPage();
+
+
+  if (
+    page !==
+    "login.html"
+  ) {
+
+    return;
+
+  }
+
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const profile =
+    await ensureProfile();
+
+
+  if (
+    isAdmin(
+      profile
+    )
+  ) {
+
+    window.location.href =
+      "admin.html";
+
+  } else {
+
+    window.location.href =
+      "conta.html";
+
+  }
+
+}
+
+
+
+/* =========================================================
+   14. PROTEÇÃO DAS PÁGINAS DE CONTA
+   ========================================================= */
+
+async function checkLoggedPage() {
+
+  const protectedPages = [
+
+    "conta.html",
+
+    "conversas.html",
+
+    "conversa.html"
+
+  ];
+
+
+  const page =
+    getCurrentPage();
+
+
+  if (
+    !protectedPages.includes(
+      page
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    !currentUser
+  ) {
+
+    window.location.href =
+      "login.html";
+
+    return;
+
+  }
+
+
+  await ensureProfile();
+
+}
+
+
+
+/* =========================================================
+   15. PROTEÇÃO DA PÁGINA ADMIN
+   ========================================================= */
+
+async function checkAdminPage() {
+
+  const page =
+    getCurrentPage();
+
+
+  if (
+    page !==
+    "admin.html"
+  ) {
+
+    return true;
+
+  }
+
+
+  return await requireAdmin();
+
+}
+
+
+
+/* =========================================================
+   FIM DA PARTE 2
+   ========================================================= */
+/* =========================================================
+   38. PRODUTOS PÚBLICOS
+   ========================================================= */
+
+async function loadPublicProducts() {
+
+  const container =
+    qs(
+      "#productsGrid",
+      "#produtosLista",
+      "#productsList",
+      "#produtosContainer"
+    );
+
+
+  if (
+    !container ||
+    !supabase
+  ) {
+
+    return;
+
+  }
+
+
+
+  const page =
+    getCurrentPage();
+
+
+  let query =
+    supabase
+
+      .from(
+        TABLES.PRODUTOS
+      )
+
+      .select(
+        `
+          id,
+          categoria_id,
+          marca_id,
+          nome,
+          modelo,
+          descricao,
+          especificacoes,
+          imagem_capa,
+          disponivel,
+          destaque
+        `
+      )
+
+      .eq(
+        "disponivel",
+        true
+      );
+
+
+
+  /*
+   * Na Home:
+   * mostra somente produtos marcados
+   * como destaque.
+   */
+
+  if (
+    page ===
+    "index.html"
+  ) {
+
+    query =
+      query
+        .eq(
+          "destaque",
+          true
+        )
+        .limit(
+          6
+        );
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await query
+
+      .order(
+        "destaque",
+        {
+          ascending:
+            false
+        }
+      )
+
+      .order(
+        "criado_em",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar produtos:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar os produtos.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhum produto disponível
+        </h3>
+
+        <p>
+          Nenhum produto foi cadastrado ou publicado ainda.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (product) => `
+
+          <article
+            class="product-card"
+          >
+
+            ${
+              product.imagem_capa
+
+                ? `
+
+                  <img
+                    src="${esc(
+                      product.imagem_capa
+                    )}"
+                    alt="${esc(
+                      product.nome ||
+                      "Produto Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+
+                `
+
+                : `
+
+                  <div class="product-image">
+                    Max Som
+                  </div>
+
+                `
+            }
+
+
+            <div
+              class="product-info"
+            >
+
+              <span>
+                Equipamento
+              </span>
+
+
+              <h3>
+                ${esc(
+                  product.nome ||
+                  "Produto"
+                )}
+              </h3>
+
+
+              ${
+                product.modelo
+
+                  ? `
+
+                    <p>
+                      <strong>
+                        Modelo:
+                      </strong>
+
+                      ${esc(
+                        product.modelo
+                      )}
+                    </p>
+
+                  `
+
+                  : ""
+              }
+
+
+              ${
+                product.descricao
+
+                  ? `
+
+                    <p>
+                      ${esc(
+                        product.descricao
+                      )}
+                    </p>
+
+                  `
+
+                  : `
+
+                    <p>
+                      Consulte a Max Som
+                      para mais informações.
+                    </p>
+
+                  `
+              }
+
+
+              ${
+                product.especificacoes
+
+                  ? `
+
+                    <details>
+
+                      <summary>
+                        Especificações
+                      </summary>
+
+                      <p>
+                        ${esc(
+                          product.especificacoes
+                        )}
+                      </p>
+
+                    </details>
+
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          </article>
+
+        `
+      )
+
+      .join("");
+
+}
+
+
+
+/* =========================================================
+   39. SERVIÇOS PÚBLICOS
+   ========================================================= */
+
+async function loadPublicServices() {
+
+  const container =
+    qs(
+      "#servicesGrid",
+      "#servicosLista",
+      "#servicesList",
+      "#servicosContainer"
+    );
+
+
+  if (
+    !container ||
+    !supabase
+  ) {
+
+    return;
+
+  }
+
+
+
+  const page =
+    getCurrentPage();
+
+
+
+  let query =
+    supabase
+
+      .from(
+        TABLES.SERVICOS
+      )
+
+      .select(
+        `
+          id,
+          nome,
+          descricao,
+          imagem_capa,
+          ativo
+        `
+      )
+
+      .eq(
+        "ativo",
+        true
+      );
+
+
+
+  /*
+   * A Home recebe uma quantidade reduzida
+   * para funcionar como destaque.
+   */
+
+  if (
+    page ===
+    "index.html"
+  ) {
+
+    query =
+      query.limit(
+        6
+      );
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await query
+
+      .order(
+        "criado_em",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar serviços:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar os serviços.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhum serviço disponível
+        </h3>
+
+        <p>
+          Nenhum serviço foi cadastrado ainda.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (service) => `
+
+          <article
+            class="service-card"
+          >
+
+            ${
+              service.imagem_capa
+
+                ? `
+
+                  <img
+                    src="${esc(
+                      service.imagem_capa
+                    )}"
+                    alt="${esc(
+                      service.nome ||
+                      "Serviço Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+
+                `
+
+                : ""
+            }
+
+
+            <div
+              class="service-info"
+            >
+
+              <h3>
+                ${esc(
+                  service.nome ||
+                  "Serviço"
+                )}
+              </h3>
+
+
+              <p>
+                ${esc(
+                  service.descricao ||
+                  "Consulte a Max Som para conhecer este serviço."
+                )}
+              </p>
+
+
+              <span
+                class="service-price"
+              >
+                Sob orçamento
+              </span>
+
+
+              <a
+                href="atendimento.html?servico=${encodeURIComponent(
+                  service.nome ||
+                  "Atendimento"
+                )}"
+                class="btn btn-primary"
+              >
+                Solicitar atendimento
+              </a>
+
+            </div>
+
+          </article>
+
+        `
+      )
+
+      .join("");
+
+}
+
+
+
+/* =========================================================
+   40. PROJETOS PÚBLICOS
+   ========================================================= */
+
+async function loadPublicProjects() {
+
+  const container =
+    qs(
+      "#projectsGrid",
+      "#projetosLista",
+      "#projectsList",
+      "#projetosContainer"
+    );
+
+
+  if (
+    !container ||
+    !supabase
+  ) {
+
+    return;
+
+  }
+
+
+
+  const page =
+    getCurrentPage();
+
+
+
+  let query =
+    supabase
+
+      .from(
+        TABLES.PROJETOS
+      )
+
+      .select(
+        `
+          id,
+          titulo,
+          descricao,
+          categoria,
+          imagem_capa,
+          publicado
+        `
+      )
+
+      .eq(
+        "publicado",
+        true
+      );
+
+
+
+  if (
+    page ===
+    "index.html"
+  ) {
+
+    query =
+      query.limit(
+        6
+      );
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await query
+
+      .order(
+        "criado_em",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar projetos:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar os projetos.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhum projeto publicado
+        </h3>
+
+        <p>
+          Os projetos publicados pela Max Som aparecerão aqui.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (project) => `
+
+          <article
+            class="project-card"
+          >
+
+            ${
+              project.imagem_capa
+
+                ? `
+
+                  <img
+                    src="${esc(
+                      project.imagem_capa
+                    )}"
+                    alt="${esc(
+                      project.titulo ||
+                      "Projeto Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+
+                `
+
+                : `
+
+                  <img
+                    src="projeto-01.png"
+                    alt="${esc(
+                      project.titulo ||
+                      "Projeto Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+
+                `
+            }
+
+
+            <div
+              class="project-info"
+            >
+
+              ${
+                project.categoria
+
+                  ? `
+
+                    <span>
+                      ${esc(
+                        project.categoria
+                      )}
+                    </span>
+
+                  `
+
+                  : ""
+              }
+
+
+              <h3>
+                ${esc(
+                  project.titulo ||
+                  "Projeto"
+                )}
+              </h3>
+
+
+              ${
+                project.descricao
+
+                  ? `
+
+                    <p>
+                      ${esc(
+                        project.descricao
+                      )}
+                    </p>
+
+                  `
+
+                  : ""
+              }
+
+
+              <a
+                href="atendimento.html"
+              >
+                Conhecer soluções →
+              </a>
+
+            </div>
+
+          </article>
+
+        `
+      )
+
+      .join("");
+
+}
+
+
+
+/* =========================================================
+   41. PUBLICAÇÕES PÚBLICAS
+   ========================================================= */
+
+async function loadPublications() {
+
+  const container =
+    qs(
+      "#postsGrid",
+      "#publicacoesLista",
+      "#publicationsList",
+      "#publicacoesContainer"
+    );
+
+
+  if (
+    !container ||
+    !supabase
+  ) {
+
+    return;
+
+  }
+
+
+
+  const page =
+    getCurrentPage();
+
+
+
+  let query =
+    supabase
+
+      .from(
+        TABLES.PUBLICACOES
+      )
+
+      .select(
+        `
+          id,
+          categoria_id,
+          autor_id,
+          titulo,
+          resumo,
+          conteudo,
+          imagem_capa,
+          publicado,
+          data_publicacao
+        `
+      )
+
+      .eq(
+        "publicado",
+        true
+      );
+
+
+
+  if (
+    page ===
+    "index.html"
+  ) {
+
+    query =
+      query.limit(
+        6
+      );
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await query
+
+      .order(
+        "data_publicacao",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar publicações:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar as publicações.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhuma publicação disponível
+        </h3>
+
+        <p>
+          As novidades da Max Som aparecerão aqui.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (publication) => `
+
+          <article
+            class="post-card"
+          >
+
+            ${
+              publication.imagem_capa
+
+                ? `
+
+                  <img
+                    src="${esc(
+                      publication.imagem_capa
+                    )}"
+                    alt="${esc(
+                      publication.titulo ||
+                      "Publicação Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+
+                `
+
+                : `
+
+                  <div class="post-image">
+                    Max Som
+                  </div>
+
+                `
+            }
+
+
+            <div
+              class="post-info"
+            >
+
+              <span>
+                Publicação
+              </span>
+
+
+              <h3>
+                ${esc(
+                  publication.titulo ||
+                  "Publicação"
+                )}
+              </h3>
+
+
+              ${
+                publication.resumo
+
+                  ? `
+
+                    <p>
+                      ${esc(
+                        publication.resumo
+                      )}
+                    </p>
+
+                  `
+
+                  : publication.conteudo
+
+                    ? `
+
+                      <p>
+                        ${esc(
+                          publication.conteudo
+                        )}
+                      </p>
+
+                    `
+
+                    : ""
+              }
+
+
+              ${
+                publication.data_publicacao
+
+                  ? `
+
+                    <small class="muted">
+
+                      ${esc(
+                        formatDate(
+                          publication.data_publicacao
+                        )
+                      )}
+
+                    </small>
+
+                  `
+
+                  : ""
+              }
+
+
+              ${
+                publication.conteudo
+
+                  ? `
+
+                    <details>
+
+                      <summary>
+                        Ler publicação
+                      </summary>
+
+                      <p>
+                        ${esc(
+                          publication.conteudo
+                        )}
+                      </p>
+
+                    </details>
+
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          </article>
+
+        `
+      )
+
+      .join("");
+
+}
+
+
+
+/* =========================================================
+   42. LINKS DE SERVIÇOS
+   ========================================================= */
+
+function setupServiceLinks() {
+
+  document
+    .querySelectorAll(
+      "[data-service]"
+    )
+    .forEach(
+      (element) => {
+
+        if (
+          element.dataset.serviceBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        element.dataset.serviceBound =
+          "true";
+
+
+        element.addEventListener(
+          "click",
+          (event) => {
+
+            event.preventDefault();
+
+
+            const service =
+              element.dataset.service ||
+              element.textContent.trim() ||
+              "Atendimento";
+
+
+            window.location.href =
+              `atendimento.html?servico=${encodeURIComponent(
+                service
+              )}`;
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   43. WHATSAPP
+   ========================================================= */
+
+function setupWhatsApp() {
+
+  const phone =
+    "5565996262514";
+
+
+  document
+    .querySelectorAll(
+      "[data-whatsapp]"
+    )
+    .forEach(
+      (element) => {
+
+        if (
+          element.dataset.whatsappBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        element.dataset.whatsappBound =
+          "true";
+
+
+        element.addEventListener(
+          "click",
+          (event) => {
+
+            event.preventDefault();
+
+
+            const message =
+              element.dataset.whatsappMessage ||
+
+              "Olá! Gostaria de falar com a Max Som.";
+
+
+            const url =
+              `https://wa.me/${phone}?text=${encodeURIComponent(
+                message
+              )}`;
+
+
+            window.open(
+              url,
+              "_blank",
+              "noopener,noreferrer"
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   44. DESTAQUES DA HOME
+   ========================================================= */
+
+function setupHomeLinks() {
+
+  const page =
+    getCurrentPage();
+
+
+  if (
+    page !==
+    "index.html"
+  ) {
+
+    return;
+
+  }
+
+
+
+  /*
+   * Garante que os links principais
+   * continuem levando às páginas próprias.
+   */
+
+  document
+    .querySelectorAll(
+      'a[href="produtos.html"]'
+    )
+    .forEach(
+      (link) => {
+
+        link.dataset.homeLink =
+          "produtos";
+
+      }
+    );
+
+
+
+  document
+    .querySelectorAll(
+      'a[href="servicos.html"]'
+    )
+    .forEach(
+      (link) => {
+
+        link.dataset.homeLink =
+          "servicos";
+
+      }
+    );
+
+
+
+  document
+    .querySelectorAll(
+      'a[href="projetos.html"]'
+    )
+    .forEach(
+      (link) => {
+
+        link.dataset.homeLink =
+          "projetos";
+
+      }
+    );
+
+
+
+  document
+    .querySelectorAll(
+      'a[href="publicacoes.html"]'
+    )
+    .forEach(
+      (link) => {
+
+        link.dataset.homeLink =
+          "publicacoes";
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   45. ANIMAÇÃO E PÁGINA ATIVA
+   ========================================================= */
+
+function enhancePublicInterface() {
+
+  const currentPage =
+    getCurrentPage();
+
+
+
+  /*
+   * Menu ativo.
+   */
+
+  document
+    .querySelectorAll(
+      "nav a[href]"
+    )
+    .forEach(
+      (link) => {
+
+        const href =
+          link
+            .getAttribute(
+              "href"
+            )
+            ?.split("?")[0];
+
+
+        if (
+          href ===
+          currentPage
+        ) {
+
+          link.classList.add(
+            "nav-current"
+          );
+
+          link.classList.add(
+            "active"
+          );
+
+        }
+
+      }
+    );
+
+
+
+  /*
+   * Pequena animação escalonada
+   * para os cards existentes.
+   */
+
+  document
+    .querySelectorAll(
+      `
+        .product-card,
+        .service-card,
+        .project-card,
+        .post-card,
+        .publication-card,
+        .benefit-card
+      `
+    )
+
+    .forEach(
+      (card, index) => {
+
+        card.style.animationDelay =
+          `${Math.min(
+            index * 45,
+            250
+          )}ms`;
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   46. FIM DA PARTE 4
+   ========================================================= */
+/* =========================================================
+   47. CARREGAR SERVIÇOS NO ATENDIMENTO
+   ========================================================= */
+
+async function loadAttendanceServices() {
+
+  const select =
+    qs(
+      "#servico",
+      "#requestServico",
+      "#servicoId"
+    );
+
+
+  if (
+    !select ||
+    !supabase
+  ) {
+
+    return;
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.SERVICOS
+      )
+
+      .select(
+        `
+          id,
+          nome,
+          ativo
+        `
+      )
+
+      .eq(
+        "ativo",
+        true
+      )
+
+      .order(
+        "nome",
+        {
+          ascending:
+            true
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar serviços do atendimento:",
+      error
+    );
+
+
+    select.innerHTML = `
+
+      <option value="">
+        Não foi possível carregar os serviços
+      </option>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  select.innerHTML = `
+
+    <option value="">
+      Selecione um serviço
+    </option>
+
+  `;
+
+
+
+  (data || [])
+    .forEach(
+      (service) => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          service.id;
+
+
+        option.textContent =
+          service.nome;
+
+
+        option.dataset.nome =
+          service.nome;
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+
+  /*
+   * Lê o serviço vindo da URL.
+   *
+   * Exemplo:
+   * atendimento.html?servico=Instalação
+   */
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const serviceFromUrl =
+    params.get(
+      "servico"
+    ) ||
+    params.get(
+      "service"
+    );
+
+
+
+  if (
+    serviceFromUrl
+  ) {
+
+    const options =
+      Array.from(
+        select.options
+      );
+
+
+
+    const match =
+      options.find(
+        (option) => {
+
+          const byId =
+            option.value ===
+            serviceFromUrl;
+
+
+          const byName =
+            (
+              option.dataset.nome ||
+              option.textContent ||
+              ""
+            )
+              .trim()
+              .toLowerCase() ===
+            serviceFromUrl
+              .trim()
+              .toLowerCase();
+
+
+          return (
+            byId ||
+            byName
+          );
+
+        }
+      );
+
+
+
+    if (match) {
+
+      select.value =
+        match.value;
+
+    }
+
+  }
+
+}
+
+
+
+/* =========================================================
+   48. PREENCHER DADOS DO USUÁRIO
+   ========================================================= */
+
+async function fillAttendanceUserData() {
+
+  const nameInput =
+    qs(
+      "#nomeContato",
+      "#requestNome",
+      "#nomeSolicitante"
+    );
+
+
+  const phoneInput =
+    qs(
+      "#telefoneContato",
+      "#requestTelefone",
+      "#telefone"
+    );
+
+
+  if (
+    !nameInput &&
+    !phoneInput
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  const profile =
+    await ensureProfile();
+
+
+
+  if (!profile) {
+
+    return;
+
+  }
+
+
+
+  if (
+    nameInput &&
+    !nameInput.value &&
+    profile.nome
+  ) {
+
+    nameInput.value =
+      profile.nome;
+
+  }
+
+
+
+  if (
+    phoneInput &&
+    !phoneInput.value
+  ) {
+
+    const phone =
+      profile.whatsapp ||
+      profile.telefone ||
+      "";
+
+
+    if (phone) {
+
+      phoneInput.value =
+        phone;
+
+    }
+
+  }
+
+}
+
+
+
+/* =========================================================
+   49. CRIAR SOLICITAÇÃO NO BANCO — CORRIGIDA
+   ========================================================= */
+
+async function saveAttendanceRequest({
+  serviceId = null,
+  nome = "",
+  telefone = "",
+  equipamento = "",
+  descricao = ""
+} = {}) {
+
+  /*
+   * Só registra no banco quando existe
+   * um usuário autenticado.
+   */
+
+  if (
+    !currentUser
+  ) {
+
+    return {
+      saved: false,
+      error: null
+    };
+
+  }
+
+
+
+  /*
+   * A tabela de solicitações utiliza:
+   *
+   * cliente_id
+   * servico_id
+   * equipamento_id
+   * descricao_problema
+   * status
+   * observacoes
+   *
+   * Como o formulário público não possui
+   * um cadastro de equipamento vinculado,
+   * o texto do equipamento fica junto
+   * da descrição/observação.
+   */
+
+  const descricaoProblema =
+    [
+      equipamento
+        ? `Produto/equipamento: ${equipamento}`
+        : "",
+
+      descricao
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+
+
+  const observacoes =
+    [
+      nome
+        ? `Nome informado: ${nome}`
+        : "",
+
+      telefone
+        ? `Telefone/WhatsApp: ${telefone}`
+        : ""
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+
+
+  const payload = {
+
+    cliente_id:
+      currentUser.id,
+
+    servico_id:
+      serviceId ||
+      null,
+
+    equipamento_id:
+      null,
+
+    descricao_problema:
+      descricaoProblema ||
+      null,
+
+    status:
+      "solicitado",
+
+    observacoes:
+      observacoes ||
+      null
+
+  };
+
+
+
+  const {
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.SOLICITACOES
+      )
+
+      .insert(
+        payload
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao salvar solicitação:",
+      error
+    );
+
+
+    return {
+      saved: false,
+      error
+    };
+
+  }
+
+
+
+  return {
+    saved: true,
+    error: null
+  };
+
+}
+
+/* =========================================================
+   50. MONTAR MENSAGEM DO WHATSAPP
+   ========================================================= */
+
+function buildAttendanceWhatsAppMessage({
+  nome = "",
+  telefone = "",
+  servico = "",
+  equipamento = "",
+  descricao = ""
+} = {}) {
+
+  const lines = [
+
+    "Olá! Quero falar com a Max Som.",
+
+    nome
+      ? `Nome: ${nome}`
+      : "",
+
+    telefone
+      ? `Telefone/WhatsApp: ${telefone}`
+      : "",
+
+    servico
+      ? `Serviço: ${servico}`
+      : "",
+
+    equipamento
+      ? `Produto/equipamento: ${equipamento}`
+      : "",
+
+    descricao
+      ? `Mensagem: ${descricao}`
+      : ""
+
+  ];
+
+
+
+  return lines
+
+    .filter(
+      Boolean
+    )
+
+    .join(
+      "\n"
+    );
+
+}
+
+
+
+/* =========================================================
+   51. FORMULÁRIO DE ATENDIMENTO
+   ========================================================= */
+
+function setupAttendanceForm() {
+
+  const form =
+    qs(
+      "#formAtendimento",
+      "#serviceRequestForm",
+      "#formSolicitacao",
+      "#requestForm"
+    );
+
+
+  if (!form) {
+
+    return;
+
+  }
+
+
+
+  if (
+    form.dataset.bound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+
+  form.dataset.bound =
+    "true";
+
+
+
+  const button =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+
+      /*
+       * Lê os campos do HTML atual.
+       */
+
+      const nameInput =
+        qs(
+          "#nomeContato",
+          "#requestNome",
+          "#nomeSolicitante"
+        );
+
+
+      const phoneInput =
+        qs(
+          "#telefoneContato",
+          "#requestTelefone",
+          "#telefone"
+        );
+
+
+      const serviceSelect =
+        qs(
+          "#servico",
+          "#requestServico",
+          "#servicoId"
+        );
+
+
+      const equipmentInput =
+        qs(
+          "#equipamento",
+          "#requestEquipamento"
+        );
+
+
+      const descriptionInput =
+        qs(
+          "#descricao",
+          "#requestDescricao",
+          "#mensagem"
+        );
+
+
+
+      const nome =
+        nameInput
+          ?.value
+          ?.trim() ||
+        "";
+
+
+      const telefone =
+        phoneInput
+          ?.value
+          ?.trim() ||
+        "";
+
+
+      const equipamento =
+        equipmentInput
+          ?.value
+          ?.trim() ||
+        "";
+
+
+      const descricao =
+        descriptionInput
+          ?.value
+          ?.trim() ||
+        "";
+
+
+
+      const serviceOption =
+        serviceSelect
+          ?.selectedOptions
+          ?.[0];
+
+
+      const serviceId =
+        serviceSelect
+          ?.value ||
+        null;
+
+
+      const serviceName =
+        serviceOption
+          ?.dataset
+          ?.nome ||
+        serviceOption
+          ?.textContent
+          ?.trim() ||
+        "";
+
+
+
+      /*
+       * O nome é obrigatório no HTML,
+       * mas fazemos a verificação aqui
+       * também.
+       */
+
+      if (!nome) {
+
+        showMessage(
+          "#mensagemAtendimento",
+          "Digite seu nome.",
+          "error"
+        );
+
+        nameInput?.focus();
+
+        return;
+
+      }
+
+
+
+      if (!descricao) {
+
+        showMessage(
+          "#mensagemAtendimento",
+          "Explique o que você precisa.",
+          "error"
+        );
+
+        descriptionInput?.focus();
+
+        return;
+
+      }
+
+
+
+      setButtonLoading(
+        button,
+        true,
+        "Enviando..."
+      );
+
+
+
+      clearMessage(
+        "#mensagemAtendimento"
+      );
+
+
+
+      /*
+       * Salva a solicitação no banco
+       * para usuários autenticados.
+       */
+
+      const saveResult =
+        await saveAttendanceRequest({
+
+          serviceId,
+
+          nome,
+
+          telefone,
+
+          equipamento,
+
+          descricao
+
+        });
+
+
+
+      /*
+       * Mesmo que o visitante esteja
+       * sem login, o contato continua
+       * funcionando pelo WhatsApp.
+       */
+
+      const whatsappMessage =
+        buildAttendanceWhatsAppMessage({
+
+          nome,
+
+          telefone,
+
+          servico:
+            serviceName,
+
+          equipamento,
+
+          descricao
+
+        });
+
+
+
+      const whatsappUrl =
+        `https://wa.me/5565996262514?text=${encodeURIComponent(
+          whatsappMessage
+        )}`;
+
+
+
+      if (
+        saveResult.error
+      ) {
+
+        showMessage(
+          "#mensagemAtendimento",
+          "O WhatsApp será aberto. Não foi possível registrar a solicitação na conta.",
+          "warning"
+        );
+
+      }
+
+
+
+      /*
+       * Abre o contato da Max Som.
+       */
+
+      window.open(
+        whatsappUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+
+
+      /*
+       * Limpa somente os dados
+       * que foram digitados.
+       */
+
+      form.reset();
+
+
+
+      /*
+       * Depois do reset, tenta colocar
+       * novamente o serviço escolhido pela URL.
+       */
+
+      await loadAttendanceServices();
+
+
+
+      if (
+        saveResult.saved
+      ) {
+
+        showMessage(
+          "#mensagemAtendimento",
+          "Solicitação registrada. O WhatsApp foi aberto para continuar o atendimento.",
+          "success"
+        );
+
+      }
+      else {
+
+        showMessage(
+          "#mensagemAtendimento",
+          "O WhatsApp foi aberto com sua mensagem pronta.",
+          "success"
+        );
+
+      }
+
+
+
+      setButtonLoading(
+        button,
+        false
+      );
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   52. INICIALIZAÇÃO DO ATENDIMENTO
+   ========================================================= */
+
+async function setupAttendancePage() {
+
+  if (
+    getCurrentPage() !==
+    "atendimento.html"
+  ) {
+
+    return;
+
+  }
+
+
+
+  await loadAttendanceServices();
+
+  await fillAttendanceUserData();
+
+  setupAttendanceForm();
+
+}
+
+
+
+/* =========================================================
+   53. BOTÕES DE ATENDIMENTO
+   ========================================================= */
+
+function setupAttendanceButtons() {
+
+  document
+    .querySelectorAll(
+      `
+        a[href^="atendimento.html"],
+        [data-service]
+      `
+    )
+    .forEach(
+      (element) => {
+
+        if (
+          element.dataset.attendanceBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        element.dataset.attendanceBound =
+          "true";
+
+
+
+        /*
+         * Links que já possuem
+         * atendimento.html?servico=
+         * não precisam de alteração.
+         */
+
+        if (
+          element.matches(
+            'a[href^="atendimento.html"]'
+          )
+        ) {
+
+          return;
+
+        }
+
+
+
+        element.addEventListener(
+          "click",
+          (event) => {
+
+            event.preventDefault();
+
+
+            const service =
+              element.dataset.service ||
+              element.textContent.trim();
+
+
+            window.location.href =
+              `atendimento.html?servico=${encodeURIComponent(
+                service
+              )}`;
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   54. FIM DA PARTE 5
+   ========================================================= */
+/* =========================================================
+   55. LISTAR CONVERSAS
+   ========================================================= */
+
+async function loadConversations() {
+
+  const container =
+    qs(
+      "#conversasLista",
+      "#conversationsList",
+      "#conversationList",
+      "#conversasConta"
+    );
+
+
+  if (!container) {
+
+    return;
+
+  }
+
+
+
+  if (!currentUser) {
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Faça login para visualizar suas conversas.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.CONVERSAS
+      )
+
+      .select(
+        `
+          id,
+          cliente_id,
+          funcionario_id,
+          assunto,
+          status,
+          criado_em,
+          atualizado_em
+        `
+      )
+
+      .order(
+        "atualizado_em",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar conversas:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar suas conversas.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhuma conversa ainda
+        </h3>
+
+        <p>
+          Quando você iniciar um atendimento,
+          sua conversa aparecerá aqui.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (conversation) => {
+
+          const title =
+            conversation.assunto ||
+            "Atendimento Max Som";
+
+
+          const status =
+            conversation.status ||
+            "aberta";
+
+
+          const date =
+            conversation.atualizado_em ||
+            conversation.criado_em;
+
+
+
+          return `
+
+            <a
+              href="conversa.html?id=${encodeURIComponent(
+                conversation.id
+              )}"
+              class="conversation-card"
+            >
+
+              <div
+                class="conversation-card-content"
+              >
+
+                <div>
+
+                  <h3>
+                    ${esc(
+                      title
+                    )}
+                  </h3>
+
+                  <span>
+                    ${esc(
+                      status
+                    )}
+                  </span>
+
+                </div>
+
+
+                <time>
+                  ${esc(
+                    formatDateTime(
+                      date
+                    )
+                  )}
+                </time>
+
+              </div>
+
+            </a>
+
+          `;
+
+        }
+      )
+
+      .join("");
+
+}
+
+
+
+/* =========================================================
+   56. CRIAR CONVERSA
+   ========================================================= */
+
+async function createConversation(
+  assunto = "Atendimento Max Som"
+) {
+
+  if (
+    !currentUser
+  ) {
+
+    showMessage(
+      "#mensagemConversa",
+      "Faça login para iniciar uma conversa.",
+      "error"
+    );
+
+    window.location.href =
+      "login.html";
+
+    return null;
+
+  }
+
+
+
+  const profile =
+    await ensureProfile();
+
+
+
+  if (!profile) {
+
+    return null;
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.CONVERSAS
+      )
+
+      .insert({
+
+        cliente_id:
+          currentUser.id,
+
+        assunto:
+          assunto ||
+
+          "Atendimento Max Som",
+
+        status:
+          "aberta"
+
+      })
+
+      .select(
+        `
+          id,
+          cliente_id,
+          funcionario_id,
+          assunto,
+          status,
+          criado_em,
+          atualizado_em
+        `
+      )
+
+      .single();
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao criar conversa:",
+      error
+    );
+
+
+    showMessage(
+      "#mensagemConversa",
+      "Não foi possível iniciar a conversa.",
+      "error"
+    );
+
+
+    return null;
+
+  }
+
+
+
+  return data;
+
+}
+
+
+
+/* =========================================================
+   57. BOTÃO PARA ABRIR NOVA CONVERSA
+   ========================================================= */
+
+async function openConversation(
+  assunto = "Atendimento geral"
+) {
+
+  const conversation =
+    await createConversation(
+      assunto
+    );
+
+
+  if (!conversation) {
+
+    return;
+
+  }
+
+
+
+  window.location.href =
+    `conversa.html?id=${encodeURIComponent(
+      conversation.id
+    )}`;
+
+}
+
+
+
+/* =========================================================
+   58. CONFIGURAR BOTÕES DE NOVA CONVERSA
+   ========================================================= */
+
+function setupConversationButtons() {
+
+  document
+
+    .querySelectorAll(
+      "[data-open-conversation]"
+    )
+
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.conversationBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        button.dataset.conversationBound =
+          "true";
+
+
+        button.addEventListener(
+          "click",
+          async (event) => {
+
+            event.preventDefault();
+
+
+            const assunto =
+              button.dataset.openConversation ||
+              button.dataset.assunto ||
+              button.textContent.trim() ||
+              "Atendimento geral";
+
+
+            await openConversation(
+              assunto
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   59. CARREGAR UMA CONVERSA
+   ========================================================= */
+
+async function loadConversation() {
+
+  const container =
+    qs(
+      "#conversaContainer",
+      "#chatMessages"
+    );
+
+
+  if (!container) {
+
+    return;
+
+  }
+
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+
+  const conversationId =
+    params.get(
+      "id"
+    );
+
+
+
+  if (
+    !conversationId
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Conversa não encontrada.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !currentUser
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Você precisa estar logado para abrir esta conversa.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  const {
+    data: conversation,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.CONVERSAS
+      )
+
+      .select(
+        `
+          id,
+          cliente_id,
+          funcionario_id,
+          assunto,
+          status,
+          criado_em,
+          atualizado_em
+        `
+      )
+
+      .eq(
+        "id",
+        conversationId
+      )
+
+      .maybeSingle();
+
+
+
+  if (
+    error ||
+    !conversation
+  ) {
+
+    console.error(
+      "Erro ao carregar conversa:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Esta conversa não está disponível.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  /*
+   * A segurança real é feita pelo RLS
+   * do Supabase.
+   *
+   * O JavaScript não tenta abrir
+   * conversas que o banco não autorizar.
+   */
+
+
+
+  const title =
+    qs(
+      "#conversaTitulo",
+      "#chatTitle"
+    );
+
+
+  const status =
+    qs(
+      "#conversaStatus",
+      "#chatStatus"
+    );
+
+
+
+  if (title) {
+
+    title.textContent =
+      conversation.assunto ||
+      "Atendimento Max Som";
+
+  }
+
+
+
+  if (status) {
+
+    status.textContent =
+      conversation.status ||
+      "aberta";
+
+  }
+
+
+
+  await loadMessages(
+    conversationId
+  );
+
+
+
+  await markConversationMessagesRead(
+    conversationId
+  );
+
+
+
+  setupMessageForm(
+    conversationId
+  );
+
+
+
+  setupConversationRealtime(
+    conversationId
+  );
+
+}
+
+
+
+/* =========================================================
+   60. CARREGAR MENSAGENS
+   ========================================================= */
+
+async function loadMessages(
+  conversationId
+) {
+
+  const container =
+    qs(
+      "#mensagensLista",
+      "#chatMessages"
+    );
+
+
+  if (
+    !container ||
+    !conversationId
+  ) {
+
+    return;
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.MENSAGENS
+      )
+
+      .select(
+        `
+          id,
+          conversa_id,
+          remetente_id,
+          conteudo,
+          lida,
+          criado_em
+        `
+      )
+
+      .eq(
+        "conversa_id",
+        conversationId
+      )
+
+      .order(
+        "criado_em",
+        {
+          ascending:
+            true
+        }
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar mensagens:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar as mensagens.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-messages">
+
+        Nenhuma mensagem ainda.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (message) => {
+
+          const mine =
+            message.remetente_id ===
+            currentUser?.id;
+
+
+
+          return `
+
+            <div
+              class="message ${
+                mine
+                  ? "message-own"
+                  : "message-other"
+              }"
+            >
+
+              <div
+                class="message-content"
+              >
+
+                <p>
+                  ${esc(
+                    message.conteudo ||
+                    ""
+                  )}
+                </p>
+
+
+                <time>
+                  ${esc(
+                    formatDateTime(
+                      message.criado_em
+                    )
+                  )}
+                </time>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+
+      .join("");
+
+
+
+  container.scrollTop =
+    container.scrollHeight;
+
+}
+
+
+
+/* =========================================================
+   61. MARCAR MENSAGENS COMO LIDAS
+   ========================================================= */
+
+async function markConversationMessagesRead(
+  conversationId
+) {
+
+  if (
+    !currentUser ||
+    !conversationId
+  ) {
+
+    return;
+
+  }
+
+
+
+  const {
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.MENSAGENS
+      )
+
+      .update({
+        lida:
+          true
+      })
+
+      .eq(
+        "conversa_id",
+        conversationId
+      )
+
+      .neq(
+        "remetente_id",
+        currentUser.id
+      )
+
+      .eq(
+        "lida",
+        false
+      );
+
+
+
+  if (error) {
+
+    console.warn(
+      "Não foi possível marcar mensagens como lidas:",
+      error
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   62. FORMULÁRIO DE MENSAGEM
+   ========================================================= */
+
+function setupMessageForm(
+  conversationId
+) {
+
+  const form =
+    qs(
+      "#mensagemForm",
+      "#chatForm",
+      "#messageForm"
+    );
+
+
+  if (!form) {
+
+    return;
+
+  }
+
+
+
+  if (
+    form.dataset.messageBound ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+
+  form.dataset.messageBound =
+    "true";
+
+
+
+  const input =
+    qs(
+      "#mensagemInput",
+      "#chatMessage",
+      "#messageInput",
+      "#mensagem",
+      "#textoMensagem"
+    );
+
+
+  const button =
+    qs(
+      "#mensagemEnviar",
+      "#chatSend",
+      "#messageSend"
+    );
+
+
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+
+      if (
+        !currentUser
+      ) {
+
+        showMessage(
+          "#mensagemConversa",
+          "Faça login para enviar mensagens.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+
+      const content =
+        input
+          ?.value
+          ?.trim() ||
+        "";
+
+
+
+      if (
+        !content
+      ) {
+
+        input?.focus();
+
+        return;
+
+      }
+
+
+
+      if (button) {
+
+        button.disabled =
+          true;
+
+      }
+
+
+
+      const {
+        error
+      } =
+        await supabase
+
+          .from(
+            TABLES.MENSAGENS
+          )
+
+          .insert({
+
+            conversa_id:
+              conversationId,
+
+            remetente_id:
+              currentUser.id,
+
+            conteudo:
+              content,
+
+            lida:
+              false
+
+          });
+
+
+
+      if (error) {
+
+        console.error(
+          "Erro ao enviar mensagem:",
+          error
+        );
+
+
+        showMessage(
+          "#mensagemConversa",
+          "Não foi possível enviar a mensagem.",
+          "error"
+        );
+
+
+        if (button) {
+
+          button.disabled =
+            false;
+
+        }
+
+        return;
+
+      }
+
+
+
+      if (input) {
+
+        input.value =
+          "";
+
+      }
+
+
+
+      await loadMessages(
+        conversationId
+      );
+
+
+
+      await markConversationMessagesRead(
+        conversationId
+      );
+
+
+
+      if (button) {
+
+        button.disabled =
+          false;
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   63. TEMPO REAL DA CONVERSA
+   ========================================================= */
+
+function setupConversationRealtime(
+  conversationId
+) {
+
+  if (
+    !supabase ||
+    !conversationId
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    window.maxSomCurrentConversationChannel
+  ) {
+
+    supabase.removeChannel(
+      window.maxSomCurrentConversationChannel
+    );
+
+  }
+
+
+
+  const channelName =
+    `maxsom-conversa-${conversationId}`;
+
+
+
+  window.maxSomCurrentConversationChannel =
+    supabase
+
+      .channel(
+        channelName
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "*",
+
+          schema:
+            "public",
+
+          table:
+            TABLES.MENSAGENS,
+
+          filter:
+            `conversa_id=eq.${conversationId}`
+
+        },
+
+        async () => {
+
+          await loadMessages(
+            conversationId
+          );
+
+          await markConversationMessagesRead(
+            conversationId
+          );
+
+        }
+
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "*",
+
+          schema:
+            "public",
+
+          table:
+            TABLES.CONVERSAS,
+
+          filter:
+            `id=eq.${conversationId}`
+
+        },
+
+        async () => {
+
+          await loadConversation();
+
+        }
+
+      )
+
+      .subscribe();
+
+}
+
+
+
+/* =========================================================
+   64. TEMPO REAL DA LISTA DE CONVERSAS
+   ========================================================= */
+
+function setupConversationsRealtime() {
+
+  if (
+    !supabase ||
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    window.maxSomConversationsChannel
+  ) {
+
+    supabase.removeChannel(
+      window.maxSomConversationsChannel
+    );
+
+  }
+
+
+
+  window.maxSomConversationsChannel =
+    supabase
+
+      .channel(
+        "maxsom-conversas-lista"
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "*",
+
+          schema:
+            "public",
+
+          table:
+            TABLES.CONVERSAS
+
+        },
+
+        async () => {
+
+          await loadConversations();
+
+        }
+
+      )
+
+      .subscribe();
+
+}
+
+
+
+/* =========================================================
+   65. NOTIFICAÇÕES
+   ========================================================= */
+
+async function loadNotifications() {
+
+  const container =
+    qs(
+      "#notificacoesLista",
+      "#notificationsList",
+      "#notificationList"
+    );
+
+
+  if (
+    !container ||
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.NOTIFICACOES
+      )
+
+      .select(
+        `
+          id,
+          usuario_id,
+          titulo,
+          mensagem,
+          lida,
+          link,
+          criado_em
+        `
+      )
+
+      .eq(
+        "usuario_id",
+        currentUser.id
+      )
+
+      .order(
+        "criado_em",
+        {
+          ascending:
+            false
+        }
+      )
+
+      .limit(
+        20
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao carregar notificações:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="empty">
+
+        Não foi possível carregar as notificações.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  if (
+    !data ||
+    !data.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>
+          Nenhuma notificação
+        </h3>
+
+        <p>
+          Você não possui novas notificações.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  container.innerHTML =
+
+    data
+
+      .map(
+        (notification) => {
+
+          const cardClass =
+            notification.lida
+              ? "notification-card read"
+              : "notification-card unread";
+
+
+
+          const title =
+            notification.titulo ||
+            "Notificação";
+
+
+          const message =
+            notification.mensagem ||
+            "";
+
+
+          const date =
+            notification.criado_em;
+
+
+
+          return `
+
+            <article
+              class="${cardClass}"
+            >
+
+              <div>
+
+                <strong>
+                  ${esc(
+                    title
+                  )}
+                </strong>
+
+
+                ${
+                  message
+
+                    ? `
+
+                      <p>
+                        ${esc(
+                          message
+                        )}
+                      </p>
+
+                    `
+
+                    : ""
+                }
+
+
+                ${
+                  date
+
+                    ? `
+
+                      <small>
+                        ${esc(
+                          formatDateTime(
+                            date
+                          )
+                        )}
+                      </small>
+
+                    `
+
+                    : ""
+                }
+
+              </div>
+
+
+              <div
+                class="notification-actions"
+              >
+
+                ${
+                  notification.link
+
+                    ? `
+
+                      <a
+                        href="${esc(
+                          notification.link
+                        )}"
+                        class="btn btn-secondary"
+                      >
+                        Abrir
+                      </a>
+
+                    `
+
+                    : ""
+                }
+
+
+                ${
+                  !notification.lida
+
+                    ? `
+
+                      <button
+                        type="button"
+                        class="btn btn-outline"
+                        data-mark-notification
+                        data-notification-id="${esc(
+                          notification.id
+                        )}"
+                      >
+                        Marcar como lida
+                      </button>
+
+                    `
+
+                    : ""
+                }
+
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      )
+
+      .join("");
+
+
+
+  setupNotificationActions();
+
+}
+
+
+
+/* =========================================================
+   66. MARCAR NOTIFICAÇÃO COMO LIDA
+   ========================================================= */
+
+async function markNotificationAsRead(
+  notificationId
+) {
+
+  if (
+    !currentUser ||
+    !notificationId
+  ) {
+
+    return;
+
+  }
+
+
+
+  const {
+    error
+  } =
+    await supabase
+
+      .from(
+        TABLES.NOTIFICACOES
+      )
+
+      .update({
+        lida:
+          true
+      })
+
+      .eq(
+        "id",
+        notificationId
+      )
+
+      .eq(
+        "usuario_id",
+        currentUser.id
+      );
+
+
+
+  if (error) {
+
+    console.error(
+      "Erro ao marcar notificação:",
+      error
+    );
+
+
+    return;
+
+  }
+
+
+
+  await loadNotifications();
+
+}
+
+
+
+/* =========================================================
+   67. BOTÕES DE NOTIFICAÇÃO
+   ========================================================= */
+
+function setupNotificationActions() {
+
+  document
+
+    .querySelectorAll(
+      "[data-mark-notification]"
+    )
+
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.notificationBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+
+        button.dataset.notificationBound =
+          "true";
+
+
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const id =
+              button.dataset.notificationId;
+
+
+            button.disabled =
+              true;
+
+
+            await markNotificationAsRead(
+              id
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   68. TEMPO REAL DAS NOTIFICAÇÕES
+   ========================================================= */
+
+function setupNotificationRealtime() {
+
+  if (
+    !supabase ||
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    window.maxSomNotificationChannel
+  ) {
+
+    supabase.removeChannel(
+      window.maxSomNotificationChannel
+    );
+
+  }
+
+
+
+  window.maxSomNotificationChannel =
+    supabase
+
+      .channel(
+        `maxsom-notificacoes-${currentUser.id}`
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "*",
+
+          schema:
+            "public",
+
+          table:
+            TABLES.NOTIFICACOES,
+
+          filter:
+            `usuario_id=eq.${currentUser.id}`
+
+        },
+
+        async () => {
+
+          await loadNotifications();
+
+        }
+
+      )
+
+      .subscribe();
+
+}
+
+
+
+/* =========================================================
+   69. PÁGINA DE CONVERSAS
+   ========================================================= */
+
+async function setupConversationsPage() {
+
+  if (
+    getCurrentPage() !==
+    "conversas.html"
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  await loadConversations();
+
+  setupConversationButtons();
+
+  setupConversationsRealtime();
+
+}
+
+
+
+/* =========================================================
+   70. PÁGINA DE UMA CONVERSA
+   ========================================================= */
+
+async function setupConversationPage() {
+
+  if (
+    getCurrentPage() !==
+    "conversa.html"
+  ) {
+
+    return;
+
+  }
+
+
+
+  if (
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  await loadConversation();
+
+}
+
+
+
+/* =========================================================
+   71. NOTIFICAÇÕES DA CONTA
+   ========================================================= */
+
+async function setupNotificationsPage() {
+
+  if (
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  await loadNotifications();
+
+  setupNotificationRealtime();
+
+}
+
+
+
+/* =========================================================
+   72. FIM DA PARTE 6
+   ========================================================= */
+/* =========================================================
+   73. LIMPEZA DE CANAIS REALTIME
+   ========================================================= */
+
+function cleanupRealtimeChannels() {
+
+  const channels = [
+
+    "maxSomCurrentConversationChannel",
+
+    "maxSomConversationsChannel",
+
+    "maxSomNotificationChannel"
+
+  ];
+
+
+
+  channels.forEach(
+    (name) => {
+
+      const channel =
+        window[name];
+
+
+      if (
+        channel &&
+        supabase
+      ) {
+
+        supabase.removeChannel(
+          channel
+        );
+
+        window[name] =
+          null;
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   74. CONFIGURAÇÃO DOS BOTÕES DE LOGOUT
+   ========================================================= */
+
+function setupLogoutButtons() {
+
+  document
+
+    .querySelectorAll(
+      "#logoutButton, #logoutLink, [data-logout]"
+    )
+
+    .forEach(
+      (button) => {
+
+        if (
+          button.dataset.logoutBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+
+        button.dataset.logoutBound =
+          "true";
+
+
+
+        button.addEventListener(
+          "click",
+          async (event) => {
+
+            event.preventDefault();
+
+
+            await logout();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   75. PÁGINAS PROTEGIDAS
+   ========================================================= */
+
+async function enforcePageAccess() {
+
+  const page =
+    getCurrentPage();
+
+
+
+  /*
+   * Conta, conversas e conversa
+   * precisam de autenticação.
+   */
+
+  const protectedPages = [
+
+    "conta.html",
+
+    "conversas.html",
+
+    "conversa.html"
+
+  ];
+
+
+
+  if (
+    protectedPages.includes(
+      page
+    )
+  ) {
+
+    if (
+      !currentUser
+    ) {
+
+      window.location.href =
+        "login.html";
+
+      return false;
+
+    }
+
+  }
+
+
+
+  /*
+   * Admin possui verificação própria
+   * na função checkAdminPage().
+   */
+
+  if (
+    page ===
+    "admin.html"
+  ) {
+
+    const allowed =
+      await checkAdminPage();
+
+
+    if (!allowed) {
+
+      return false;
+
+    }
+
+  }
+
+
+
+  return true;
+
+}
+
+
+
+/* =========================================================
+   76. CARREGAMENTO DAS PÁGINAS PÚBLICAS
+   ========================================================= */
+
+async function loadPublicPageData() {
+
+  await Promise.allSettled([
+
+    loadPublicProducts(),
+
+    loadPublicServices(),
+
+    loadPublicProjects(),
+
+    loadPublications()
+
+  ]);
+
+}
+
+
+
+/* =========================================================
+   77. CARREGAMENTO DA ÁREA DO USUÁRIO
+   ========================================================= */
+
+async function loadUserArea() {
+
+  const page =
+    getCurrentPage();
+
+
+
+  if (
+    !currentUser
+  ) {
+
+    return;
+
+  }
+
+
+
+  /*
+   * Minha conta
+   */
+
+  if (
+    page ===
+    "conta.html"
+  ) {
+
+    await account();
+
+  }
+
+
+
+  /*
+   * Lista de conversas
+   */
+
+  if (
+    page ===
+    "conversas.html"
+  ) {
+
+    await setupConversationsPage();
+
+  }
+
+
+
+  /*
+   * Conversa individual
+   */
+
+  if (
+    page ===
+    "conversa.html"
+  ) {
+
+    await setupConversationPage();
+
+  }
+
+
+
+  /*
+   * Notificações
+   */
+
+  await setupNotificationsPage();
+
+}
+
+
+
+/* =========================================================
+   78. CARREGAMENTO DA ÁREA ADMINISTRATIVA
+   ========================================================= */
+
+async function loadAdminArea() {
+
+  if (
+    getCurrentPage() !==
+    "admin.html"
+  ) {
+
+    return;
+
+  }
+
+
+
+  const allowed =
+    await requireAdmin();
+
+
+
+  if (
+    !allowed
+  ) {
+
+    return;
+
+  }
+
+
+
+  await adminMain();
+
+}
+
+
+
+/* =========================================================
+   79. ATALHOS GERAIS DE NAVEGAÇÃO
+   ========================================================= */
+
+function setupGeneralNavigation() {
+
+  /*
+   * Links de conta.
+   */
+
+  document
+
+    .querySelectorAll(
+      "a[href='conta.html']"
+    )
+
+    .forEach(
+      (link) => {
+
+        if (
+          link.dataset.navigationBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+
+        link.dataset.navigationBound =
+          "true";
+
+
+
+        link.addEventListener(
+          "click",
+          (event) => {
+
+            if (
+              !currentUser
+            ) {
+
+              event.preventDefault();
+
+
+              window.location.href =
+                "login.html";
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+
+  /*
+   * Links de conversas.
+   */
+
+  document
+
+    .querySelectorAll(
+      `
+        a[href='conversas.html'],
+        a[href='conversa.html']
+      `
+    )
+
+    .forEach(
+      (link) => {
+
+        if (
+          link.dataset.navigationBound ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+
+        link.dataset.navigationBound =
+          "true";
+
+
+
+        link.addEventListener(
+          "click",
+          (event) => {
+
+            if (
+              !currentUser
+            ) {
+
+              event.preventDefault();
+
+
+              window.location.href =
+                "login.html";
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+
+/* =========================================================
+   80. ATUALIZAR ESTADO DA NAVEGAÇÃO
+   ========================================================= */
+
+async function refreshApplicationState() {
+
+  await updateNav();
+
+  setupLogoutButtons();
+
+  setupGeneralNavigation();
+
+  enhancePublicInterface();
+
+}
+
+
+
+/* =========================================================
+   81. INICIALIZAÇÃO PRINCIPAL
+   ========================================================= */
+
+async function initializeMaxSom() {
+
+  try {
+
+    /*
+     * Primeiro recuperamos a sessão.
+     */
+
+    await initializeAuth();
+
+
+
+    /*
+     * Atualiza navegação.
+     */
+
+    await refreshApplicationState();
+
+
+
+    /*
+     * Proteção de páginas.
+     */
+
+    const allowed =
+      await enforcePageAccess();
+
+
+
+    if (
+      !allowed
+    ) {
+
+      return;
+
+    }
+
+
+
+    /*
+     * Formulários de autenticação.
+     */
+
+    setupLogin();
+
+    setupSignup();
+
+
+
+    /*
+     * Atendimento.
+     */
+
+    setupAttendancePage();
+
+
+
+    /*
+     * Links e botões.
+     */
+
+    setupServiceLinks();
+
+    setupAttendanceButtons();
+
+    setupServiceLinks();
+
+    setupWhatsApp();
+
+    setupConversationButtons();
+
+    setupAdminRequestButton();
+
+
+
+    /*
+     * Administração.
+     */
+
+    setupAdminMenu();
+
+    setupAdminForms();
+
+    bindAdminActions();
+
+    setupAdminRequestButton();
+
+
+
+    /*
+     * Conteúdo público.
+     */
+
+    await loadPublicPageData();
+
+
+
+    /*
+     * Área do usuário.
+     */
+
+    await loadUserArea();
+
+
+
+    /*
+     * Área administrativa.
+     */
+
+    await loadAdminArea();
+
+
+
+    /*
+     * Canais realtime.
+     */
+
+    if (
+      currentUser
+    ) {
+
+      setupConversationsRealtime();
+
+      setupNotificationRealtime();
+
+    }
+
+
+
+    /*
+     * Conversa individual possui
+     * seu próprio canal.
+     */
+
+    if (
+      getCurrentPage() ===
+      "conversa.html" &&
+      currentUser
+    ) {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const conversationId =
+        params.get(
+          "id"
+        );
+
+
+      if (
+        conversationId
+      ) {
+
+        setupConversationRealtime(
+          conversationId
+        );
+
+      }
+
+    }
+
+
+
+    /*
+     * Teclas e pequenos recursos
+     * gerais do sistema.
+     */
+
+    if (
+      typeof setupKeyboardShortcuts ===
+      "function"
+    ) {
+
+      setupKeyboardShortcuts();
+
+    }
+
+
+
+  }
+  catch (
+    error
+  ) {
+
+    console.error(
+      "Erro na inicialização do Max Som:",
+      error
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   82. LISTENER DE AUTENTICAÇÃO
+   ========================================================= */
+
+function setupGlobalAuthListener() {
+
+  if (
+    window.maxSomAuthListenerBound
+  ) {
+
+    return;
+
+  }
+
+
+
+  window.maxSomAuthListenerBound =
+    true;
+
+
+
+  supabase.auth.onAuthStateChange(
+    async (
+      event,
+      session
+    ) => {
+
+      currentUser =
+        session?.user ||
+        null;
+
+
+
+      if (
+        currentUser
+      ) {
+
+        await ensureProfile();
+
+      }
+      else {
+
+        currentProfile =
+          null;
+
+      }
+
+
+
+      /*
+       * Atualiza apenas a navegação
+       * imediatamente.
+       */
+
+      await updateNav();
+
+
+
+      /*
+       * Após login/logout,
+       * atualiza a página somente
+       * quando realmente necessário.
+       */
+
+      const page =
+        getCurrentPage();
+
+
+
+      if (
+        event ===
+        "SIGNED_OUT"
+      ) {
+
+        cleanupRealtimeChannels();
+
 
 
         if (
@@ -3109,775 +8193,60 @@ function setupAuthListener() {
 
           window.location.href =
             "login.html";
+
         }
+
       }
+
+
+
+      if (
+        event ===
+        "SIGNED_IN"
+      ) {
+
+        await refreshApplicationState();
+
+      }
+
     }
   );
+
 }
 
 
-/* =========================================================
-   39. REALTIME DAS NOTIFICAÇÕES
-   ========================================================= */
-
-function setupNotificationRealtime() {
-
-  if (!currentUser) return;
-
-
-  if (
-    window.maxSomNotificationChannel
-  ) {
-
-    supabase.removeChannel(
-      window.maxSomNotificationChannel
-    );
-  }
-
-
-  window.maxSomNotificationChannel =
-    supabase
-      .channel(
-        "maxsom-notificacoes"
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: TABLES.NOTIFICACOES,
-          filter:
-            `usuario_id=eq.${currentUser.id}`
-        },
-        async () => {
-
-          await loadNotifications();
-        }
-      )
-      .subscribe();
-}
-
 
 /* =========================================================
-   40. ATALHOS DO TECLADO
+   83. EXECUÇÃO FINAL
    ========================================================= */
 
-function setupKeyboardShortcuts() {
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (
-        event.key ===
-        "Escape"
-      ) {
-
-        document
-          .querySelectorAll(
-            ".modal.open, .modal.active"
-          )
-          .forEach(
-            (modal) => {
-
-              modal.classList.remove(
-                "open",
-                "active"
-              );
-            }
-          );
-      }
-    }
-  );
-}
-
-
-/* =========================================================
-   41. FORMULÁRIOS DO ADMIN
-   ========================================================= */
-
-function setupAdminForms() {
-
-  /*
-   * Os formulários do painel podem ser
-   * controlados pelos atributos data-table
-   * e data-action.
-   */
-
-  document
-    .querySelectorAll(
-      "form[data-table]"
-    )
-    .forEach((form) => {
-
-      if (
-        form.dataset.formBound ===
-        "true"
-      ) {
-        return;
-      }
-
-
-      form.dataset.formBound =
-        "true";
-
-
-      form.addEventListener(
-        "submit",
-        async (event) => {
-
-          event.preventDefault();
-
-
-          const table =
-            form.dataset.table;
-
-
-          const action =
-            form.dataset.action ||
-            "insert";
-
-
-          if (!table) {
-            return;
-          }
-
-
-          const formData =
-            new FormData(form);
-
-
-          const values = {};
-
-
-          formData.forEach(
-            (
-              value,
-              key
-            ) => {
-
-              if (
-                value !==
-                ""
-              ) {
-
-                values[key] =
-                  value;
-              }
-            }
-          );
-
-
-          let result;
-
-
-          if (
-            action ===
-            "update"
-          ) {
-
-            const id =
-              form.dataset.id;
-
-
-            if (!id) {
-              return;
-            }
-
-
-            result =
-              await supabase
-                .from(table)
-                .update(values)
-                .eq(
-                  "id",
-                  id
-                );
-
-          } else {
-
-            result =
-              await supabase
-                .from(table)
-                .insert(values);
-          }
-
-
-          if (result.error) {
-
-            console.error(
-              "Erro no formulário admin:",
-              result.error
-            );
-
-            alert(
-              "Não foi possível salvar os dados."
-            );
-
-            return;
-          }
-
-
-          alert(
-            "Dados salvos com sucesso."
-          );
-
-
-          form.reset();
-
-
-          await adminStats();
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   42. EXCLUSÃO DE REGISTROS
-   ========================================================= */
-
-function setupDeleteButtons() {
-
-  document
-    .querySelectorAll(
-      "[data-delete-table]"
-    )
-    .forEach((button) => {
-
-      if (
-        button.dataset.deleteBound ===
-        "true"
-      ) {
-        return;
-      }
-
-
-      button.dataset.deleteBound =
-        "true";
-
-
-      button.addEventListener(
-        "click",
-        async () => {
-
-          const table =
-            button.dataset.deleteTable;
-
-
-          const id =
-            button.dataset.deleteId;
-
-
-          if (
-            !table ||
-            !id
-          ) {
-            return;
-          }
-
-
-          const confirmed =
-            window.confirm(
-              "Tem certeza que deseja excluir este registro?"
-            );
-
-
-          if (!confirmed) {
-            return;
-          }
-
-
-          const {
-            error
-          } =
-            await supabase
-              .from(table)
-              .delete()
-              .eq(
-                "id",
-                id
-              );
-
-
-          if (error) {
-
-            console.error(
-              "Erro ao excluir:",
-              error
-            );
-
-            alert(
-              "Não foi possível excluir o registro."
-            );
-
-            return;
-          }
-
-
-          button
-            .closest(
-              "[data-admin-item]"
-            )
-            ?.remove();
-
-
-          await adminStats();
-        }
-      );
-    });
-}
-
-
-/* =========================================================
-   43. LINKS DA CONTA
-   ========================================================= */
-
-function setupAccountLinks() {
-
-  document
-    .querySelectorAll(
-      "[data-account-link]"
-    )
-    .forEach(
-      (element) => {
-
-        if (
-          element.dataset.accountBound ===
-          "true"
-        ) {
-          return;
-        }
-
-
-        element.dataset.accountBound =
-          "true";
-
-
-        element.addEventListener(
-          "click",
-          async (event) => {
-
-            if (!currentUser) {
-
-              event.preventDefault();
-
-              window.location.href =
-                "login.html";
-            }
-          }
-        );
-      }
-    );
-}
-
-
-/* =========================================================
-   44. LINKS ADMIN
-   ========================================================= */
-
-function setupAdminLinks() {
-
-  document
-    .querySelectorAll(
-      "[data-admin-link]"
-    )
-    .forEach(
-      (element) => {
-
-        element.addEventListener(
-          "click",
-          async (event) => {
-
-            const profile =
-              await ensureProfile();
-
-
-            if (
-              !isAdmin(profile)
-            ) {
-
-              event.preventDefault();
-
-              alert(
-                "Você não possui acesso ao painel administrativo."
-              );
-            }
-          }
-        );
-      }
-    );
-}
-
-
-/* =========================================================
-   45. INICIALIZAÇÃO
-   ========================================================= */
-
-async function initializePage() {
-
-  await initializeAuth();
-
-  await checkLoggedPage();
-
-  await redirectAdmin();
-
-
-  setupAuthListener();
-
-  setupKeyboardShortcuts();
-
-  setupServiceLinks();
-
-  setupWhatsApp();
-
-  setupContactForm();
-
-  setupLogin();
-
-  setupSignup();
-
-  setupAdminRequestButton();
-
-  setupAccountLinks();
-
-  setupAdminLinks();
-
-  setupCancelButtons();
-
-  setupAdminForms();
-
-  setupDeleteButtons();
-
-
-  await account();
-
-  await adminMain();
-
-  await loadConversations();
-
-  await loadConversation();
-
-  await loadPublicProducts();
-
-  await loadPublicServices();
-
-  await loadPublicProjects();
-
-  await loadPublications();
-
-
-  setupMessageRealtime();
-
-  setupConversationRealtime();
-
-  setupNotificationRealtime();
-}
-
-
-/* =========================================================
-   46. NOTIFICAÇÕES
-   ========================================================= */
-
-async function loadNotifications() {
-
-  const container =
-    qs(
-      "#notificacoesLista",
-      "#notificationsList",
-      "#notificationsContainer"
-    );
-
-  if (!container) return;
-
-
-  if (!currentUser) {
-
-    container.innerHTML = "";
-
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.NOTIFICACOES)
-      .select(`
-        id,
-        usuario_id,
-        titulo,
-        mensagem,
-        lida,
-        link,
-        criado_em
-      `)
-      .eq(
-        "usuario_id",
-        currentUser.id
-      )
-      .order(
-        "criado_em",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar notificações:",
-      error
-    );
-
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Nenhuma notificação.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map(
-        (notification) => `
-
-          <article
-            class="
-              notification-item
-              ${
-                notification.lida
-                  ? "is-read"
-                  : "is-unread"
-              }
-            "
-          >
-
-            <div>
-
-              <strong>
-                ${esc(
-                  notification.titulo ||
-                  "Notificação"
-                )}
-              </strong>
-
-              <p>
-                ${esc(
-                  notification.mensagem ||
-                  ""
-                )}
-              </p>
-
-            </div>
-
-
-            ${
-              notification.link
-
-                ? `
-                  <a
-                    href="${esc(
-                      notification.link
-                    )}"
-                  >
-                    Abrir
-                  </a>
-                `
-
-                : ""
-            }
-
-          </article>
-
-        `
-      )
-      .join("");
-}
-
-
-/* =========================================================
-   47. SOLICITAÇÃO DE SERVIÇO
-   ========================================================= */
-
-async function createServiceRequest(
-  serviceName,
-  description = ""
+if (
+  document.readyState ===
+  "loading"
 ) {
 
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile || !currentUser) {
-
-    window.location.href =
-      "login.html";
-
-    return null;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.SOLICITACOES)
-      .insert({
-
-        cliente_id:
-          currentUser.id,
-
-        servico:
-          serviceName,
-
-        descricao:
-          description,
-
-        status:
-          "pendente"
-
-      })
-      .select()
-      .single();
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao criar solicitação:",
-      error
-    );
-
-    alert(
-      "Não foi possível registrar sua solicitação."
-    );
-
-    return null;
-  }
-
-
-  return data;
-}
-
-
-/* =========================================================
-   48. SOLICITAÇÃO DE ADMIN
-   ========================================================= */
-
-async function setupAdminApproval() {
-
-  const button =
-    qs(
-      "#aprovarAdmin",
-      "#aprovarAdministrador"
-    );
-
-
-  if (!button) return;
-
-
-  button.addEventListener(
-    "click",
+  document.addEventListener(
+    "DOMContentLoaded",
     async () => {
 
-      const userId =
-        button.dataset.userId;
+      setupGlobalAuthListener();
 
+      await initializeMaxSom();
 
-      if (!userId) {
-        return;
-      }
-
-
-      const {
-        error
-      } =
-        await supabase
-          .from(TABLES.USUARIO)
-          .update({
-            tipo_usuario:
-              "admin"
-          })
-          .eq(
-            "id",
-            userId
-          );
-
-
-      if (error) {
-
-        console.error(
-          "Erro ao aprovar administrador:",
-          error
-        );
-
-        alert(
-          "Não foi possível aprovar."
-        );
-
-        return;
-      }
-
-
-      alert(
-        "Usuário aprovado como administrador."
-      );
-
-
-      await adminUsers();
     }
   );
+
+}
+else {
+
+  setupGlobalAuthListener();
+
+  initializeMaxSom();
+
 }
 
 
-/* =========================================================
-   49. FUNÇÃO DE ACESSO ADMIN
-   ========================================================= */
-
-async function checkAdminAccess() {
-
-  const profile =
-    await ensureProfile();
-
-
-  return isAdmin(
-    profile
-  );
-}
-
 
 /* =========================================================
-   50. FINALIZAÇÃO
+   84. FIM DO MAIN.JS
    ========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    try {
-
-      await initializePage();
-
-    } catch (error) {
-
-      console.error(
-        "Erro na inicialização do Max Som:",
-        error
-      );
-    }
-  }
-);
