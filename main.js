@@ -1942,6 +1942,7 @@ await ensureProfile();
 
 window.location.href =
   "conta.html";
+}
 /* =========================================================
    14. PROTEÇÃO DAS PÁGINAS DE CONTA
    ========================================================= */
