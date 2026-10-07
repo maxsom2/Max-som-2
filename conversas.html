@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -20,31 +21,42 @@
 
 <body>
 
-  <!-- CABEÇALHO -->
+  <!-- =====================================================
+       CABEÇALHO
+       ===================================================== -->
+
   <header>
+
     <div class="container header-content">
 
-      <a class="logo" href="index.html">
+      <a
+        class="logo"
+        href="index.html"
+        aria-label="Max Som - Início"
+      >
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
         >
       </a>
 
+
       <a
         class="header-whatsapp"
         href="https://wa.me/5565996262514"
         target="_blank"
-        rel="noopener"
+        rel="noopener noreferrer"
       >
         WhatsApp
       </a>
+
 
       <span class="phone">
         +55 65 99626-2514
       </span>
 
-      <nav>
+
+      <nav aria-label="Navegação principal">
 
         <a href="index.html">
           Início
@@ -70,6 +82,7 @@
           Atendimento
         </a>
 
+
         <a
           href="admin.html"
           data-admin-only
@@ -77,12 +90,14 @@
           ⚙ Painel
         </a>
 
+
         <a
           href="conta.html"
           data-logged-only
         >
           Minha conta
         </a>
+
 
         <button
           class="btn btn-outline"
@@ -96,11 +111,17 @@
       </nav>
 
     </div>
+
   </header>
 
 
-  <!-- CONTEÚDO PRINCIPAL -->
+  <!-- =====================================================
+       CONTEÚDO PRINCIPAL
+       ===================================================== -->
+
   <main>
+
+    <!-- TÍTULO DA PÁGINA -->
 
     <section class="page-header">
 
@@ -123,6 +144,8 @@
     </section>
 
 
+    <!-- LISTA DE CONVERSAS -->
+
     <section>
 
       <div class="container">
@@ -133,7 +156,9 @@
 
             <div class="section-title">
 
-              <span>Conversas</span>
+              <span>
+                Conversas
+              </span>
 
               <h2>
                 Seus atendimentos
@@ -146,10 +171,10 @@
             </div>
 
 
-            <!-- LISTA DE CONVERSAS -->
             <div
               id="conversasLista"
               class="conversation-list"
+              aria-live="polite"
             >
 
               <div class="empty">
@@ -169,18 +194,23 @@
   </main>
 
 
-  <!-- RODAPÉ -->
+  <!-- =====================================================
+       RODAPÉ
+       ===================================================== -->
+
   <footer class="footer footer-v2">
 
     <div class="container footer-content">
 
 
       <!-- SOBRE -->
+
       <div class="footer-column">
 
         <a
           class="logo"
           href="index.html"
+          aria-label="Max Som - Início"
         >
           <img
             src="logo-maxsom-white.png"
@@ -197,6 +227,7 @@
 
 
       <!-- NAVEGAÇÃO -->
+
       <div class="footer-column">
 
         <h3>
@@ -227,6 +258,7 @@
 
 
       <!-- ATENDIMENTO -->
+
       <div class="footer-column">
 
         <h3>
@@ -241,10 +273,15 @@
           Minha conta
         </a>
 
+        <a href="conversas.html">
+          Minhas conversas
+        </a>
+
       </div>
 
 
       <!-- CONTATO -->
+
       <div class="footer-column">
 
         <h3>
@@ -258,7 +295,7 @@
         <a
           href="https://wa.me/5565996262514"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
         >
           WhatsApp: (65) 99626-2514
         </a>
@@ -273,6 +310,7 @@
 
 
     <!-- COPYRIGHT -->
+
     <div class="footer-bottom">
 
       <div class="container">
@@ -284,11 +322,17 @@
   </footer>
 
 
-  <!-- SCRIPTS -->
+  <!-- =====================================================
+       SCRIPTS
+       ===================================================== -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="supabase.js"></script>
+
   <script src="main.js"></script>
 
 </body>
 
 </html>
+```
