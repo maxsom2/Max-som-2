@@ -4,35 +4,8 @@
 
    MAIN.JS — VERSAO LIMPA E CORRIGIDA
 
- 
-
-   Objetivos desta versão:
-
-   - um único fluxo de autenticação;
-
-   - Login sempre leva para conta.html;
-
-   - Painel aparece somente para administradores;
-
-   - admin.html fica protegido;
-
-   - uso das tabelas atuais do projeto;
-
-   - sem alterar o banco de dados;
-
-   - compatível com os IDs antigos e novos das páginas.
-
- 
-
-   IMPORTANTE:
-
-   - Não carregar supabase.js junto com este arquivo.
-
-   - Cada página deve carregar o SDK do Supabase antes deste main.js.
-
    ========================================================= */
 
- 
 
 /* =========================================================
 
@@ -40,65 +13,45 @@
 
    ========================================================= */
 
- 
 
 const SUPABASE_URL =
 
   "https://diabhunpflawknocixit.supabase.co";
 
- 
 
 const SUPABASE_KEY =
 
   "sb_publishable_GrFU5c86UZESBh3qs1znQw__ZMNVAnC";
 
- 
 
-let supabase = null;
+const supabase =
 
- 
+  window.supabase && typeof window.supabase.createClient === "function"
 
-if (
+    ? window.supabase.createClient(
 
-  window.supabase &&
+        SUPABASE_URL,
 
-  typeof window.supabase.createClient === "function"
+        SUPABASE_KEY,
 
-) {
+        {
 
-  supabase = window.supabase.createClient(
+          auth: {
 
-    SUPABASE_URL,
+            persistSession: true,
 
-    SUPABASE_KEY,
+            autoRefreshToken: true,
 
-    {
+            detectSessionInUrl: true
 
-      auth: {
+          }
 
-        persistSession: true,
+        }
 
-        autoRefreshToken: true,
+      )
 
-        detectSessionInUrl: true
+    : null;
 
-      }
-
-    }
-
-  );
-
-} else {
-
-  console.error(
-
-    "Supabase JS nao foi carregado antes do main.js."
-
-  );
-
-}
-
- 
 
 /* =========================================================
 
@@ -106,7 +59,6 @@ if (
 
    ========================================================= */
 
- 
 
 const ADMIN_TYPES = [
 
@@ -122,7 +74,6 @@ const ADMIN_TYPES = [
 
 ];
 
- 
 
 const TABLES = {
 
@@ -142,15 +93,10 @@ const TABLES = {
 
   PROJETOS: "projetos",
 
-  PUBLICACOES: "publicacoes",
-
-  ARQUIVOS: "arquivos",
-
-  MARCAS: "marcas"
+  PUBLICACOES: "publicacoes"
 
 };
 
- 
 
 let currentUser = null;
 
@@ -158,23 +104,13 @@ let currentProfile = null;
 
 let authListenerBound = false;
 
-let currentConversationChannel = null;
-
-let conversationListChannel = null;
-
-let notificationChannel = null;
-
-let messageChannel = null;
-
- 
 
 /* =========================================================
 
-   3. AUXILIARES
+   3. FUNCOES AUXILIARES
 
    ========================================================= */
 
- 
 
 function qs(...selectors) {
 
@@ -190,7 +126,6 @@ function qs(...selectors) {
 
 }
 
- 
 
 function qsa(selector) {
 
@@ -198,7 +133,6 @@ function qsa(selector) {
 
 }
 
- 
 
 function esc(value) {
 
@@ -216,19 +150,13 @@ function esc(value) {
 
 }
 
- 
 
-function normalizeType(value) {
+function normalizeType(type) {
 
-  return String(value ?? "")
-
-    .trim()
-
-    .toLowerCase();
+  return String(type ?? "").trim().toLowerCase();
 
 }
 
- 
 
 function isAdmin(profile = currentProfile) {
 
@@ -240,77 +168,38 @@ function isAdmin(profile = currentProfile) {
 
 }
 
- 
-
-function isLoggedIn() {
-
-  return !!currentUser;
-
-}
-
- 
 
 function getCurrentPage() {
 
-  const path =
+  const file =
 
-    window.location.pathname
+    window.location.pathname.split("/").pop()?.toLowerCase();
 
-      .split("/")
-
-      .pop()
-
-      .toLowerCase();
-
- 
-
-  return path || "index.html";
+  return file || "index.html";
 
 }
 
- 
 
 function formatDate(value) {
 
   if (!value) return "";
 
- 
-
   const date = new Date(value);
-
- 
 
   if (Number.isNaN(date.getTime())) return "";
 
- 
-
-  return date.toLocaleDateString("pt-BR", {
-
-    day: "2-digit",
-
-    month: "2-digit",
-
-    year: "numeric"
-
-  });
+  return date.toLocaleDateString("pt-BR");
 
 }
 
- 
 
 function formatDateTime(value) {
 
   if (!value) return "";
 
- 
-
   const date = new Date(value);
 
- 
-
   if (Number.isNaN(date.getTime())) return "";
-
- 
 
   return date.toLocaleString("pt-BR", {
 
@@ -328,23 +217,16 @@ function formatDateTime(value) {
 
 }
 
- 
 
 function showMessage(target, text, type = "info") {
 
   const element =
 
-    typeof target === "string"
+    typeof target === "string" ? qs(target) : target;
 
-      ? document.querySelector(target)
-
-      : target;
-
- 
 
   if (!element) return;
 
- 
 
   element.textContent = text || "";
 
@@ -366,23 +248,16 @@ function showMessage(target, text, type = "info") {
 
 }
 
- 
 
 function clearMessage(target) {
 
   const element =
 
-    typeof target === "string"
+    typeof target === "string" ? qs(target) : target;
 
-      ? document.querySelector(target)
-
-      : target;
-
- 
 
   if (!element) return;
 
- 
 
   element.textContent = "";
 
@@ -402,25 +277,19 @@ function clearMessage(target) {
 
 }
 
- 
 
 function setButtonLoading(button, loading, normalText = "") {
 
   if (!button) return;
 
- 
 
   if (loading) {
 
     if (!button.dataset.originalText) {
 
-      button.dataset.originalText =
-
-        button.textContent.trim();
+      button.dataset.originalText = button.textContent.trim();
 
     }
-
- 
 
     button.disabled = true;
 
@@ -430,7 +299,6 @@ function setButtonLoading(button, loading, normalText = "") {
 
   }
 
- 
 
   button.disabled = false;
 
@@ -444,7 +312,6 @@ function setButtonLoading(button, loading, normalText = "") {
 
 }
 
- 
 
 function dbError(error, fallback = "Ocorreu um erro.") {
 
@@ -464,41 +331,25 @@ function dbError(error, fallback = "Ocorreu um erro.") {
 
 }
 
- 
 
 function isSupabaseReady() {
 
-  if (supabase) return true;
-
- 
-
-  console.error(
-
-    "Cliente Supabase indisponivel."
-
-  );
-
- 
-
-  return false;
+  return !!supabase;
 
 }
 
- 
 
 /* =========================================================
 
-   4. PERFIL
+   4. PERFIL / AUTENTICACAO
 
    ========================================================= */
 
- 
 
 async function getAuthUser() {
 
   if (!isSupabaseReady()) return null;
 
- 
 
   const {
 
@@ -508,7 +359,6 @@ async function getAuthUser() {
 
   } = await supabase.auth.getUser();
 
- 
 
   if (error || !data?.user) {
 
@@ -518,7 +368,6 @@ async function getAuthUser() {
 
   }
 
- 
 
   currentUser = data.user;
 
@@ -526,13 +375,11 @@ async function getAuthUser() {
 
 }
 
- 
 
 async function loadProfile(user = null) {
 
   if (!isSupabaseReady()) return null;
 
- 
 
   const authUser =
 
@@ -542,7 +389,6 @@ async function loadProfile(user = null) {
 
     await getAuthUser();
 
- 
 
   if (!authUser) {
 
@@ -552,7 +398,9 @@ async function loadProfile(user = null) {
 
   }
 
- 
+
+  currentUser = authUser;
+
 
   const {
 
@@ -570,17 +418,10 @@ async function loadProfile(user = null) {
 
     .maybeSingle();
 
- 
 
   if (error) {
 
-    console.error(
-
-      "Erro ao carregar perfil:",
-
-      error
-
-    );
+    console.error("Erro ao carregar perfil:", error);
 
     currentProfile = null;
 
@@ -588,7 +429,6 @@ async function loadProfile(user = null) {
 
   }
 
- 
 
   currentProfile = data || null;
 
@@ -596,13 +436,11 @@ async function loadProfile(user = null) {
 
 }
 
- 
 
 async function ensureProfile(user = null, values = {}) {
 
   if (!isSupabaseReady()) return null;
 
- 
 
   const authUser =
 
@@ -612,7 +450,6 @@ async function ensureProfile(user = null, values = {}) {
 
     await getAuthUser();
 
- 
 
   if (!authUser) {
 
@@ -624,75 +461,60 @@ async function ensureProfile(user = null, values = {}) {
 
   }
 
- 
 
   currentUser = authUser;
 
- 
 
-  const existing =
+  const existing = await loadProfile(authUser);
 
-    await loadProfile(authUser);
-
- 
 
   if (existing) return existing;
 
- 
 
-  const nome = String(
-
-    values.nome ||
-
-    authUser.user_metadata?.nome ||
-
-    authUser.email?.split("@")[0] ||
-
-    "Cliente"
-
-  ).trim();
-
- 
-
-  const telefone = String(
-
-    values.telefone ||
-
-    authUser.user_metadata?.telefone ||
-
-    ""
-
-  ).trim();
-
- 
-
-  const whatsapp = String(
-
-    values.whatsapp ||
-
-    authUser.user_metadata?.whatsapp ||
-
-    ""
-
-  ).trim();
-
- 
-
-  const newProfile = {
+  const profileData = {
 
     id: authUser.id,
 
-    nome,
+    nome: String(
 
-    telefone: telefone || null,
+      values.nome ||
 
-    whatsapp: whatsapp || null,
+      authUser.user_metadata?.nome ||
+
+      authUser.email?.split("@")[0] ||
+
+      "Cliente"
+
+    ).trim(),
+
+    telefone:
+
+      String(
+
+        values.telefone ||
+
+        authUser.user_metadata?.telefone ||
+
+        ""
+
+      ).trim() || null,
+
+    whatsapp:
+
+      String(
+
+        values.whatsapp ||
+
+        authUser.user_metadata?.whatsapp ||
+
+        ""
+
+      ).trim() || null,
 
     tipo_usuario: "cliente"
 
   };
 
- 
 
   const {
 
@@ -704,29 +526,21 @@ async function ensureProfile(user = null, values = {}) {
 
     .from(TABLES.USUARIO)
 
-    .insert(newProfile)
+    .insert(profileData)
 
     .select("*")
 
     .single();
 
- 
 
   if (error) {
 
-    console.error(
-
-      "Erro ao criar perfil:",
-
-      error
-
-    );
+    console.error("Erro ao criar perfil:", error);
 
     return null;
 
   }
 
- 
 
   currentProfile = data;
 
@@ -734,7 +548,6 @@ async function ensureProfile(user = null, values = {}) {
 
 }
 
- 
 
 /* =========================================================
 
@@ -742,19 +555,22 @@ async function ensureProfile(user = null, values = {}) {
 
    ========================================================= */
 
- 
 
 async function updateNav() {
 
   if (!isSupabaseReady()) return;
 
- 
 
   const logged = !!currentUser;
 
-  const admin = isAdmin(currentProfile);
+  const profile =
 
- 
+    currentProfile ||
+
+    (logged ? await loadProfile(currentUser) : null);
+
+  const admin = isAdmin(profile);
+
 
   qsa("[data-guest-only]").forEach((element) => {
 
@@ -762,7 +578,6 @@ async function updateNav() {
 
   });
 
- 
 
   qsa("[data-logged-only]").forEach((element) => {
 
@@ -770,15 +585,6 @@ async function updateNav() {
 
   });
 
- 
-
-  qsa("[data-admin-only]").forEach((element) => {
-
-    element.style.display = admin ? "" : "none";
-
-  });
-
- 
 
   qsa("[data-conversations-link]").forEach((element) => {
 
@@ -786,9 +592,36 @@ async function updateNav() {
 
   });
 
+
+  qsa("[data-admin-only]").forEach((element) => {
+
+    element.style.display = admin ? "" : "none";
+
+  });
+
+
+  qsa("[data-logout]").forEach((button) => {
+
+    button.style.display = logged ? "" : "none";
+
+
+    if (button.dataset.logoutBound === "true") return;
+
+
+    button.dataset.logoutBound = "true";
+
+    button.addEventListener("click", async (event) => {
+
+      event.preventDefault();
+
+      await logout();
+
+    });
+
+  });
+
 }
 
- 
 
 /* =========================================================
 
@@ -796,81 +629,41 @@ async function updateNav() {
 
    ========================================================= */
 
- 
 
-async function setupLogin() {
+function setupLogin() {
 
-  const form = qs(
+  const form = qs("#loginForm", "#formLogin");
 
-    "#loginForm",
+  if (!form || form.dataset.loginBound === "true") return;
 
-    "#formLogin"
-
-  );
-
- 
-
-  if (!form) return;
-
- 
-
-  if (form.dataset.loginBound === "true") {
-
-    return;
-
-  }
-
- 
 
   form.dataset.loginBound = "true";
 
- 
 
   form.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
- 
 
-    const email = qs(
+    const email =
 
-      "#loginEmail",
+      qs("#loginEmail", "#email")?.value.trim().toLowerCase() || "";
 
-      "#email"
+    const password =
 
-    )?.value.trim().toLowerCase();
+      qs("#loginPassword", "#senha")?.value || "";
 
- 
+    const message =
 
-    const password = qs(
-
-      "#loginPassword",
-
-      "#senha"
-
-    )?.value || "";
-
- 
-
-    const message = qs(
-
-      "#loginError",
-
-      "#mensagemLogin"
-
-    );
-
- 
+      qs("#loginError", "#mensagemLogin");
 
     const button =
 
       form.querySelector("button[type='submit']");
 
- 
 
     clearMessage(message);
 
- 
 
     if (!email || !password) {
 
@@ -888,7 +681,6 @@ async function setupLogin() {
 
     }
 
- 
 
     if (!isSupabaseReady()) {
 
@@ -896,7 +688,7 @@ async function setupLogin() {
 
         message,
 
-        "O sistema de login nao foi carregado.",
+        "O sistema de login não foi carregado.",
 
         "error"
 
@@ -906,11 +698,9 @@ async function setupLogin() {
 
     }
 
- 
 
     setButtonLoading(button, true, "Entrar");
 
- 
 
     try {
 
@@ -928,57 +718,25 @@ async function setupLogin() {
 
       });
 
- 
 
       if (error) throw error;
 
- 
-
       if (!data?.user) {
 
-        throw new Error("A sessao nao foi criada.");
+        throw new Error("A sessão não foi criada.");
 
       }
 
- 
 
       currentUser = data.user;
 
- 
-
-      await ensureProfile(data.user);
-
- 
-
-      showMessage(
-
-        message,
-
-        "Login realizado com sucesso. Entrando...",
-
-        "success"
-
-      );
-
- 
+      await loadProfile(data.user);
 
       await updateNav();
 
- 
 
-      /*
+      window.location.replace("conta.html");
 
-       * REGRA DO PROJETO:
-
-       * o login sempre entra primeiro em Minha conta.
-
-       * O admin continua podendo abrir o Painel depois.
-
-       */
-
-      window.location.href = "conta.html";
-
- 
 
     } catch (error) {
 
@@ -994,19 +752,9 @@ async function setupLogin() {
 
       console.error("Erro no login:", error);
 
- 
-
     } finally {
 
-      setButtonLoading(
-
-        button,
-
-        false,
-
-        "Entrar"
-
-      );
+      setButtonLoading(button, false, "Entrar");
 
     }
 
@@ -1014,7 +762,6 @@ async function setupLogin() {
 
 }
 
- 
 
 /* =========================================================
 
@@ -1022,111 +769,53 @@ async function setupLogin() {
 
    ========================================================= */
 
- 
 
-async function setupSignup() {
+function setupSignup() {
 
-  const form = qs(
+  const form = qs("#signupForm", "#formCadastro");
 
-    "#signupForm",
+  if (!form || form.dataset.signupBound === "true") return;
 
-    "#formCadastro"
-
-  );
-
- 
-
-  if (!form) return;
-
- 
-
-  if (form.dataset.signupBound === "true") {
-
-    return;
-
-  }
-
- 
 
   form.dataset.signupBound = "true";
 
- 
 
   form.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
- 
 
-    const nome = qs(
+    const nome =
 
-      "#signupNome",
+      qs("#signupNome", "#nome")?.value.trim() || "";
 
-      "#nome"
+    const telefone =
 
-    )?.value.trim() || "";
+      qs("#signupTelefone", "#telefone")?.value.trim() || "";
 
- 
+    const whatsapp =
 
-    const telefone = qs(
+      qs("#signupWhatsapp", "#whatsapp")?.value.trim() || "";
 
-      "#signupTelefone",
+    const email =
 
-      "#telefone"
+      qs("#signupEmail", "#email")?.value.trim().toLowerCase() || "";
 
-    )?.value.trim() || "";
+    const password =
 
- 
+      qs("#signupPassword", "#senha")?.value || "";
 
-    const whatsapp = qs(
+    const message =
 
-      "#signupWhatsapp",
-
-      "#whatsapp"
-
-    )?.value.trim() || "";
-
- 
-
-    const email = qs(
-
-      "#signupEmail",
-
-      "#email"
-
-    )?.value.trim().toLowerCase() || "";
-
- 
-
-    const password = qs(
-
-      "#signupPassword",
-
-      "#senha"
-
-    )?.value || "";
-
- 
-
-    const message = qs(
-
-      "#signupError",
-
-      "#mensagemCadastro"
-
-    );
-
- 
+      qs("#signupError", "#mensagemCadastro");
 
     const button =
 
       form.querySelector("button[type='submit']");
 
- 
 
     clearMessage(message);
 
- 
 
     if (!nome || !email || !password) {
 
@@ -1144,29 +833,9 @@ async function setupSignup() {
 
     }
 
- 
-
-    if (!isSupabaseReady()) {
-
-      showMessage(
-
-        message,
-
-        "O sistema de cadastro nao foi carregado.",
-
-        "error"
-
-      );
-
-      return;
-
-    }
-
- 
 
     setButtonLoading(button, true, "Criar conta");
 
- 
 
     try {
 
@@ -1198,27 +867,21 @@ async function setupSignup() {
 
       });
 
- 
 
       if (error) throw error;
 
- 
+      if (!data?.user) {
 
-      const user = data?.user;
-
- 
-
-      if (!user) {
-
-        throw new Error("O usuario nao foi criado.");
+        throw new Error("Não foi possível criar o usuário.");
 
       }
 
- 
 
       if (data.session) {
 
-        await ensureProfile(user, {
+        currentUser = data.user;
+
+        await ensureProfile(data.user, {
 
           nome,
 
@@ -1228,43 +891,25 @@ async function setupSignup() {
 
         });
 
- 
-
-        showMessage(
-
-          message,
-
-          "Conta criada com sucesso. Entrando...",
-
-          "success"
-
-        );
-
- 
-
-        window.location.href = "conta.html";
+        window.location.replace("conta.html");
 
         return;
 
       }
 
- 
 
       showMessage(
 
         message,
 
-        "Conta criada. Confirme seu e-mail e depois faca login.",
+        "Conta criada. Confirme seu e-mail e depois faça login.",
 
         "success"
 
       );
 
- 
-
       form.reset();
 
- 
 
     } catch (error) {
 
@@ -1272,31 +917,15 @@ async function setupSignup() {
 
         message,
 
-        dbError(
-
-          error,
-
-          "Nao foi possivel criar a conta."
-
-        ),
+        dbError(error, "Não foi possível criar a conta."),
 
         "error"
 
       );
 
- 
-
     } finally {
 
-      setButtonLoading(
-
-        button,
-
-        false,
-
-        "Criar conta"
-
-      );
+      setButtonLoading(button, false, "Criar conta");
 
     }
 
@@ -1304,7 +933,6 @@ async function setupSignup() {
 
 }
 
- 
 
 /* =========================================================
 
@@ -1312,29 +940,18 @@ async function setupSignup() {
 
    ========================================================= */
 
- 
 
 async function logout() {
 
   if (!isSupabaseReady()) return;
 
- 
 
-  const {
+  const { error } = await supabase.auth.signOut();
 
-    error
-
-  } = await supabase.auth.signOut();
-
- 
 
   if (error) {
 
-    alert(
-
-      "Nao foi possivel sair da conta."
-
-    );
+    alert("Não foi possível sair da conta.");
 
     console.error(error);
 
@@ -1342,19 +959,17 @@ async function logout() {
 
   }
 
- 
-
-  cleanupRealtimeChannels();
 
   currentUser = null;
 
   currentProfile = null;
 
-  window.location.href = "index.html";
+  cleanupRealtimeChannels();
+
+  window.location.replace("index.html");
 
 }
 
- 
 
 /* =========================================================
 
@@ -1362,79 +977,63 @@ async function logout() {
 
    ========================================================= */
 
- 
 
 function setupAuthListener() {
 
-  if (!isSupabaseReady()) return;
+  if (!isSupabaseReady() || authListenerBound) return;
 
-  if (authListenerBound) return;
-
- 
 
   authListenerBound = true;
 
- 
 
-  supabase.auth.onAuthStateChange(
+  supabase.auth.onAuthStateChange(async (event, session) => {
 
-    async (event, session) => {
+    currentUser = session?.user || null;
 
-      currentUser = session?.user || null;
 
- 
+    if (currentUser) {
 
-      if (currentUser) {
+      await loadProfile(currentUser);
 
-        await loadProfile(currentUser);
+    } else {
 
-      } else {
+      currentProfile = null;
 
-        currentProfile = null;
+    }
 
-      }
 
- 
+    await updateNav();
 
-      await updateNav();
 
- 
+    if (event === "SIGNED_OUT") {
 
-      if (event === "SIGNED_OUT") {
+      cleanupRealtimeChannels();
 
-        cleanupRealtimeChannels();
 
- 
+      const page = getCurrentPage();
 
-        const page = getCurrentPage();
+      if ([
 
- 
+        "conta.html",
 
-        if ([
+        "conversas.html",
 
-          "conta.html",
+        "conversa.html",
 
-          "conversas.html",
+        "admin.html"
 
-          "conversa.html",
+      ].includes(page)) {
 
-          "admin.html"
-
-        ].includes(page)) {
-
-          window.location.href = "login.html";
-
-        }
+        window.location.replace("login.html");
 
       }
 
     }
 
-  );
+  });
 
 }
 
- 
 
 /* =========================================================
 
@@ -1442,19 +1041,17 @@ function setupAuthListener() {
 
    ========================================================= */
 
- 
 
 async function requireAdmin() {
 
   if (!currentUser) {
 
-    window.location.href = "login.html";
+    window.location.replace("login.html");
 
     return false;
 
   }
 
- 
 
   const profile =
 
@@ -1462,23 +1059,20 @@ async function requireAdmin() {
 
     await loadProfile(currentUser);
 
- 
 
   if (!profile || !isAdmin(profile)) {
 
-    window.location.href = "index.html";
+    window.location.replace("index.html");
 
     return false;
 
   }
 
- 
 
   return true;
 
 }
 
- 
 
 /* =========================================================
 
@@ -1486,13 +1080,11 @@ async function requireAdmin() {
 
    ========================================================= */
 
- 
 
 async function enforcePageAccess() {
 
   const page = getCurrentPage();
 
- 
 
   if ([
 
@@ -1506,7 +1098,7 @@ async function enforcePageAccess() {
 
     if (!currentUser) {
 
-      window.location.href = "login.html";
+      window.location.replace("login.html");
 
       return false;
 
@@ -1514,7 +1106,6 @@ async function enforcePageAccess() {
 
   }
 
- 
 
   if (page === "admin.html") {
 
@@ -1522,91 +1113,37 @@ async function enforcePageAccess() {
 
   }
 
- 
 
   return true;
 
 }
 
- 
 
 /* =========================================================
 
-   12. REDIRECIONAMENTO DE USUARIO JA LOGADO
+   12. LOGIN JA ATIVO
 
    ========================================================= */
 
- 
 
 async function redirectAuthenticatedUser() {
 
-  if (getCurrentPage() !== "login.html") {
+  if (getCurrentPage() !== "login.html") return;
 
-    return;
+  if (!currentUser) return;
 
-  }
 
- 
-
-  if (!currentUser) {
-
-    return;
-
-  }
-
- 
-
-  await loadProfile(currentUser);
-
- 
-
-  window.location.href = "conta.html";
+  window.location.replace("conta.html");
 
 }
 
- 
 
 /* =========================================================
 
-   13. ATUALIZACAO DE LINKS
+   13. NAVEGACAO GERAL
 
    ========================================================= */
 
- 
-
-function setupLogoutButtons() {
-
-  qsa(
-
-    "#logoutButton, #logoutLink, [data-logout]"
-
-  ).forEach((button) => {
-
-    if (button.dataset.logoutBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.logoutBound = "true";
-
- 
-
-    button.addEventListener("click", async (event) => {
-
-      event.preventDefault();
-
-      await logout();
-
-    });
-
-  });
-
-}
-
- 
 
 function setupGeneralNavigation() {
 
@@ -1616,17 +1153,10 @@ function setupGeneralNavigation() {
 
   ).forEach((link) => {
 
-    if (link.dataset.navigationBound === "true") {
+    if (link.dataset.navigationBound === "true") return;
 
-      return;
-
-    }
-
- 
 
     link.dataset.navigationBound = "true";
-
- 
 
     link.addEventListener("click", (event) => {
 
@@ -1634,7 +1164,7 @@ function setupGeneralNavigation() {
 
         event.preventDefault();
 
-        window.location.href = "login.html";
+        window.location.replace("login.html");
 
       }
 
@@ -1644,15 +1174,13 @@ function setupGeneralNavigation() {
 
 }
 
- 
 
 /* =========================================================
 
-   14. PAGINA MINHA CONTA
+   14. MINHA CONTA
 
    ========================================================= */
 
- 
 
 async function loadAccountPage() {
 
@@ -1664,21 +1192,17 @@ async function loadAccountPage() {
 
   );
 
- 
 
   if (!page) return;
 
- 
-
   if (!currentUser) {
 
-    window.location.href = "login.html";
+    window.location.replace("login.html");
 
     return;
 
   }
 
- 
 
   const profile =
 
@@ -1686,33 +1210,24 @@ async function loadAccountPage() {
 
     await loadProfile(currentUser);
 
- 
 
-  if (!profile) return;
+  const displayName =
 
- 
-
-  const name =
-
-    profile.nome ||
+    profile?.nome ||
 
     currentUser.email?.split("@")[0] ||
 
-    "Usuario";
+    "Usuário";
 
- 
 
   const type = normalizeType(
 
-    profile.tipo_usuario || "cliente"
+    profile?.tipo_usuario || "cliente"
 
   );
 
- 
 
   let typeLabel = "Visualizador";
-
- 
 
   if (isAdmin(profile)) {
 
@@ -1720,11 +1235,10 @@ async function loadAccountPage() {
 
   } else if (type === "solicitante_admin") {
 
-    typeLabel = "Solicitacao de administrador";
+    typeLabel = "Solicitação de administrador";
 
   }
 
- 
 
   const nameTitle = qs(
 
@@ -1734,8 +1248,6 @@ async function loadAccountPage() {
 
   );
 
- 
-
   const nameField = qs(
 
     "#contaNome",
@@ -1743,8 +1255,6 @@ async function loadAccountPage() {
     "[data-account-name-full]"
 
   );
-
- 
 
   const emailField = qs(
 
@@ -1754,8 +1264,6 @@ async function loadAccountPage() {
 
   );
 
- 
-
   const phoneField = qs(
 
     "#contaTelefone",
@@ -1763,8 +1271,6 @@ async function loadAccountPage() {
     "[data-account-phone]"
 
   );
-
- 
 
   const typeField = qs(
 
@@ -1774,27 +1280,20 @@ async function loadAccountPage() {
 
   );
 
- 
 
-  if (nameTitle) nameTitle.textContent = name;
+  if (nameTitle) nameTitle.textContent = displayName;
 
-  if (nameField) nameField.textContent = name;
+  if (nameField) nameField.textContent = displayName;
 
-  if (emailField) {
-
-    emailField.textContent =
-
-      currentUser.email || "-";
-
-  }
+  if (emailField) emailField.textContent = currentUser.email || "-";
 
   if (phoneField) {
 
     phoneField.textContent =
 
-      profile.whatsapp ||
+      profile?.whatsapp ||
 
-      profile.telefone ||
+      profile?.telefone ||
 
       "-";
 
@@ -1802,7 +1301,6 @@ async function loadAccountPage() {
 
   if (typeField) typeField.textContent = typeLabel;
 
- 
 
   await loadAccountRequests();
 
@@ -1810,9 +1308,10 @@ async function loadAccountPage() {
 
   await loadNotifications();
 
+  setupAdminRequestButton();
+
 }
 
- 
 
 /* =========================================================
 
@@ -1820,7 +1319,6 @@ async function loadAccountPage() {
 
    ========================================================= */
 
- 
 
 async function loadAccountRequests() {
 
@@ -1834,11 +1332,9 @@ async function loadAccountRequests() {
 
   );
 
- 
 
   if (!container || !currentUser) return;
 
- 
 
   const {
 
@@ -1850,21 +1346,11 @@ async function loadAccountRequests() {
 
     .from(TABLES.SOLICITACOES)
 
-    .select(`
+    .select(
 
-      id,
+      "id,servico_id,status,descricao_problema,observacoes,criado_em"
 
-      status,
-
-      descricao_problema,
-
-      observacoes,
-
-      criado_em,
-
-      servicos(nome)
-
-    `)
+    )
 
     .eq("cliente_id", currentUser.id)
 
@@ -1872,19 +1358,12 @@ async function loadAccountRequests() {
 
     .limit(20);
 
- 
 
   if (error) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nao foi possivel carregar suas solicitacoes.
-
-      </div>
-
-    `;
+      '<div class="empty">Não foi possível carregar suas solicitações.</div>';
 
     console.error(error);
 
@@ -1892,51 +1371,27 @@ async function loadAccountRequests() {
 
   }
 
- 
 
   if (!data?.length) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nenhuma solicitacao encontrada.
-
-      </div>
-
-    `;
+      '<div class="empty">Nenhuma solicitação encontrada.</div>';
 
     return;
 
   }
 
- 
 
   container.innerHTML = data.map((item) => `
 
     <article class="account-item">
 
-      <strong>
+      <strong>Solicitação de atendimento</strong>
 
-        ${esc(item.servicos?.nome || "Solicitacao")}
+      <span>${esc(item.status || "Em análise")} • ${esc(formatDateTime(item.criado_em))}</span>
 
-      </strong>
-
-      <span>
-
-        ${esc(item.status || "Em analise")}
-
-        •
-
-        ${esc(formatDateTime(item.criado_em))}
-
-      </span>
-
-      <p>
-
-        ${esc(item.descricao_problema || "")}
-
-      </p>
+      <p>${esc(item.descricao_problema || item.observacoes || "")}</p>
 
     </article>
 
@@ -1944,7 +1399,6 @@ async function loadAccountRequests() {
 
 }
 
- 
 
 /* =========================================================
 
@@ -1952,7 +1406,6 @@ async function loadAccountRequests() {
 
    ========================================================= */
 
- 
 
 async function loadAccountConversations() {
 
@@ -1966,11 +1419,9 @@ async function loadAccountConversations() {
 
   );
 
- 
 
   if (!container || !currentUser) return;
 
- 
 
   const {
 
@@ -1982,23 +1433,11 @@ async function loadAccountConversations() {
 
     .from(TABLES.CONVERSAS)
 
-    .select(`
+    .select(
 
-      id,
+      "id,cliente_id,funcionario_id,assunto,status,criado_em,atualizado_em"
 
-      cliente_id,
-
-      funcionario_id,
-
-      assunto,
-
-      status,
-
-      criado_em,
-
-      atualizado_em
-
-    `)
+    )
 
     .or(
 
@@ -2010,19 +1449,12 @@ async function loadAccountConversations() {
 
     .limit(20);
 
- 
 
   if (error) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nao foi possivel carregar suas conversas.
-
-      </div>
-
-    `;
+      '<div class="empty">Não foi possível carregar suas conversas.</div>';
 
     console.error(error);
 
@@ -2030,25 +1462,17 @@ async function loadAccountConversations() {
 
   }
 
- 
 
   if (!data?.length) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nenhuma conversa encontrada.
-
-      </div>
-
-    `;
+      '<div class="empty">Nenhuma conversa encontrada.</div>';
 
     return;
 
   }
 
- 
 
   container.innerHTML = data.map((conversation) => `
 
@@ -2064,29 +1488,13 @@ async function loadAccountConversations() {
 
         <div>
 
-          <h3>
+          <h3>${esc(conversation.assunto || "Atendimento Max Som")}</h3>
 
-            ${esc(conversation.assunto || "Atendimento Max Som")}
-
-          </h3>
-
-          <span>
-
-            ${esc(conversation.status || "aberta")}
-
-          </span>
+          <span>${esc(conversation.status || "aberta")}</span>
 
         </div>
 
-        <time>
-
-          ${esc(formatDateTime(
-
-            conversation.atualizado_em || conversation.criado_em
-
-          ))}
-
-        </time>
+        <time>${esc(formatDateTime(conversation.atualizado_em || conversation.criado_em))}</time>
 
       </div>
 
@@ -2096,7 +1504,6 @@ async function loadAccountConversations() {
 
 }
 
- 
 
 /* =========================================================
 
@@ -2104,7 +1511,86 @@ async function loadAccountConversations() {
 
    ========================================================= */
 
- 
+
+async function requestAdminAccess() {
+
+  if (!currentUser) {
+
+    window.location.replace("login.html");
+
+    return;
+
+  }
+
+
+  const profile =
+
+    currentProfile ||
+
+    await loadProfile(currentUser);
+
+
+  if (!profile) return;
+
+
+  const type = normalizeType(profile.tipo_usuario);
+
+
+  if (isAdmin(profile)) {
+
+    alert("Sua conta já possui acesso de administrador.");
+
+    return;
+
+  }
+
+
+  if (type === "solicitante_admin") {
+
+    alert("Sua solicitação de administrador já foi enviada.");
+
+    return;
+
+  }
+
+
+  const { error } = await supabase
+
+    .from(TABLES.USUARIO)
+
+    .update({ tipo_usuario: "solicitante_admin" })
+
+    .eq("id", currentUser.id);
+
+
+  if (error) {
+
+    alert("Não foi possível enviar a solicitação.");
+
+    console.error(error);
+
+    return;
+
+  }
+
+
+  currentProfile = {
+
+    ...profile,
+
+    tipo_usuario: "solicitante_admin"
+
+  };
+
+
+  alert("Solicitação enviada para análise.");
+
+  await updateNav();
+
+  await loadAccountPage();
+
+}
+
 
 function setupAdminRequestButton() {
 
@@ -2112,155 +1598,29 @@ function setupAdminRequestButton() {
 
     "#requestAdminButton",
 
+    "#btnAdminRequest",
+
     "[data-request-admin]"
 
   );
 
- 
 
-  if (!button) return;
+  if (!button || button.dataset.adminRequestBound === "true") return;
 
- 
-
-  if (button.dataset.adminRequestBound === "true") {
-
-    return;
-
-  }
-
- 
 
   button.dataset.adminRequestBound = "true";
 
- 
-
-  button.addEventListener("click", async () => {
-
-    if (!currentUser) {
-
-      window.location.href = "login.html";
-
-      return;
-
-    }
-
- 
-
-    const profile =
-
-      currentProfile ||
-
-      await loadProfile(currentUser);
-
- 
-
-    if (!profile) return;
-
- 
-
-    if (isAdmin(profile)) {
-
-      alert(
-
-        "Sua conta ja possui acesso de administrador."
-
-      );
-
-      return;
-
-    }
-
- 
-
-    if (
-
-      normalizeType(profile.tipo_usuario) ===
-
-      "solicitante_admin"
-
-    ) {
-
-      alert(
-
-        "Sua solicitacao de administrador ja foi enviada."
-
-      );
-
-      return;
-
-    }
-
- 
-
-    const {
-
-      error
-
-    } = await supabase
-
-      .from(TABLES.USUARIO)
-
-      .update({
-
-        tipo_usuario: "solicitante_admin"
-
-      })
-
-      .eq("id", currentUser.id);
-
- 
-
-    if (error) {
-
-      alert(
-
-        "Nao foi possivel enviar a solicitacao."
-
-      );
-
-      console.error(error);
-
-      return;
-
-    }
-
- 
-
-    currentProfile = {
-
-      ...profile,
-
-      tipo_usuario: "solicitante_admin"
-
-    };
-
- 
-
-    alert(
-
-      "Solicitacao enviada para analise."
-
-    );
-
- 
-
-    await updateNav();
-
-    await loadAccountPage();
-
-  });
+  button.addEventListener("click", requestAdminAccess);
 
 }
 
- 
 
 /* =========================================================
 
-   18. ATENDIMENTO - SERVICOS
+   18. ATENDIMENTO
 
    ========================================================= */
 
- 
 
 async function loadAttendanceServices() {
 
@@ -2274,11 +1634,9 @@ async function loadAttendanceServices() {
 
   );
 
- 
 
   if (!select || !isSupabaseReady()) return;
 
- 
 
   const {
 
@@ -2296,19 +1654,12 @@ async function loadAttendanceServices() {
 
     .order("nome", { ascending: true });
 
- 
 
   if (error) {
 
-    select.innerHTML = `
+    select.innerHTML =
 
-      <option value="">
-
-        Nao foi possivel carregar os servicos
-
-      </option>
-
-    `;
+      '<option value="">Não foi possível carregar os serviços</option>';
 
     console.error(error);
 
@@ -2316,15 +1667,11 @@ async function loadAttendanceServices() {
 
   }
 
- 
 
-  select.innerHTML = `
+  select.innerHTML =
 
-    <option value="">Selecione um servico</option>
+    '<option value="">Selecione um serviço</option>';
 
-  `;
-
- 
 
   (data || []).forEach((service) => {
 
@@ -2340,15 +1687,8 @@ async function loadAttendanceServices() {
 
   });
 
- 
 
-  const params = new URLSearchParams(
-
-    window.location.search
-
-  );
-
- 
+  const params = new URLSearchParams(window.location.search);
 
   const serviceFromUrl =
 
@@ -2356,55 +1696,31 @@ async function loadAttendanceServices() {
 
     params.get("service");
 
- 
 
-  if (!serviceFromUrl) return;
+  if (serviceFromUrl) {
 
- 
+    const match = Array.from(select.options).find((option) =>
 
-  const match =
+      option.value === serviceFromUrl ||
 
-    Array.from(select.options).find((option) => {
+      option.textContent.trim().toLowerCase() ===
 
-      const byId =
+        serviceFromUrl.trim().toLowerCase()
 
-        option.value === serviceFromUrl;
+    );
 
- 
 
-      const byName =
-
-        String(option.dataset.nome || "")
-
-          .trim()
-
-          .toLowerCase() ===
-
-        serviceFromUrl.trim().toLowerCase();
-
- 
-
-      return byId || byName;
-
-    });
-
- 
-
-  if (match) {
-
-    select.value = match.value;
+    if (match) select.value = match.value;
 
   }
 
 }
 
- 
 
 async function fillAttendanceUserData() {
 
   if (!currentUser) return;
 
- 
 
   const nameInput = qs(
 
@@ -2416,8 +1732,6 @@ async function fillAttendanceUserData() {
 
   );
 
- 
-
   const phoneInput = qs(
 
     "#telefoneContato",
@@ -2428,23 +1742,11 @@ async function fillAttendanceUserData() {
 
   );
 
- 
 
-  if (!nameInput && !phoneInput) return;
-
- 
-
-  const profile =
-
-    currentProfile ||
-
-    await loadProfile(currentUser);
-
- 
+  const profile = currentProfile || await loadProfile(currentUser);
 
   if (!profile) return;
 
- 
 
   if (nameInput && !nameInput.value) {
 
@@ -2452,7 +1754,6 @@ async function fillAttendanceUserData() {
 
   }
 
- 
 
   if (phoneInput && !phoneInput.value) {
 
@@ -2468,15 +1769,6 @@ async function fillAttendanceUserData() {
 
 }
 
- 
-
-/* =========================================================
-
-   19. ATENDIMENTO - SALVAR SOLICITACAO
-
-   ========================================================= */
-
- 
 
 async function saveAttendanceRequest({
 
@@ -2494,17 +1786,10 @@ async function saveAttendanceRequest({
 
   if (!currentUser) {
 
-    return {
-
-      saved: false,
-
-      error: null
-
-    };
+    return { saved: false, error: null };
 
   }
 
- 
 
   const descricaoProblema = [
 
@@ -2516,53 +1801,17 @@ async function saveAttendanceRequest({
 
     descricao
 
-  ]
+  ].filter(Boolean).join("\n\n");
 
-    .filter(Boolean)
-
-    .join("\n\n");
-
- 
 
   const observacoes = [
 
-    nome
+    nome ? `Nome informado: ${nome}` : "",
 
-      ? `Nome informado: ${nome}`
+    telefone ? `Telefone/WhatsApp: ${telefone}` : ""
 
-      : "",
+  ].filter(Boolean).join("\n");
 
-    telefone
-
-      ? `Telefone/WhatsApp: ${telefone}`
-
-      : ""
-
-  ]
-
-    .filter(Boolean)
-
-    .join("\n");
-
- 
-
-  const payload = {
-
-    cliente_id: currentUser.id,
-
-    servico_id: serviceId || null,
-
-    equipamento_id: null,
-
-    descricao_problema: descricaoProblema || null,
-
-    status: "solicitado",
-
-    observacoes: observacoes || null
-
-  };
-
- 
 
   const {
 
@@ -2572,45 +1821,33 @@ async function saveAttendanceRequest({
 
     .from(TABLES.SOLICITACOES)
 
-    .insert(payload);
+    .insert({
 
- 
+      cliente_id: currentUser.id,
 
-  if (error) {
+      servico_id: serviceId || null,
 
-    console.error(
+      equipamento_id: null,
 
-      "Erro ao salvar solicitacao:",
+      descricao_problema: descricaoProblema || null,
 
-      error
+      status: "solicitado",
 
-    );
+      observacoes: observacoes || null
 
- 
+    });
 
-    return {
-
-      saved: false,
-
-      error
-
-    };
-
-  }
-
- 
 
   return {
 
-    saved: true,
+    saved: !error,
 
-    error: null
+    error: error || null
 
   };
 
 }
 
- 
 
 function buildAttendanceWhatsAppMessage({
 
@@ -2628,217 +1865,73 @@ function buildAttendanceWhatsAppMessage({
 
   return [
 
-    "Ola! Quero falar com a Max Som.",
+    "Olá! Quero falar com a Max Som.",
 
     nome ? `Nome: ${nome}` : "",
 
-    telefone
+    telefone ? `Telefone/WhatsApp: ${telefone}` : "",
 
-      ? `Telefone/WhatsApp: ${telefone}`
+    servico ? `Serviço: ${servico}` : "",
 
-      : "",
-
-    servico ? `Servico: ${servico}` : "",
-
-    equipamento
-
-      ? `Produto/equipamento: ${equipamento}`
-
-      : "",
+    equipamento ? `Produto/equipamento: ${equipamento}` : "",
 
     descricao ? `Mensagem: ${descricao}` : ""
 
-  ]
-
-    .filter(Boolean)
-
-    .join("\n");
+  ].filter(Boolean).join("\n");
 
 }
 
- 
 
-/* =========================================================
+function setupAttendanceForm() {
 
-   20. ATENDIMENTO - FORMULARIO
+  const form = qs("#formAtendimento", "#serviceRequestForm");
 
-   ========================================================= */
+  if (!form || form.dataset.attendanceBound === "true") return;
 
- 
-
-async function setupAttendancePage() {
-
-  if (getCurrentPage() !== "atendimento.html") {
-
-    return;
-
-  }
-
- 
-
-  const form = qs(
-
-    "#formAtendimento",
-
-    "#serviceRequestForm",
-
-    "#formSolicitacao",
-
-    "#requestForm"
-
-  );
-
- 
-
-  if (!form) return;
-
- 
-
-  if (form.dataset.attendanceBound === "true") {
-
-    return;
-
-  }
-
- 
 
   form.dataset.attendanceBound = "true";
 
- 
-
-  await loadAttendanceServices();
-
-  await fillAttendanceUserData();
-
- 
-
-  const button =
-
-    form.querySelector('button[type="submit"]');
-
- 
 
   form.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
- 
 
-    const nameInput = qs(
+    const nameInput = qs("#nomeContato", "#requestNome");
 
-      "#nomeContato",
+    const phoneInput = qs("#telefoneContato", "#requestTelefone", "#telefone");
 
-      "#requestNome",
+    const serviceSelect = qs("#servico", "#requestServico", "#servicoId");
 
-      "#nomeSolicitante"
+    const equipmentInput = qs("#equipamento", "#requestEquipamento");
 
-    );
+    const descriptionInput = qs("#descricao", "#requestDescricao", "#mensagem");
 
- 
+    const button = form.querySelector("button[type='submit']");
 
-    const phoneInput = qs(
 
-      "#telefoneContato",
+    const nome = nameInput?.value.trim() || "";
 
-      "#requestTelefone",
+    const telefone = phoneInput?.value.trim() || "";
 
-      "#telefone"
+    const equipamento = equipmentInput?.value.trim() || "";
 
-    );
+    const descricao = descriptionInput?.value.trim() || "";
 
- 
+    const serviceId = serviceSelect?.value || null;
 
-    const serviceSelect = qs(
+    const serviceNome =
 
-      "#servico",
+      serviceSelect?.selectedOptions?.[0]?.dataset?.nome ||
 
-      "#requestServico",
-
-      "#servicoId"
-
-    );
-
- 
-
-    const equipmentInput = qs(
-
-      "#equipamento",
-
-      "#requestEquipamento"
-
-    );
-
- 
-
-    const descriptionInput = qs(
-
-      "#descricao",
-
-      "#requestDescricao",
-
-      "#mensagem"
-
-    );
-
- 
-
-    const nome =
-
-      nameInput?.value.trim() || "";
-
- 
-
-    const telefone =
-
-      phoneInput?.value.trim() || "";
-
- 
-
-    const equipamento =
-
-      equipmentInput?.value.trim() || "";
-
- 
-
-    const descricao =
-
-      descriptionInput?.value.trim() || "";
-
- 
-
-    const serviceOption =
-
-      serviceSelect?.selectedOptions?.[0] || null;
-
- 
-
-    const serviceId =
-
-      serviceSelect?.value || null;
-
- 
-
-    const serviceName =
-
-      serviceOption?.dataset?.nome ||
-
-      serviceOption?.textContent?.trim() ||
+      serviceSelect?.selectedOptions?.[0]?.textContent?.trim() ||
 
       "";
 
- 
 
     if (!nome) {
 
-      showMessage(
-
-        "#mensagemAtendimento",
-
-        "Digite seu nome.",
-
-        "error"
-
-      );
+      showMessage("#mensagemAtendimento", "Digite seu nome.", "error");
 
       nameInput?.focus();
 
@@ -2846,7 +1939,6 @@ async function setupAttendancePage() {
 
     }
 
- 
 
     if (!descricao) {
 
@@ -2854,7 +1946,7 @@ async function setupAttendancePage() {
 
         "#mensagemAtendimento",
 
-        "Explique o que voce precisa.",
+        "Explique o que você precisa.",
 
         "error"
 
@@ -2866,85 +1958,45 @@ async function setupAttendancePage() {
 
     }
 
- 
 
-    setButtonLoading(
-
-      button,
-
-      true,
-
-      "Enviar para o WhatsApp"
-
-    );
-
- 
+    setButtonLoading(button, true, "Enviar para o WhatsApp");
 
     clearMessage("#mensagemAtendimento");
 
- 
 
-    let saveResult = {
+    const result = await saveAttendanceRequest({
 
-      saved: false,
+      serviceId,
 
-      error: null
+      nome,
 
-    };
+      telefone,
 
- 
+      equipamento,
 
-    if (currentUser) {
+      descricao
 
-      saveResult = await saveAttendanceRequest({
+    });
 
-        serviceId,
 
-        nome,
+    const whatsappMessage = buildAttendanceWhatsAppMessage({
 
-        telefone,
+      nome,
 
-        equipamento,
+      telefone,
 
-        descricao
+      servico: serviceNome,
 
-      });
+      equipamento,
 
-    }
+      descricao
 
- 
+    });
 
-    const whatsappMessage =
-
-      buildAttendanceWhatsAppMessage({
-
-        nome,
-
-        telefone,
-
-        servico: serviceName,
-
-        equipamento,
-
-        descricao
-
-      });
-
- 
-
-    const whatsappUrl =
-
-      `https://wa.me/5565996262514?text=${encodeURIComponent(
-
-        whatsappMessage
-
-      )}`;
-
- 
 
     window.open(
 
-      whatsappUrl,
+      `https://wa.me/5565996262514?text=${encodeURIComponent(whatsappMessage)}`,
 
       "_blank",
 
@@ -2952,67 +2004,51 @@ async function setupAttendancePage() {
 
     );
 
- 
 
     form.reset();
 
-    await loadAttendanceServices();
 
-    await fillAttendanceUserData();
+    showMessage(
 
- 
+      "#mensagemAtendimento",
 
-    if (saveResult.saved) {
+      result.saved
 
-      showMessage(
+        ? "Solicitação registrada. O WhatsApp foi aberto."
 
-        "#mensagemAtendimento",
+        : "O WhatsApp foi aberto com sua mensagem pronta.",
 
-        "Solicitacao registrada. O WhatsApp foi aberto para continuar o atendimento.",
-
-        "success"
-
-      );
-
-    } else {
-
-      showMessage(
-
-        "#mensagemAtendimento",
-
-        "O WhatsApp foi aberto com sua mensagem pronta.",
-
-        "success"
-
-      );
-
-    }
-
- 
-
-    setButtonLoading(
-
-      button,
-
-      false,
-
-      "Enviar para o WhatsApp"
+      "success"
 
     );
+
+
+    setButtonLoading(button, false, "Enviar para o WhatsApp");
 
   });
 
 }
 
- 
+
+async function setupAttendancePage() {
+
+  if (getCurrentPage() !== "atendimento.html") return;
+
+  await loadAttendanceServices();
+
+  await fillAttendanceUserData();
+
+  setupAttendanceForm();
+
+}
+
 
 /* =========================================================
 
-   21. DADOS PUBLICOS - PRODUTOS
+   19. PRODUTOS
 
    ========================================================= */
 
- 
 
 async function loadProducts() {
 
@@ -3024,65 +2060,35 @@ async function loadProducts() {
 
     "#produtosLista",
 
-    "#productsList"
+    "#productsList",
+
+    "#produtosContainer"
 
   );
 
- 
 
-  if (!containers.length || !isSupabaseReady()) {
+  if (!containers.length || !isSupabaseReady()) return;
 
-    return;
-
-  }
-
- 
 
   let query = supabase
 
     .from(TABLES.PRODUTOS)
 
-    .select(`
+    .select(
 
-      id,
+      "id,nome,modelo,descricao,especificacoes,imagem_capa,disponivel,destaque,criado_em"
 
-      categoria_id,
-
-      marca_id,
-
-      nome,
-
-      modelo,
-
-      descricao,
-
-      especificacoes,
-
-      imagem_capa,
-
-      disponivel,
-
-      destaque,
-
-      criado_em
-
-    `)
+    )
 
     .eq("disponivel", true);
 
- 
 
   if (getCurrentPage() === "index.html") {
 
-    query = query
-
-      .eq("destaque", true)
-
-      .limit(6);
+    query = query.eq("destaque", true).limit(6);
 
   }
 
- 
 
   const {
 
@@ -3090,53 +2096,32 @@ async function loadProducts() {
 
     error
 
-  } = await query.order(
+  } = await query.order("criado_em", { ascending: false });
 
-    "criado_em",
-
-    { ascending: false }
-
-  );
-
- 
 
   containers.forEach((container) => {
 
     if (error) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nao foi possivel carregar os produtos.
-
-        </div>
-
-      `;
+        '<div class="empty">Não foi possível carregar os produtos.</div>';
 
       return;
 
     }
 
- 
 
     if (!data?.length) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nenhum produto disponivel no momento.
-
-        </div>
-
-      `;
+        '<div class="empty">Nenhum produto disponível no momento.</div>';
 
       return;
 
     }
 
- 
 
     container.innerHTML = data.map((product) => `
 
@@ -3144,31 +2129,9 @@ async function loadProducts() {
 
         ${product.imagem_capa
 
-          ? `
+          ? `<img src="${esc(product.imagem_capa)}" alt="${esc(product.nome || "Produto Max Som")}" loading="lazy">`
 
-            <img
-
-              src="${esc(product.imagem_capa)}"
-
-              alt="${esc(product.nome || "Produto Max Som")}"
-
-              loading="lazy"
-
-            >
-
-          `
-
-          : `
-
-            <div class="product-image">
-
-              Max Som
-
-            </div>
-
-          `}
-
- 
+          : `<div class="product-image">Max Som</div>`}
 
         <div class="product-info">
 
@@ -3176,53 +2139,13 @@ async function loadProducts() {
 
           <h3>${esc(product.nome || "Produto")}</h3>
 
- 
+          ${product.modelo ? `<p><strong>Modelo:</strong> ${esc(product.modelo)}</p>` : ""}
 
-          ${product.modelo
-
-            ? `
-
-              <p>
-
-                <strong>Modelo:</strong>
-
-                ${esc(product.modelo)}
-
-              </p>
-
-            `
-
-            : ""}
-
- 
-
-          <p>
-
-            ${esc(
-
-              product.descricao ||
-
-              "Consulte a Max Som para mais informacoes."
-
-            )}
-
-          </p>
-
- 
+          <p>${esc(product.descricao || "Consulte a Max Som para mais informações.")}</p>
 
           ${product.especificacoes
 
-            ? `
-
-              <details>
-
-                <summary>Especificacoes</summary>
-
-                <p>${esc(product.especificacoes)}</p>
-
-              </details>
-
-            `
+            ? `<details><summary>Especificações</summary><p>${esc(product.especificacoes)}</p></details>`
 
             : ""}
 
@@ -3236,15 +2159,13 @@ async function loadProducts() {
 
 }
 
- 
 
 /* =========================================================
 
-   22. DADOS PUBLICOS - SERVICOS
+   20. SERVICOS
 
    ========================================================= */
 
- 
 
 async function loadServices() {
 
@@ -3256,43 +2177,24 @@ async function loadServices() {
 
     "#servicosLista",
 
-    "#servicesList"
+    "#servicesList",
+
+    "#servicosContainer"
 
   );
 
- 
 
-  if (!containers.length || !isSupabaseReady()) {
+  if (!containers.length || !isSupabaseReady()) return;
 
-    return;
-
-  }
-
- 
 
   let query = supabase
 
     .from(TABLES.SERVICOS)
 
-    .select(`
-
-      id,
-
-      nome,
-
-      descricao,
-
-      imagem_capa,
-
-      ativo,
-
-      criado_em
-
-    `)
+    .select("id,nome,descricao,imagem_capa,ativo,criado_em")
 
     .eq("ativo", true);
 
- 
 
   if (getCurrentPage() === "index.html") {
 
@@ -3300,7 +2202,6 @@ async function loadServices() {
 
   }
 
- 
 
   const {
 
@@ -3308,99 +2209,46 @@ async function loadServices() {
 
     error
 
-  } = await query.order(
+  } = await query.order("criado_em", { ascending: false });
 
-    "criado_em",
-
-    { ascending: false }
-
-  );
-
- 
 
   containers.forEach((container) => {
 
     if (error) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nao foi possivel carregar os servicos.
-
-        </div>
-
-      `;
+        '<div class="empty">Não foi possível carregar os serviços.</div>';
 
       return;
 
     }
 
- 
 
     if (!data?.length) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nenhum servico disponivel no momento.
-
-        </div>
-
-      `;
+        '<div class="empty">Nenhum serviço disponível.</div>';
 
       return;
 
     }
 
- 
 
     container.innerHTML = data.map((service) => `
 
       <article class="service-card">
 
-        ${service.imagem_capa
-
-          ? `
-
-            <img
-
-              src="${esc(service.imagem_capa)}"
-
-              alt="${esc(service.nome || "Servico Max Som")}"
-
-              loading="lazy"
-
-            >
-
-          `
-
-          : ""}
-
- 
+        ${service.imagem_capa ? `<img src="${esc(service.imagem_capa)}" alt="${esc(service.nome || "Serviço Max Som")}" loading="lazy">` : ""}
 
         <div class="service-info">
 
-          <h3>${esc(service.nome || "Servico")}</h3>
+          <h3>${esc(service.nome || "Serviço")}</h3>
 
-          <p>
+          <p>${esc(service.descricao || "Consulte a Max Som para conhecer este serviço.")}</p>
 
-            ${esc(
-
-              service.descricao ||
-
-              "Consulte a Max Som para conhecer este servico."
-
-            )}
-
-          </p>
-
-          <span class="service-price">
-
-            Sob orcamento
-
-          </span>
+          <span class="service-price">Sob orçamento</span>
 
           <a
 
@@ -3408,11 +2256,7 @@ async function loadServices() {
 
             class="btn btn-primary"
 
-          >
-
-            Solicitar atendimento
-
-          </a>
+          >Solicitar atendimento</a>
 
         </div>
 
@@ -3424,15 +2268,13 @@ async function loadServices() {
 
 }
 
- 
 
 /* =========================================================
 
-   23. DADOS PUBLICOS - PROJETOS
+   21. PROJETOS
 
    ========================================================= */
 
- 
 
 async function loadProjects() {
 
@@ -3448,41 +2290,18 @@ async function loadProjects() {
 
   );
 
- 
 
-  if (!containers.length || !isSupabaseReady()) {
+  if (!containers.length || !isSupabaseReady()) return;
 
-    return;
-
-  }
-
- 
 
   let query = supabase
 
     .from(TABLES.PROJETOS)
 
-    .select(`
-
-      id,
-
-      titulo,
-
-      categoria,
-
-      descricao,
-
-      imagem_capa,
-
-      publicado,
-
-      criado_em
-
-    `)
+    .select("id,titulo,categoria,descricao,imagem_capa,publicado,criado_em")
 
     .eq("publicado", true);
 
- 
 
   if (getCurrentPage() === "index.html") {
 
@@ -3490,7 +2309,6 @@ async function loadProjects() {
 
   }
 
- 
 
   const {
 
@@ -3498,53 +2316,32 @@ async function loadProjects() {
 
     error
 
-  } = await query.order(
+  } = await query.order("criado_em", { ascending: false });
 
-    "criado_em",
-
-    { ascending: false }
-
-  );
-
- 
 
   containers.forEach((container) => {
 
     if (error) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nao foi possivel carregar os projetos.
-
-        </div>
-
-      `;
+        '<div class="empty">Não foi possível carregar os projetos.</div>';
 
       return;
 
     }
 
- 
 
     if (!data?.length) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nenhum projeto publicado no momento.
-
-        </div>
-
-      `;
+        '<div class="empty">Nenhum projeto publicado.</div>';
 
       return;
 
     }
 
- 
 
     container.innerHTML = data.map((project) => `
 
@@ -3552,51 +2349,17 @@ async function loadProjects() {
 
         ${project.imagem_capa
 
-          ? `
+          ? `<img src="${esc(project.imagem_capa)}" alt="${esc(project.titulo || "Projeto Max Som")}" loading="lazy">`
 
-            <img
-
-              src="${esc(project.imagem_capa)}"
-
-              alt="${esc(project.titulo || "Projeto Max Som")}"
-
-              loading="lazy"
-
-            >
-
-          `
-
-          : `
-
-            <div class="project-image">
-
-              Max Som
-
-            </div>
-
-          `}
-
- 
+          : `<div class="project-image">Max Som</div>`}
 
         <div class="project-info">
 
-          ${project.categoria
-
-            ? `<span>${esc(project.categoria)}</span>`
-
-            : ""}
-
- 
+          ${project.categoria ? `<span>${esc(project.categoria)}</span>` : ""}
 
           <h3>${esc(project.titulo || "Projeto")}</h3>
 
- 
-
-          ${project.descricao
-
-            ? `<p>${esc(project.descricao)}</p>`
-
-            : ""}
+          ${project.descricao ? `<p>${esc(project.descricao)}</p>` : ""}
 
         </div>
 
@@ -3608,15 +2371,13 @@ async function loadProjects() {
 
 }
 
- 
 
 /* =========================================================
 
-   24. DADOS PUBLICOS - PUBLICACOES
+   22. PUBLICACOES
 
    ========================================================= */
 
- 
 
 async function loadPosts() {
 
@@ -3628,49 +2389,28 @@ async function loadPosts() {
 
     "#publicacoesLista",
 
-    "#publicationsList"
+    "#publicationsList",
+
+    "#publicacoesContainer"
 
   );
 
- 
 
-  if (!containers.length || !isSupabaseReady()) {
+  if (!containers.length || !isSupabaseReady()) return;
 
-    return;
-
-  }
-
- 
 
   let query = supabase
 
     .from(TABLES.PUBLICACOES)
 
-    .select(`
+    .select(
 
-      id,
+      "id,titulo,resumo,conteudo,imagem_capa,publicado,data_publicacao,criado_em"
 
-      categoria_id,
-
-      autor_id,
-
-      titulo,
-
-      resumo,
-
-      conteudo,
-
-      imagem_capa,
-
-      publicado,
-
-      data_publicacao
-
-    `)
+    )
 
     .eq("publicado", true);
 
- 
 
   if (getCurrentPage() === "index.html") {
 
@@ -3678,7 +2418,6 @@ async function loadPosts() {
 
   }
 
- 
 
   const {
 
@@ -3686,129 +2425,54 @@ async function loadPosts() {
 
     error
 
-  } = await query.order(
+  } = await query.order("data_publicacao", { ascending: false });
 
-    "data_publicacao",
-
-    { ascending: false }
-
-  );
-
- 
 
   containers.forEach((container) => {
 
     if (error) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nao foi possivel carregar as publicacoes.
-
-        </div>
-
-      `;
+        '<div class="empty">Não foi possível carregar as publicações.</div>';
 
       return;
 
     }
 
- 
 
     if (!data?.length) {
 
-      container.innerHTML = `
+      container.innerHTML =
 
-        <div class="empty">
-
-          Nenhuma publicacao disponivel no momento.
-
-        </div>
-
-      `;
+        '<div class="empty">Nenhuma publicação disponível.</div>';
 
       return;
 
     }
 
- 
 
-    container.innerHTML = data.map((post) => `
+    container.innerHTML = data.map((publication) => `
 
       <article class="post-card">
 
-        ${post.imagem_capa
+        ${publication.imagem_capa
 
-          ? `
+          ? `<img src="${esc(publication.imagem_capa)}" alt="${esc(publication.titulo || "Publicação Max Som")}" loading="lazy">`
 
-            <img
-
-              src="${esc(post.imagem_capa)}"
-
-              alt="${esc(post.titulo || "Publicacao Max Som")}"
-
-              loading="lazy"
-
-            >
-
-          `
-
-          : `
-
-            <div class="post-image">
-
-              Max Som
-
-            </div>
-
-          `}
-
- 
+          : `<div class="post-image">Max Som</div>`}
 
         <div class="post-info">
 
-          <span>Publicacao</span>
+          <span>Publicação</span>
 
-          <h3>${esc(post.titulo || "Publicacao")}</h3>
+          <h3>${esc(publication.titulo || "Publicação")}</h3>
 
- 
+          ${publication.resumo ? `<p>${esc(publication.resumo)}</p>` : ""}
 
-          ${post.resumo
+          ${publication.data_publicacao ? `<small>${esc(formatDate(publication.data_publicacao))}</small>` : ""}
 
-            ? `<p>${esc(post.resumo)}</p>`
-
-            : post.conteudo
-
-              ? `<p>${esc(post.conteudo)}</p>`
-
-              : ""}
-
- 
-
-          ${post.data_publicacao
-
-            ? `<small class="muted">${esc(formatDate(post.data_publicacao))}</small>`
-
-            : ""}
-
- 
-
-          ${post.conteudo
-
-            ? `
-
-              <details>
-
-                <summary>Ler publicacao</summary>
-
-                <p>${esc(post.conteudo)}</p>
-
-              </details>
-
-            `
-
-            : ""}
+          ${publication.conteudo ? `<details><summary>Ler publicação</summary><p>${esc(publication.conteudo)}</p></details>` : ""}
 
         </div>
 
@@ -3820,15 +2484,88 @@ async function loadPosts() {
 
 }
 
- 
 
 /* =========================================================
 
-   25. CONVERSAS
+   23. LINKS DE SERVICOS / WHATSAPP
 
    ========================================================= */
 
- 
+
+function setupServiceLinks() {
+
+  qsa("[data-service]").forEach((element) => {
+
+    if (element.dataset.serviceBound === "true") return;
+
+
+    element.dataset.serviceBound = "true";
+
+    element.addEventListener("click", (event) => {
+
+      event.preventDefault();
+
+      const service =
+
+        element.dataset.service ||
+
+        element.textContent.trim() ||
+
+        "Atendimento";
+
+      window.location.href =
+
+        `atendimento.html?servico=${encodeURIComponent(service)}`;
+
+    });
+
+  });
+
+}
+
+
+function setupWhatsApp() {
+
+  qsa("[data-whatsapp]").forEach((element) => {
+
+    if (element.dataset.whatsappBound === "true") return;
+
+
+    element.dataset.whatsappBound = "true";
+
+    element.addEventListener("click", (event) => {
+
+      event.preventDefault();
+
+      const message =
+
+        element.dataset.whatsappMessage ||
+
+        "Olá! Gostaria de falar com a Max Som.";
+
+      window.open(
+
+        `https://wa.me/5565996262514?text=${encodeURIComponent(message)}`,
+
+        "_blank",
+
+        "noopener,noreferrer"
+
+      );
+
+    });
+
+  });
+
+}
+
+
+/* =========================================================
+
+   24. CONVERSAS
+
+   ========================================================= */
+
 
 async function loadConversations() {
 
@@ -3842,15 +2579,9 @@ async function loadConversations() {
 
   );
 
- 
 
-  if (!container || !currentUser) {
+  if (!container || !currentUser) return;
 
-    return;
-
-  }
-
- 
 
   const {
 
@@ -3862,23 +2593,11 @@ async function loadConversations() {
 
     .from(TABLES.CONVERSAS)
 
-    .select(`
+    .select(
 
-      id,
+      "id,cliente_id,funcionario_id,assunto,status,criado_em,atualizado_em"
 
-      cliente_id,
-
-      funcionario_id,
-
-      assunto,
-
-      status,
-
-      criado_em,
-
-      atualizado_em
-
-    `)
+    )
 
     .or(
 
@@ -3888,19 +2607,12 @@ async function loadConversations() {
 
     .order("atualizado_em", { ascending: false });
 
- 
 
   if (error) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nao foi possivel carregar suas conversas.
-
-      </div>
-
-    `;
+      '<div class="empty">Não foi possível carregar suas conversas.</div>';
 
     console.error(error);
 
@@ -3908,33 +2620,25 @@ async function loadConversations() {
 
   }
 
- 
 
   if (!data?.length) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nenhuma conversa ainda.
-
-      </div>
-
-    `;
+      '<div class="empty">Nenhuma conversa encontrada.</div>';
 
     return;
 
   }
 
- 
 
   container.innerHTML = data.map((conversation) => `
 
     <a
 
-      href="conversa.html?id=${encodeURIComponent(conversation.id)}"
-
       class="conversation-card"
+
+      href="conversa.html?id=${encodeURIComponent(conversation.id)}"
 
     >
 
@@ -3942,25 +2646,13 @@ async function loadConversations() {
 
         <div>
 
-          <h3>
-
-            ${esc(conversation.assunto || "Atendimento Max Som")}
-
-          </h3>
+          <h3>${esc(conversation.assunto || "Atendimento Max Som")}</h3>
 
           <span>${esc(conversation.status || "aberta")}</span>
 
         </div>
 
-        <time>
-
-          ${esc(formatDateTime(
-
-            conversation.atualizado_em || conversation.criado_em
-
-          ))}
-
-        </time>
+        <time>${esc(formatDateTime(conversation.atualizado_em || conversation.criado_em))}</time>
 
       </div>
 
@@ -3970,23 +2662,17 @@ async function loadConversations() {
 
 }
 
- 
 
-async function createConversation(
-
-  assunto = "Atendimento Max Som"
-
-) {
+async function createConversation(assunto = "Atendimento Max Som") {
 
   if (!currentUser) {
 
-    window.location.href = "login.html";
+    window.location.replace("login.html");
 
     return null;
 
   }
 
- 
 
   const {
 
@@ -4008,73 +2694,62 @@ async function createConversation(
 
     })
 
-    .select(`
+    .select(
 
-      id,
+      "id,cliente_id,funcionario_id,assunto,status,criado_em,atualizado_em"
 
-      cliente_id,
-
-      funcionario_id,
-
-      assunto,
-
-      status,
-
-      criado_em,
-
-      atualizado_em
-
-    `)
+    )
 
     .single();
 
- 
 
   if (error) {
 
+    alert("Não foi possível iniciar a conversa.");
+
     console.error(error);
-
-    alert(
-
-      "Nao foi possivel iniciar a conversa."
-
-    );
 
     return null;
 
   }
 
- 
 
   return data;
 
 }
 
- 
+
+async function openConversation(assunto) {
+
+  const conversation =
+
+    await createConversation(assunto || "Atendimento geral");
+
+
+  if (!conversation) return;
+
+
+  window.location.href =
+
+    `conversa.html?id=${encodeURIComponent(conversation.id)}`;
+
+}
+
 
 function setupConversationButtons() {
 
   qsa("[data-open-conversation]").forEach((button) => {
 
-    if (button.dataset.conversationBound === "true") {
+    if (button.dataset.conversationBound === "true") return;
 
-      return;
-
-    }
-
- 
 
     button.dataset.conversationBound = "true";
-
- 
 
     button.addEventListener("click", async (event) => {
 
       event.preventDefault();
 
- 
-
-      const assunto =
+      await openConversation(
 
         button.dataset.openConversation ||
 
@@ -4082,23 +2757,9 @@ function setupConversationButtons() {
 
         button.textContent.trim() ||
 
-        "Atendimento Max Som";
+        "Atendimento geral"
 
- 
-
-      const conversation =
-
-        await createConversation(assunto);
-
- 
-
-      if (conversation) {
-
-        window.location.href =
-
-          `conversa.html?id=${encodeURIComponent(conversation.id)}`;
-
-      }
+      );
 
     });
 
@@ -4106,15 +2767,6 @@ function setupConversationButtons() {
 
 }
 
- 
-
-/* =========================================================
-
-   26. CONVERSA INDIVIDUAL
-
-   ========================================================= */
-
- 
 
 async function loadConversation() {
 
@@ -4126,59 +2778,25 @@ async function loadConversation() {
 
   );
 
- 
 
-  if (!container) return;
+  if (!container || !currentUser) return;
 
- 
 
-  const params = new URLSearchParams(
-
-    window.location.search
-
-  );
-
- 
+  const params = new URLSearchParams(window.location.search);
 
   const conversationId = params.get("id");
 
- 
 
   if (!conversationId) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Conversa nao encontrada.
-
-      </div>
-
-    `;
+      '<div class="empty">Conversa não encontrada.</div>';
 
     return;
 
   }
 
- 
-
-  if (!currentUser) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Voce precisa estar logado para abrir esta conversa.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
- 
 
   const {
 
@@ -4190,41 +2808,22 @@ async function loadConversation() {
 
     .from(TABLES.CONVERSAS)
 
-    .select(`
+    .select(
 
-      id,
+      "id,cliente_id,funcionario_id,assunto,status,criado_em,atualizado_em"
 
-      cliente_id,
-
-      funcionario_id,
-
-      assunto,
-
-      status,
-
-      criado_em,
-
-      atualizado_em
-
-    `)
+    )
 
     .eq("id", conversationId)
 
     .maybeSingle();
 
- 
 
   if (error || !conversation) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Esta conversa nao esta disponivel.
-
-      </div>
-
-    `;
+      '<div class="empty">Esta conversa não está disponível.</div>';
 
     console.error(error);
 
@@ -4232,71 +2831,23 @@ async function loadConversation() {
 
   }
 
- 
 
-  const title = qs(
+  const title = qs("#conversaTitulo", "#chatTitle");
 
-    "#conversaTitulo",
+  const status = qs("#conversaStatus", "#chatStatus");
 
-    "#chatTitle"
 
-  );
+  if (title) title.textContent = conversation.assunto || "Atendimento Max Som";
 
- 
+  if (status) status.textContent = conversation.status || "aberta";
 
-  const status = qs(
-
-    "#conversaStatus",
-
-    "#chatStatus"
-
-  );
-
- 
-
-  if (title) {
-
-    title.textContent =
-
-      conversation.assunto ||
-
-      "Atendimento Max Som";
-
-  }
-
- 
-
-  if (status) {
-
-    status.textContent =
-
-      conversation.status ||
-
-      "aberta";
-
-  }
-
- 
 
   await loadMessages(conversationId);
 
-  await markConversationMessagesRead(conversationId);
-
   setupMessageForm(conversationId);
-
-  setupCurrentConversationRealtime(conversationId);
 
 }
 
- 
-
-/* =========================================================
-
-   27. MENSAGENS
-
-   ========================================================= */
-
- 
 
 async function loadMessages(conversationId) {
 
@@ -4308,11 +2859,9 @@ async function loadMessages(conversationId) {
 
   );
 
- 
 
   if (!container || !conversationId) return;
 
- 
 
   const {
 
@@ -4324,39 +2873,22 @@ async function loadMessages(conversationId) {
 
     .from(TABLES.MENSAGENS)
 
-    .select(`
+    .select(
 
-      id,
+      "id,conversa_id,remetente_id,conteudo,lida,criado_em"
 
-      conversa_id,
-
-      remetente_id,
-
-      conteudo,
-
-      lida,
-
-      criado_em
-
-    `)
+    )
 
     .eq("conversa_id", conversationId)
 
     .order("criado_em", { ascending: true });
 
- 
 
   if (error) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nao foi possivel carregar as mensagens.
-
-      </div>
-
-    `;
+      '<div class="empty">Não foi possível carregar as mensagens.</div>';
 
     console.error(error);
 
@@ -4364,55 +2896,32 @@ async function loadMessages(conversationId) {
 
   }
 
- 
 
   if (!data?.length) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nenhuma mensagem ainda.
-
-      </div>
-
-    `;
+      '<div class="empty-messages">Nenhuma mensagem ainda.</div>';
 
     return;
 
   }
 
- 
 
   container.innerHTML = data.map((message) => {
 
-    const mine =
+    const mine = message.remetente_id === currentUser?.id;
 
-      message.remetente_id === currentUser?.id;
-
- 
 
     return `
 
-      <div class="message ${
-
-        mine
-
-          ? "message-own"
-
-          : "message-other"
-
-      }">
+      <div class="message ${mine ? "message-own" : "message-other"}">
 
         <div class="message-content">
 
           <p>${esc(message.conteudo || "")}</p>
 
-          <time>
-
-            ${esc(formatDateTime(message.criado_em))}
-
-          </time>
+          <time>${esc(formatDateTime(message.criado_em))}</time>
 
         </div>
 
@@ -4422,59 +2931,11 @@ async function loadMessages(conversationId) {
 
   }).join("");
 
- 
 
-  container.scrollTop =
-
-    container.scrollHeight;
+  container.scrollTop = container.scrollHeight;
 
 }
 
- 
-
-async function markConversationMessagesRead(
-
-  conversationId
-
-) {
-
-  if (!currentUser || !conversationId) return;
-
- 
-
-  const {
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.MENSAGENS)
-
-    .update({ lida: true })
-
-    .eq("conversa_id", conversationId)
-
-    .neq("remetente_id", currentUser.id)
-
-    .eq("lida", false);
-
- 
-
-  if (error) {
-
-    console.warn(
-
-      "Nao foi possivel marcar mensagens como lidas:",
-
-      error
-
-    );
-
-  }
-
-}
-
- 
 
 function setupMessageForm(conversationId) {
 
@@ -4488,23 +2949,8 @@ function setupMessageForm(conversationId) {
 
   );
 
- 
+  if (!form || form.dataset.messageBound === "true") return;
 
-  if (!form) return;
-
- 
-
-  if (form.dataset.messageBound === "true") {
-
-    return;
-
-  }
-
- 
-
-  form.dataset.messageBound = "true";
-
- 
 
   const input = qs(
 
@@ -4520,8 +2966,6 @@ function setupMessageForm(conversationId) {
 
   );
 
- 
-
   const button = qs(
 
     "#mensagemEnviar",
@@ -4532,43 +2976,25 @@ function setupMessageForm(conversationId) {
 
   );
 
- 
+
+  form.dataset.messageBound = "true";
+
 
   form.addEventListener("submit", async (event) => {
 
     event.preventDefault();
 
- 
 
-    if (!currentUser) {
+    if (!currentUser) return;
 
-      window.location.href = "login.html";
 
-      return;
+    const content = input?.value.trim() || "";
 
-    }
+    if (!content) return;
 
- 
-
-    const content =
-
-      input?.value?.trim() || "";
-
- 
-
-    if (!content) {
-
-      input?.focus();
-
-      return;
-
-    }
-
- 
 
     if (button) button.disabled = true;
 
- 
 
     const {
 
@@ -4590,41 +3016,29 @@ function setupMessageForm(conversationId) {
 
       });
 
- 
 
     if (error) {
-
-      console.error(error);
 
       showMessage(
 
         "#mensagemConversa",
 
-        "Nao foi possivel enviar a mensagem.",
+        "Não foi possível enviar a mensagem.",
 
         "error"
 
       );
 
- 
+      console.error(error);
 
-      if (button) button.disabled = false;
+    } else if (input) {
 
-      return;
+      input.value = "";
+
+      await loadMessages(conversationId);
 
     }
 
- 
-
-    if (input) input.value = "";
-
- 
-
-    await loadMessages(conversationId);
-
-    await markConversationMessagesRead(conversationId);
-
- 
 
     if (button) button.disabled = false;
 
@@ -4632,15 +3046,13 @@ function setupMessageForm(conversationId) {
 
 }
 
- 
 
 /* =========================================================
 
-   28. NOTIFICACOES
+   25. NOTIFICACOES
 
    ========================================================= */
 
- 
 
 async function loadNotifications() {
 
@@ -4654,11 +3066,9 @@ async function loadNotifications() {
 
   );
 
- 
 
   if (!container || !currentUser) return;
 
- 
 
   const {
 
@@ -4670,23 +3080,11 @@ async function loadNotifications() {
 
     .from(TABLES.NOTIFICACOES)
 
-    .select(`
+    .select(
 
-      id,
+      "id,usuario_id,titulo,mensagem,lida,link,criado_em"
 
-      usuario_id,
-
-      titulo,
-
-      mensagem,
-
-      lida,
-
-      link,
-
-      criado_em
-
-    `)
+    )
 
     .eq("usuario_id", currentUser.id)
 
@@ -4694,19 +3092,12 @@ async function loadNotifications() {
 
     .limit(20);
 
- 
 
   if (error) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nao foi possivel carregar as notificacoes.
-
-      </div>
-
-    `;
+      '<div class="empty">Não foi possível carregar as notificações.</div>';
 
     console.error(error);
 
@@ -4714,107 +3105,39 @@ async function loadNotifications() {
 
   }
 
- 
 
   if (!data?.length) {
 
-    container.innerHTML = `
+    container.innerHTML =
 
-      <div class="empty">
-
-        Nenhuma notificacao.
-
-      </div>
-
-    `;
+      '<div class="empty">Nenhuma notificação.</div>';
 
     return;
 
   }
 
- 
 
   container.innerHTML = data.map((notification) => `
 
-    <article class="notification-card ${
-
-      notification.lida ? "read" : "unread"
-
-    }">
+    <article class="notification-card ${notification.lida ? "read" : "unread"}">
 
       <div>
 
-        <strong>
+        <strong>${esc(notification.titulo || "Notificação")}</strong>
 
-          ${esc(notification.titulo || "Notificacao")}
+        ${notification.mensagem ? `<p>${esc(notification.mensagem)}</p>` : ""}
 
-        </strong>
-
- 
-
-        ${notification.mensagem
-
-          ? `<p>${esc(notification.mensagem)}</p>`
-
-          : ""}
-
- 
-
-        <small>
-
-          ${esc(formatDateTime(notification.criado_em))}
-
-        </small>
+        ${notification.criado_em ? `<small>${esc(formatDateTime(notification.criado_em))}</small>` : ""}
 
       </div>
 
- 
-
       <div class="notification-actions">
 
-        ${notification.link
-
-          ? `
-
-            <a
-
-              href="${esc(notification.link)}"
-
-              class="btn btn-secondary"
-
-            >
-
-              Abrir
-
-            </a>
-
-          `
-
-          : ""}
-
- 
+        ${notification.link ? `<a class="btn btn-secondary" href="${esc(notification.link)}">Abrir</a>` : ""}
 
         ${!notification.lida
 
-          ? `
-
-            <button
-
-              type="button"
-
-              class="btn btn-outline"
-
-              data-mark-notification
-
-              data-notification-id="${esc(notification.id)}"
-
-            >
-
-              Marcar como lida
-
-            </button>
-
-          `
+          ? `<button type="button" class="btn btn-outline" data-mark-notification data-notification-id="${esc(notification.id)}">Marcar como lida</button>`
 
           : ""}
 
@@ -4824,23 +3147,16 @@ async function loadNotifications() {
 
   `).join("");
 
- 
 
   setupNotificationActions();
 
 }
 
- 
 
-async function markNotificationAsRead(
-
-  notificationId
-
-) {
+async function markNotificationAsRead(notificationId) {
 
   if (!currentUser || !notificationId) return;
 
- 
 
   const {
 
@@ -4856,7 +3172,6 @@ async function markNotificationAsRead(
 
     .eq("usuario_id", currentUser.id);
 
- 
 
   if (error) {
 
@@ -4866,41 +3181,26 @@ async function markNotificationAsRead(
 
   }
 
- 
 
   await loadNotifications();
 
 }
 
- 
 
 function setupNotificationActions() {
 
   qsa("[data-mark-notification]").forEach((button) => {
 
-    if (button.dataset.notificationBound === "true") {
+    if (button.dataset.notificationBound === "true") return;
 
-      return;
-
-    }
-
- 
 
     button.dataset.notificationBound = "true";
-
- 
 
     button.addEventListener("click", async () => {
 
       button.disabled = true;
 
- 
-
-      await markNotificationAsRead(
-
-        button.dataset.notificationId
-
-      );
+      await markNotificationAsRead(button.dataset.notificationId);
 
     });
 
@@ -4908,101 +3208,1113 @@ function setupNotificationActions() {
 
 }
 
- 
 
 /* =========================================================
 
-   29. REALTIME
+   26. ADMIN - ESTATISTICAS
 
    ========================================================= */
 
- 
 
-function cleanupRealtimeChannels() {
+async function countTable(table) {
 
-  if (supabase) {
+  const {
 
-    if (currentConversationChannel) {
+    count,
 
-      supabase.removeChannel(
+    error
 
-        currentConversationChannel
+  } = await supabase
 
-      );
+    .from(table)
 
-    }
+    .select("id", { count: "exact", head: true });
 
- 
 
-    if (conversationListChannel) {
+  if (error) {
 
-      supabase.removeChannel(
+    console.error(`Erro ao contar ${table}:`, error);
 
-        conversationListChannel
-
-      );
-
-    }
-
- 
-
-    if (notificationChannel) {
-
-      supabase.removeChannel(
-
-        notificationChannel
-
-      );
-
-    }
-
- 
-
-    if (messageChannel) {
-
-      supabase.removeChannel(
-
-        messageChannel
-
-      );
-
-    }
+    return 0;
 
   }
 
- 
 
-  currentConversationChannel = null;
-
-  conversationListChannel = null;
-
-  notificationChannel = null;
-
-  messageChannel = null;
+  return count || 0;
 
 }
 
- 
 
-function setupCurrentConversationRealtime(conversationId) {
+async function adminStats() {
 
-  if (!supabase || !conversationId) return;
+  const container = qs("#adminStats");
 
- 
+  if (!container || !currentUser || !isAdmin()) return;
 
-  if (currentConversationChannel) {
 
-    supabase.removeChannel(
+  const [
 
-      currentConversationChannel
+    produtos,
 
-    );
+    servicos,
+
+    projetos,
+
+    publicacoes,
+
+    usuarios,
+
+    solicitacoes,
+
+    conversas
+
+  ] = await Promise.all([
+
+    countTable(TABLES.PRODUTOS),
+
+    countTable(TABLES.SERVICOS),
+
+    countTable(TABLES.PROJETOS),
+
+    countTable(TABLES.PUBLICACOES),
+
+    countTable(TABLES.USUARIO),
+
+    countTable(TABLES.SOLICITACOES),
+
+    countTable(TABLES.CONVERSAS)
+
+  ]);
+
+
+  const values = [
+
+    ["Produtos", produtos],
+
+    ["Serviços", servicos],
+
+    ["Projetos", projetos],
+
+    ["Publicações", publicacoes],
+
+    ["Usuários", usuarios],
+
+    ["Solicitações", solicitacoes],
+
+    ["Conversas", conversas]
+
+  ];
+
+
+  container.innerHTML = values.map(([label, value]) => `
+
+    <div class="stat-card">
+
+      <span>${esc(label)}</span>
+
+      <strong>${value}</strong>
+
+    </div>
+
+  `).join("");
+
+}
+
+
+/* =========================================================
+
+   27. ADMIN - LISTAS
+
+   ========================================================= */
+
+
+async function adminUsers() {
+
+  const container = qs("#adminUsuariosLista");
+
+  if (!container || !isAdmin()) return;
+
+
+  const {
+
+    data,
+
+    error
+
+  } = await supabase
+
+    .from(TABLES.USUARIO)
+
+    .select("id,nome,telefone,whatsapp,tipo_usuario")
+
+    .order("nome", { ascending: true });
+
+
+  if (error) {
+
+    container.innerHTML = '<p>Erro ao carregar usuários.</p>';
+
+    console.error(error);
+
+    return;
 
   }
 
- 
 
-  currentConversationChannel =
+  container.innerHTML = (data || []).map((user) => {
+
+    const type = normalizeType(user.tipo_usuario);
+
+    const action = type === "solicitante_admin"
+
+      ? `
+
+        <div class="admin-user-actions">
+
+          <button class="btn-aprovar-admin" data-user-id="${esc(user.id)}" data-action="aprovar">Aprovar administrador</button>
+
+          <button class="btn-recusar-admin" data-user-id="${esc(user.id)}" data-action="recusar">Recusar</button>
+
+        </div>
+
+      `
+
+      : "";
+
+
+    return `
+
+      <div class="admin-user-card">
+
+        <div class="admin-user-info">
+
+          <strong>${esc(user.nome || "Sem nome")}</strong>
+
+          <span>${esc(user.tipo_usuario || "cliente")}</span>
+
+        </div>
+
+        ${ADMIN_TYPES.includes(type)
+
+          ? '<span class="admin-badge">Administrador</span>'
+
+          : action}
+
+      </div>
+
+    `;
+
+  }).join("") || '<p>Nenhum usuário encontrado.</p>';
+
+
+  setupAdminUserActions();
+
+}
+
+
+async function adminRequests() {
+
+  const requests = qs("#adminSolicitacoes");
+
+  const conversations = qs("#adminConversas");
+
+  if (!isAdmin()) return;
+
+
+  if (requests) {
+
+    const {
+
+      data,
+
+      error
+
+    } = await supabase
+
+      .from(TABLES.SOLICITACOES)
+
+      .select("id,status,descricao_problema,observacoes,criado_em")
+
+      .order("criado_em", { ascending: false })
+
+      .limit(30);
+
+
+    requests.innerHTML = error
+
+      ? '<p>Não foi possível carregar as solicitações.</p>'
+
+      : data?.length
+
+        ? data.map((item) => `
+
+            <div class="account-item">
+
+              <strong>${esc(item.status || "Solicitado")}</strong>
+
+              <span>${esc(formatDateTime(item.criado_em))}</span>
+
+              <p>${esc(item.descricao_problema || item.observacoes || "")}</p>
+
+            </div>
+
+          `).join("")
+
+        : '<p>Nenhuma solicitação encontrada.</p>';
+
+  }
+
+
+  if (conversations) {
+
+    const {
+
+      data,
+
+      error
+
+    } = await supabase
+
+      .from(TABLES.CONVERSAS)
+
+      .select("id,assunto,status,criado_em,atualizado_em")
+
+      .order("atualizado_em", { ascending: false })
+
+      .limit(30);
+
+
+    conversations.innerHTML = error
+
+      ? '<p>Não foi possível carregar as conversas.</p>'
+
+      : data?.length
+
+        ? data.map((item) => `
+
+            <div class="account-item">
+
+              <strong>${esc(item.assunto || "Atendimento")}</strong>
+
+              <span>${esc(item.status || "aberta")} • ${esc(formatDateTime(item.atualizado_em || item.criado_em))}</span>
+
+            </div>
+
+          `).join("")
+
+        : '<p>Nenhuma conversa encontrada.</p>';
+
+  }
+
+}
+
+
+/* =========================================================
+
+   28. ADMIN - CRUD
+
+   ========================================================= */
+
+
+async function saveAdminRow(table, id, values) {
+
+  const query = id
+
+    ? supabase.from(table).update(values).eq("id", id)
+
+    : supabase.from(table).insert(values);
+
+
+  const {
+
+    error
+
+  } = await query;
+
+
+  if (error) {
+
+    alert(dbError(error, "Não foi possível salvar."));
+
+    return false;
+
+  }
+
+
+  alert("Dados salvos com sucesso.");
+
+  return true;
+
+}
+
+
+async function loadAdminProducts() {
+
+  const container = qs("#produtosAdminLista");
+
+  if (!container || !isAdmin()) return;
+
+
+  const {
+
+    data,
+
+    error
+
+  } = await supabase
+
+    .from(TABLES.PRODUTOS)
+
+    .select("id,nome,modelo,descricao,imagem_capa,disponivel,destaque")
+
+    .order("nome", { ascending: true });
+
+
+  if (error) {
+
+    container.innerHTML = '<p>Não foi possível carregar os produtos.</p>';
+
+    return;
+
+  }
+
+
+  container.innerHTML = (data || []).map((item) => `
+
+    <div class="admin-item" data-admin-item>
+
+      <div>
+
+        <strong>${esc(item.nome || "Produto")}</strong>
+
+        <span>${esc(item.modelo || "")}</span>
+
+      </div>
+
+      <div class="admin-item-actions">
+
+        <button type="button" class="btn btn-outline" data-edit-type="produto" data-edit-id="${esc(item.id)}">Editar</button>
+
+        <button type="button" class="btn btn-danger" data-delete-table="${TABLES.PRODUTOS}" data-delete-id="${esc(item.id)}">Excluir</button>
+
+      </div>
+
+    </div>
+
+  `).join("") || '<p>Nenhum produto cadastrado.</p>';
+
+}
+
+
+async function loadAdminServices() {
+
+  const container = qs("#servicosAdminLista");
+
+  if (!container || !isAdmin()) return;
+
+
+  const {
+
+    data,
+
+    error
+
+  } = await supabase
+
+    .from(TABLES.SERVICOS)
+
+    .select("id,nome,descricao,imagem_capa,ativo")
+
+    .order("nome", { ascending: true });
+
+
+  if (error) {
+
+    container.innerHTML = '<p>Não foi possível carregar os serviços.</p>';
+
+    return;
+
+  }
+
+
+  container.innerHTML = (data || []).map((item) => `
+
+    <div class="admin-item" data-admin-item>
+
+      <div><strong>${esc(item.nome || "Serviço")}</strong></div>
+
+      <div class="admin-item-actions">
+
+        <button type="button" class="btn btn-outline" data-edit-type="servico" data-edit-id="${esc(item.id)}">Editar</button>
+
+        <button type="button" class="btn btn-danger" data-delete-table="${TABLES.SERVICOS}" data-delete-id="${esc(item.id)}">Excluir</button>
+
+      </div>
+
+    </div>
+
+  `).join("") || '<p>Nenhum serviço cadastrado.</p>';
+
+}
+
+
+async function loadAdminProjects() {
+
+  const container = qs("#projetosAdminLista");
+
+  if (!container || !isAdmin()) return;
+
+
+  const {
+
+    data,
+
+    error
+
+  } = await supabase
+
+    .from(TABLES.PROJETOS)
+
+    .select("id,titulo,categoria,descricao,imagem_capa,publicado")
+
+    .order("titulo", { ascending: true });
+
+
+  if (error) {
+
+    container.innerHTML = '<p>Não foi possível carregar os projetos.</p>';
+
+    return;
+
+  }
+
+
+  container.innerHTML = (data || []).map((item) => `
+
+    <div class="admin-item" data-admin-item>
+
+      <div><strong>${esc(item.titulo || "Projeto")}</strong></div>
+
+      <div class="admin-item-actions">
+
+        <button type="button" class="btn btn-outline" data-edit-type="projeto" data-edit-id="${esc(item.id)}">Editar</button>
+
+        <button type="button" class="btn btn-danger" data-delete-table="${TABLES.PROJETOS}" data-delete-id="${esc(item.id)}">Excluir</button>
+
+      </div>
+
+    </div>
+
+  `).join("") || '<p>Nenhum projeto cadastrado.</p>';
+
+}
+
+
+async function loadAdminPosts() {
+
+  const container = qs("#publicacoesAdminLista");
+
+  if (!container || !isAdmin()) return;
+
+
+  const {
+
+    data,
+
+    error
+
+  } = await supabase
+
+    .from(TABLES.PUBLICACOES)
+
+    .select("id,titulo,resumo,publicado,data_publicacao")
+
+    .order("data_publicacao", { ascending: false });
+
+
+  if (error) {
+
+    container.innerHTML = '<p>Não foi possível carregar as publicações.</p>';
+
+    return;
+
+  }
+
+
+  container.innerHTML = (data || []).map((item) => `
+
+    <div class="admin-item" data-admin-item>
+
+      <div><strong>${esc(item.titulo || "Publicação")}</strong></div>
+
+      <div class="admin-item-actions">
+
+        <button type="button" class="btn btn-outline" data-edit-type="publicacao" data-edit-id="${esc(item.id)}">Editar</button>
+
+        <button type="button" class="btn btn-danger" data-delete-table="${TABLES.PUBLICACOES}" data-delete-id="${esc(item.id)}">Excluir</button>
+
+      </div>
+
+    </div>
+
+  `).join("") || '<p>Nenhuma publicação cadastrada.</p>';
+
+}
+
+
+async function setupAdminForms() {
+
+  if (!isAdmin()) return;
+
+
+  const productForm = qs("#produtoForm");
+
+  if (productForm && productForm.dataset.formBound !== "true") {
+
+    productForm.dataset.formBound = "true";
+
+    productForm.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      const id = qs("#produtoId")?.value || "";
+
+      const values = {
+
+        nome: qs("#produtoNome")?.value.trim() || "",
+
+        modelo: qs("#produtoModelo")?.value.trim() || null,
+
+        descricao: qs("#produtoDescricao")?.value.trim() || null,
+
+        imagem_capa: qs("#produtoImagem")?.value.trim() || null,
+
+        disponivel: !!qs("#produtoDisponivel")?.checked,
+
+        destaque: !!qs("#produtoDestaque")?.checked
+
+      };
+
+      if (await saveAdminRow(TABLES.PRODUTOS, id, values)) {
+
+        productForm.reset();
+
+        qs("#produtoId") && (qs("#produtoId").value = "");
+
+        await loadAdminProducts();
+
+        await loadProducts();
+
+      }
+
+    });
+
+  }
+
+
+  const serviceForm = qs("#servicoForm");
+
+  if (serviceForm && serviceForm.dataset.formBound !== "true") {
+
+    serviceForm.dataset.formBound = "true";
+
+    serviceForm.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      const id = qs("#servicoId")?.value || "";
+
+      const values = {
+
+        nome: qs("#servicoNome")?.value.trim() || "",
+
+        descricao: qs("#servicoDescricao")?.value.trim() || null,
+
+        imagem_capa: qs("#servicoImagem")?.value.trim() || null,
+
+        ativo: !!qs("#servicoAtivo")?.checked
+
+      };
+
+      if (await saveAdminRow(TABLES.SERVICOS, id, values)) {
+
+        serviceForm.reset();
+
+        qs("#servicoId") && (qs("#servicoId").value = "");
+
+        await loadAdminServices();
+
+        await loadServices();
+
+      }
+
+    });
+
+  }
+
+
+  const projectForm = qs("#projetoForm");
+
+  if (projectForm && projectForm.dataset.formBound !== "true") {
+
+    projectForm.dataset.formBound = "true";
+
+    projectForm.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      const id = qs("#projetoId")?.value || "";
+
+      const values = {
+
+        titulo: qs("#projetoTitulo")?.value.trim() || "",
+
+        categoria: qs("#projetoCategoria")?.value.trim() || null,
+
+        descricao: qs("#projetoDescricao")?.value.trim() || null,
+
+        imagem_capa: qs("#projetoImagem")?.value.trim() || null,
+
+        publicado: !!qs("#projetoPublicado")?.checked
+
+      };
+
+      if (await saveAdminRow(TABLES.PROJETOS, id, values)) {
+
+        projectForm.reset();
+
+        qs("#projetoId") && (qs("#projetoId").value = "");
+
+        await loadAdminProjects();
+
+        await loadProjects();
+
+      }
+
+    });
+
+  }
+
+
+  const postForm = qs("#publicacaoForm");
+
+  if (postForm && postForm.dataset.formBound !== "true") {
+
+    postForm.dataset.formBound = "true";
+
+    postForm.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      const id = qs("#publicacaoId")?.value || "";
+
+      const values = {
+
+        titulo: qs("#publicacaoTitulo")?.value.trim() || "",
+
+        resumo: qs("#publicacaoResumo")?.value.trim() || null,
+
+        conteudo: qs("#publicacaoConteudo")?.value.trim() || null,
+
+        imagem_capa: qs("#publicacaoImagem")?.value.trim() || null,
+
+        publicado: !!qs("#publicacaoPublicado")?.checked,
+
+        data_publicacao: new Date().toISOString()
+
+      };
+
+      if (await saveAdminRow(TABLES.PUBLICACOES, id, values)) {
+
+        postForm.reset();
+
+        qs("#publicacaoId") && (qs("#publicacaoId").value = "");
+
+        await loadAdminPosts();
+
+        await loadPosts();
+
+      }
+
+    });
+
+  }
+
+}
+
+
+async function bindEditButtons() {
+
+  qsa("[data-edit-type]").forEach((button) => {
+
+    if (button.dataset.editBound === "true") return;
+
+
+    button.dataset.editBound = "true";
+
+    button.addEventListener("click", async () => {
+
+      const type = button.dataset.editType;
+
+      const id = button.dataset.editId;
+
+
+      if (!type || !id) return;
+
+
+      const tableMap = {
+
+        produto: TABLES.PRODUTOS,
+
+        servico: TABLES.SERVICOS,
+
+        projeto: TABLES.PROJETOS,
+
+        publicacao: TABLES.PUBLICACOES
+
+      };
+
+
+      const table = tableMap[type];
+
+      if (!table) return;
+
+
+      const {
+
+        data,
+
+        error
+
+      } = await supabase
+
+        .from(table)
+
+        .select("*")
+
+        .eq("id", id)
+
+        .maybeSingle();
+
+
+      if (error || !data) {
+
+        console.error(error);
+
+        return;
+
+      }
+
+
+      if (type === "produto") {
+
+        qs("#produtoId") && (qs("#produtoId").value = data.id || "");
+
+        qs("#produtoNome") && (qs("#produtoNome").value = data.nome || "");
+
+        qs("#produtoModelo") && (qs("#produtoModelo").value = data.modelo || "");
+
+        qs("#produtoDescricao") && (qs("#produtoDescricao").value = data.descricao || "");
+
+        qs("#produtoImagem") && (qs("#produtoImagem").value = data.imagem_capa || "");
+
+        qs("#produtoDisponivel") && (qs("#produtoDisponivel").checked = !!data.disponivel);
+
+        qs("#produtoDestaque") && (qs("#produtoDestaque").checked = !!data.destaque);
+
+      }
+
+
+      if (type === "servico") {
+
+        qs("#servicoId") && (qs("#servicoId").value = data.id || "");
+
+        qs("#servicoNome") && (qs("#servicoNome").value = data.nome || "");
+
+        qs("#servicoDescricao") && (qs("#servicoDescricao").value = data.descricao || "");
+
+        qs("#servicoImagem") && (qs("#servicoImagem").value = data.imagem_capa || "");
+
+        qs("#servicoAtivo") && (qs("#servicoAtivo").checked = !!data.ativo);
+
+      }
+
+
+      if (type === "projeto") {
+
+        qs("#projetoId") && (qs("#projetoId").value = data.id || "");
+
+        qs("#projetoTitulo") && (qs("#projetoTitulo").value = data.titulo || "");
+
+        qs("#projetoCategoria") && (qs("#projetoCategoria").value = data.categoria || "");
+
+        qs("#projetoDescricao") && (qs("#projetoDescricao").value = data.descricao || "");
+
+        qs("#projetoImagem") && (qs("#projetoImagem").value = data.imagem_capa || "");
+
+        qs("#projetoPublicado") && (qs("#projetoPublicado").checked = !!data.publicado);
+
+      }
+
+
+      if (type === "publicacao") {
+
+        qs("#publicacaoId") && (qs("#publicacaoId").value = data.id || "");
+
+        qs("#publicacaoTitulo") && (qs("#publicacaoTitulo").value = data.titulo || "");
+
+        qs("#publicacaoResumo") && (qs("#publicacaoResumo").value = data.resumo || "");
+
+        qs("#publicacaoConteudo") && (qs("#publicacaoConteudo").value = data.conteudo || "");
+
+        qs("#publicacaoImagem") && (qs("#publicacaoImagem").value = data.imagem_capa || "");
+
+        qs("#publicacaoPublicado") && (qs("#publicacaoPublicado").checked = !!data.publicado);
+
+      }
+
+    });
+
+  });
+
+}
+
+
+function setupDeleteButtons() {
+
+  qsa("[data-delete-table]").forEach((button) => {
+
+    if (button.dataset.deleteBound === "true") return;
+
+
+    button.dataset.deleteBound = "true";
+
+    button.addEventListener("click", async () => {
+
+      const table = button.dataset.deleteTable;
+
+      const id = button.dataset.deleteId;
+
+      if (!table || !id) return;
+
+
+      if (!window.confirm("Tem certeza que deseja excluir este item?")) {
+
+        return;
+
+      }
+
+
+      const {
+
+        error
+
+      } = await supabase
+
+        .from(table)
+
+        .delete()
+
+        .eq("id", id);
+
+
+      if (error) {
+
+        alert("Não foi possível excluir o item.");
+
+        console.error(error);
+
+        return;
+
+      }
+
+
+      button.closest("[data-admin-item]")?.remove();
+
+      await adminStats();
+
+      await loadAdminProducts();
+
+      await loadAdminServices();
+
+      await loadAdminProjects();
+
+      await loadAdminPosts();
+
+    });
+
+  });
+
+}
+
+
+function setupAdminUserActions() {
+
+  qsa("[data-action]").forEach((button) => {
+
+    if (button.dataset.userActionBound === "true") return;
+
+
+    button.dataset.userActionBound = "true";
+
+    button.addEventListener("click", async () => {
+
+      const userId = button.dataset.userId;
+
+      const action = button.dataset.action;
+
+
+      if (!userId || !action) return;
+
+
+      const newType = action === "aprovar" ? "admin" : "cliente";
+
+
+      const {
+
+        error
+
+      } = await supabase
+
+        .from(TABLES.USUARIO)
+
+        .update({ tipo_usuario: newType })
+
+        .eq("id", userId);
+
+
+      if (error) {
+
+        alert("Não foi possível atualizar o usuário.");
+
+        console.error(error);
+
+        return;
+
+      }
+
+
+      await adminUsers();
+
+    });
+
+  });
+
+}
+
+
+/* =========================================================
+
+   29. MENU ADMIN
+
+   ========================================================= */
+
+
+function setupAdminMenu() {
+
+  const buttons = qsa("[data-panel]");
+
+  const panels = qsa(".admin-panel");
+
+
+  if (!buttons.length || !panels.length) return;
+
+
+  buttons.forEach((button) => {
+
+    if (button.dataset.panelBound === "true") return;
+
+
+    button.dataset.panelBound = "true";
+
+    button.addEventListener("click", () => {
+
+      const target = button.dataset.panel;
+
+
+      buttons.forEach((item) => {
+
+        item.classList.toggle("active", item === button);
+
+      });
+
+
+      panels.forEach((panel) => {
+
+        panel.style.display =
+
+          panel.id === target ? "block" : "none";
+
+      });
+
+    });
+
+  });
+
+
+  buttons[0]?.click();
+
+}
+
+
+async function loadAdminArea() {
+
+  if (getCurrentPage() !== "admin.html") return;
+
+
+  const allowed = await requireAdmin();
+
+  if (!allowed) return;
+
+
+  await Promise.all([
+
+    adminStats(),
+
+    adminUsers(),
+
+    adminRequests(),
+
+    loadAdminProducts(),
+
+    loadAdminServices(),
+
+    loadAdminProjects(),
+
+    loadAdminPosts()
+
+  ]);
+
+
+  await setupAdminForms();
+
+  await bindEditButtons();
+
+  setupDeleteButtons();
+
+  setupAdminMenu();
+
+}
+
+
+/* =========================================================
+
+   30. REALTIME
+
+   ========================================================= */
+
+
+function setupRealtime() {
+
+  if (!supabase || !currentUser) return;
+
+
+  const conversationId =
+
+    new URLSearchParams(window.location.search).get("id");
+
+
+  if (conversationId && qs("#conversaContainer", "#chatMessages")) {
 
     supabase
 
@@ -5028,2291 +4340,62 @@ function setupCurrentConversationRealtime(conversationId) {
 
           await loadMessages(conversationId);
 
-          await markConversationMessagesRead(
-
-            conversationId
-
-          );
-
         }
 
       )
 
       .subscribe();
 
-}
-
- 
-
-function setupConversationListRealtime() {
-
-  if (!supabase || !currentUser) return;
-
- 
-
-  if (conversationListChannel) {
-
-    supabase.removeChannel(
-
-      conversationListChannel
-
-    );
-
   }
 
- 
 
-  conversationListChannel =
+  supabase
 
-    supabase
+    .channel(`maxsom-notificacoes-${currentUser.id}`)
 
-      .channel("maxsom-conversas-lista")
+    .on(
 
-      .on(
+      "postgres_changes",
 
-        "postgres_changes",
+      {
 
-        {
+        event: "*",
 
-          event: "*",
+        schema: "public",
 
-          schema: "public",
+        table: TABLES.NOTIFICACOES,
 
-          table: TABLES.CONVERSAS
+        filter: `usuario_id=eq.${currentUser.id}`
 
-        },
+      },
 
-        async () => {
+      async () => {
 
-          await loadConversations();
-
-          await loadAccountConversations();
-
-        }
-
-      )
-
-      .subscribe();
-
-}
-
- 
-
-function setupNotificationRealtime() {
-
-  if (!supabase || !currentUser) return;
-
- 
-
-  if (notificationChannel) {
-
-    supabase.removeChannel(
-
-      notificationChannel
-
-    );
-
-  }
-
- 
-
-  notificationChannel =
-
-    supabase
-
-      .channel(
-
-        `maxsom-notificacoes-${currentUser.id}`
-
-      )
-
-      .on(
-
-        "postgres_changes",
-
-        {
-
-          event: "*",
-
-          schema: "public",
-
-          table: TABLES.NOTIFICACOES,
-
-          filter: `usuario_id=eq.${currentUser.id}`
-
-        },
-
-        async () => {
-
-          await loadNotifications();
-
-        }
-
-      )
-
-      .subscribe();
-
-}
-
- 
-
-/* =========================================================
-
-   30. ADMIN - ESTATISTICAS
-
-   ========================================================= */
-
- 
-
-async function adminStats() {
-
-  const counters = qsa(
-
-    "[data-admin-count]"
-
-  );
-
- 
-
-  if (!counters.length) return;
-
- 
-
-  const tables = {
-
-    usuarios: TABLES.USUARIO,
-
-    produtos: TABLES.PRODUTOS,
-
-    servicos: TABLES.SERVICOS,
-
-    projetos: TABLES.PROJETOS
-
-  };
-
- 
-
-  for (const [key, table] of Object.entries(tables)) {
-
-    const element = qs(
-
-      `[data-admin-count="${key}"]`
-
-    );
-
- 
-
-    if (!element) continue;
-
- 
-
-    const {
-
-      count,
-
-      error
-
-    } = await supabase
-
-      .from(table)
-
-      .select("*", {
-
-        count: "exact",
-
-        head: true
-
-      });
-
- 
-
-    if (error) {
-
-      element.textContent = "-";
-
-      console.error(error);
-
-      continue;
-
-    }
-
- 
-
-    element.textContent = count ?? 0;
-
-  }
-
-}
-
- 
-
-/* =========================================================
-
-   31. ADMIN - USUARIOS
-
-   ========================================================= */
-
- 
-
-async function adminUsers() {
-
-  const container = qs(
-
-    "#adminUsuariosLista"
-
-  );
-
- 
-
-  if (!container) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.USUARIO)
-
-    .select("id,nome,telefone,whatsapp,tipo_usuario")
-
-    .order("nome", { ascending: true });
-
- 
-
-  if (error) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nao foi possivel carregar os usuarios.
-
-      </div>
-
-    `;
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nenhum usuario encontrado.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
- 
-
-  container.innerHTML = data.map((user) => {
-
-    const type = normalizeType(
-
-      user.tipo_usuario || "cliente"
-
-    );
-
- 
-
-    const request =
-
-      type === "solicitante_admin";
-
- 
-
-    const admin = isAdmin(user);
-
- 
-
-    return `
-
-      <div class="admin-request">
-
-        <div>
-
-          <strong>
-
-            ${esc(user.nome || "Sem nome")}
-
-          </strong>
-
-          <small>
-
-            ${esc(
-
-              user.telefone ||
-
-              user.whatsapp ||
-
-              "Sem telefone"
-
-            )}
-
-            •
-
-            ${esc(user.tipo_usuario || "cliente")}
-
-          </small>
-
-        </div>
-
- 
-
-        <div class="admin-actions">
-
-          ${request
-
-            ? `
-
-              <button
-
-                type="button"
-
-                class="btn btn-primary"
-
-                data-approve-admin
-
-                data-user-id="${esc(user.id)}"
-
-              >
-
-                Aprovar administrador
-
-              </button>
-
- 
-
-              <button
-
-                type="button"
-
-                class="btn btn-outline"
-
-                data-reject-admin
-
-                data-user-id="${esc(user.id)}"
-
-              >
-
-                Recusar
-
-              </button>
-
-            `
-
-            : ""}
-
- 
-
-          ${admin
-
-            ? `
-
-              <span class="muted">
-
-                Administrador
-
-              </span>
-
-            `
-
-            : ""}
-
-        </div>
-
-      </div>
-
-    `;
-
-  }).join("");
-
- 
-
-  setupAdminUserActions();
-
-}
-
- 
-
-function setupAdminUserActions() {
-
-  qsa("[data-approve-admin]").forEach((button) => {
-
-    if (button.dataset.adminActionBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.adminActionBound = "true";
-
- 
-
-    button.addEventListener("click", async () => {
-
-      const userId = button.dataset.userId;
-
-      if (!userId) return;
-
- 
-
-      const {
-
-        error
-
-      } = await supabase
-
-        .from(TABLES.USUARIO)
-
-        .update({
-
-          tipo_usuario: "admin"
-
-        })
-
-        .eq("id", userId);
-
- 
-
-      if (error) {
-
-        alert(
-
-          "Nao foi possivel aprovar o usuario."
-
-        );
-
-        console.error(error);
-
-        return;
+        await loadNotifications();
 
       }
 
- 
+    )
 
-      await adminUsers();
-
-      await adminStats();
-
-    });
-
-  });
-
- 
-
-  qsa("[data-reject-admin]").forEach((button) => {
-
-    if (button.dataset.adminActionBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.adminActionBound = "true";
-
- 
-
-    button.addEventListener("click", async () => {
-
-      const userId = button.dataset.userId;
-
-      if (!userId) return;
-
- 
-
-      const {
-
-        error
-
-      } = await supabase
-
-        .from(TABLES.USUARIO)
-
-        .update({
-
-          tipo_usuario: "cliente"
-
-        })
-
-        .eq("id", userId);
-
- 
-
-      if (error) {
-
-        alert(
-
-          "Nao foi possivel recusar a solicitacao."
-
-        );
-
-        console.error(error);
-
-        return;
-
-      }
-
- 
-
-      await adminUsers();
-
-    });
-
-  });
+    .subscribe();
 
 }
 
- 
 
-/* =========================================================
+function cleanupRealtimeChannels() {
 
-   32. ADMIN - SOLICITACOES E CONVERSAS
+  if (!supabase) return;
 
-   ========================================================= */
 
- 
+  supabase.getChannels().forEach((channel) => {
 
-async function adminRequests() {
+    try {
 
-  const requestContainer = qs(
+      supabase.removeChannel(channel);
 
-    "#adminSolicitacoes"
+    } catch (error) {
 
-  );
-
- 
-
-  const conversationContainer = qs(
-
-    "#adminConversas"
-
-  );
-
- 
-
-  if (requestContainer) {
-
-    const {
-
-      data,
-
-      error
-
-    } = await supabase
-
-      .from(TABLES.SOLICITACOES)
-
-      .select(`
-
-        id,
-
-        cliente_id,
-
-        servico_id,
-
-        descricao_problema,
-
-        status,
-
-        observacoes,
-
-        criado_em,
-
-        servicos(nome)
-
-      `)
-
-      .order("criado_em", { ascending: false })
-
-      .limit(30);
-
- 
-
-    if (error) {
-
-      requestContainer.innerHTML = `
-
-        <div class="empty">
-
-          Nao foi possivel carregar as solicitacoes.
-
-        </div>
-
-      `;
-
-      console.error(error);
-
-    } else if (!data?.length) {
-
-      requestContainer.innerHTML = `
-
-        <div class="empty">
-
-          Nenhuma solicitacao encontrada.
-
-        </div>
-
-      `;
-
-    } else {
-
-      requestContainer.innerHTML = data.map((item) => `
-
-        <article class="account-item">
-
-          <strong>
-
-            ${esc(item.servicos?.nome || "Servico")}
-
-          </strong>
-
-          <span>
-
-            ${esc(item.status || "solicitado")}
-
-            •
-
-            ${esc(formatDateTime(item.criado_em))}
-
-          </span>
-
-          <p>
-
-            ${esc(item.descricao_problema || "")}
-
-          </p>
-
-        </article>
-
-      `).join("");
-
-    }
-
-  }
-
- 
-
-  if (conversationContainer) {
-
-    const {
-
-      data,
-
-      error
-
-    } = await supabase
-
-      .from(TABLES.CONVERSAS)
-
-      .select(`
-
-        id,
-
-        assunto,
-
-        status,
-
-        criado_em,
-
-        atualizado_em
-
-      `)
-
-      .order("atualizado_em", { ascending: false })
-
-      .limit(30);
-
- 
-
-    if (error) {
-
-      conversationContainer.innerHTML = `
-
-        <div class="empty">
-
-          Nao foi possivel carregar as conversas.
-
-        </div>
-
-      `;
-
-      console.error(error);
-
-    } else if (!data?.length) {
-
-      conversationContainer.innerHTML = `
-
-        <div class="empty">
-
-          Nenhuma conversa encontrada.
-
-        </div>
-
-      `;
-
-    } else {
-
-      conversationContainer.innerHTML = data.map((item) => `
-
-        <a
-
-          href="conversa.html?id=${encodeURIComponent(item.id)}"
-
-          class="conversation-card"
-
-        >
-
-          <div class="conversation-card-content">
-
-            <div>
-
-              <h3>
-
-                ${esc(item.assunto || "Atendimento")}
-
-              </h3>
-
-              <span>
-
-                ${esc(item.status || "aberta")}
-
-              </span>
-
-            </div>
-
-            <time>
-
-              ${esc(formatDateTime(
-
-                item.atualizado_em || item.criado_em
-
-              ))}
-
-            </time>
-
-          </div>
-
-        </a>
-
-      `).join("");
-
-    }
-
-  }
-
-}
-
- 
-
-/* =========================================================
-
-   33. ADMIN - LISTAS DE CONTEUDO
-
-   ========================================================= */
-
- 
-
-async function loadAdminProducts() {
-
-  const container = qs(
-
-    "#produtosAdminLista"
-
-  );
-
- 
-
-  if (!container) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.PRODUTOS)
-
-    .select("id,nome,modelo,descricao,imagem_capa,disponivel,destaque")
-
-    .order("nome", { ascending: true });
-
- 
-
-  if (error) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nao foi possivel carregar os produtos.
-
-      </div>
-
-    `;
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  container.innerHTML = (data || []).map((item) => `
-
-    <div class="admin-item" data-admin-item>
-
-      <div>
-
-        <strong>${esc(item.nome || "Produto")}</strong>
-
-        <small>
-
-          ${esc(item.modelo || "Sem modelo")}
-
-          •
-
-          ${item.disponivel ? "Disponivel" : "Oculto"}
-
-          ${item.destaque ? " • Destaque" : ""}
-
-        </small>
-
-      </div>
-
-      <div class="admin-actions">
-
-        <button
-
-          type="button"
-
-          class="btn btn-outline"
-
-          data-admin-edit="produto"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Editar
-
-        </button>
-
-        <button
-
-          type="button"
-
-          class="btn btn-danger"
-
-          data-admin-delete="produtos"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Excluir
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `).join("") || `
-
-    <div class="empty">
-
-      Nenhum produto cadastrado.
-
-    </div>
-
-  `;
-
-}
-
- 
-
-async function loadAdminServices() {
-
-  const container = qs(
-
-    "#servicosAdminLista"
-
-  );
-
- 
-
-  if (!container) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.SERVICOS)
-
-    .select("id,nome,descricao,imagem_capa,ativo")
-
-    .order("nome", { ascending: true });
-
- 
-
-  if (error) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nao foi possivel carregar os servicos.
-
-      </div>
-
-    `;
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  container.innerHTML = (data || []).map((item) => `
-
-    <div class="admin-item" data-admin-item>
-
-      <div>
-
-        <strong>${esc(item.nome || "Servico")}</strong>
-
-        <small>
-
-          ${item.ativo ? "Ativo" : "Oculto"}
-
-        </small>
-
-      </div>
-
-      <div class="admin-actions">
-
-        <button
-
-          type="button"
-
-          class="btn btn-outline"
-
-          data-admin-edit="servico"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Editar
-
-        </button>
-
-        <button
-
-          type="button"
-
-          class="btn btn-danger"
-
-          data-admin-delete="servicos"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Excluir
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `).join("") || `
-
-    <div class="empty">
-
-      Nenhum servico cadastrado.
-
-    </div>
-
-  `;
-
-}
-
- 
-
-async function loadAdminProjects() {
-
-  const container = qs(
-
-    "#projetosAdminLista"
-
-  );
-
- 
-
-  if (!container) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.PROJETOS)
-
-    .select("id,titulo,categoria,descricao,imagem_capa,publicado")
-
-    .order("titulo", { ascending: true });
-
- 
-
-  if (error) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nao foi possivel carregar os projetos.
-
-      </div>
-
-    `;
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  container.innerHTML = (data || []).map((item) => `
-
-    <div class="admin-item" data-admin-item>
-
-      <div>
-
-        <strong>${esc(item.titulo || "Projeto")}</strong>
-
-        <small>
-
-          ${esc(item.categoria || "Sem categoria")}
-
-          •
-
-          ${item.publicado ? "Publicado" : "Rascunho"}
-
-        </small>
-
-      </div>
-
-      <div class="admin-actions">
-
-        <button
-
-          type="button"
-
-          class="btn btn-outline"
-
-          data-admin-edit="projeto"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Editar
-
-        </button>
-
-        <button
-
-          type="button"
-
-          class="btn btn-danger"
-
-          data-admin-delete="projetos"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Excluir
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `).join("") || `
-
-    <div class="empty">
-
-      Nenhum projeto cadastrado.
-
-    </div>
-
-  `;
-
-}
-
- 
-
-async function loadAdminPosts() {
-
-  const container = qs(
-
-    "#publicacoesAdminLista"
-
-  );
-
- 
-
-  if (!container) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(TABLES.PUBLICACOES)
-
-    .select("id,titulo,resumo,conteudo,imagem_capa,publicado,data_publicacao")
-
-    .order("data_publicacao", { ascending: false });
-
- 
-
-  if (error) {
-
-    container.innerHTML = `
-
-      <div class="empty">
-
-        Nao foi possivel carregar as publicacoes.
-
-      </div>
-
-    `;
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  container.innerHTML = (data || []).map((item) => `
-
-    <div class="admin-item" data-admin-item>
-
-      <div>
-
-        <strong>${esc(item.titulo || "Publicacao")}</strong>
-
-        <small>
-
-          ${item.publicado ? "Publicado" : "Rascunho"}
-
-          ${item.data_publicacao
-
-            ? ` • ${esc(formatDate(item.data_publicacao))}`
-
-            : ""}
-
-        </small>
-
-      </div>
-
-      <div class="admin-actions">
-
-        <button
-
-          type="button"
-
-          class="btn btn-outline"
-
-          data-admin-edit="publicacao"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Editar
-
-        </button>
-
-        <button
-
-          type="button"
-
-          class="btn btn-danger"
-
-          data-admin-delete="publicacoes"
-
-          data-id="${esc(item.id)}"
-
-        >
-
-          Excluir
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `).join("") || `
-
-    <div class="empty">
-
-      Nenhuma publicacao cadastrada.
-
-    </div>
-
-  `;
-
-}
-
- 
-
-/* =========================================================
-
-   34. ADMIN - PREENCHER EDICAO
-
-   ========================================================= */
-
- 
-
-async function editAdminItem(kind, id) {
-
-  if (!id) return;
-
- 
-
-  const map = {
-
-    produto: {
-
-      table: TABLES.PRODUTOS,
-
-      form: "#produtoForm"
-
-    },
-
-    servico: {
-
-      table: TABLES.SERVICOS,
-
-      form: "#servicoForm"
-
-    },
-
-    projeto: {
-
-      table: TABLES.PROJETOS,
-
-      form: "#projetoForm"
-
-    },
-
-    publicacao: {
-
-      table: TABLES.PUBLICACOES,
-
-      form: "#publicacaoForm"
-
-    }
-
-  };
-
- 
-
-  const config = map[kind];
-
-  if (!config) return;
-
- 
-
-  const {
-
-    data,
-
-    error
-
-  } = await supabase
-
-    .from(config.table)
-
-    .select("*")
-
-    .eq("id", id)
-
-    .maybeSingle();
-
- 
-
-  if (error || !data) {
-
-    alert(
-
-      "Nao foi possivel carregar este item."
-
-    );
-
-    console.error(error);
-
-    return;
-
-  }
-
- 
-
-  const form = document.querySelector(config.form);
-
-  if (!form) return;
-
- 
-
-  if (kind === "produto") {
-
-    qs("#produtoId").value = data.id || "";
-
-    qs("#produtoNome").value = data.nome || "";
-
-    qs("#produtoModelo").value = data.modelo || "";
-
-    qs("#produtoDescricao").value = data.descricao || "";
-
-    qs("#produtoImagem").value = data.imagem_capa || "";
-
-    qs("#produtoDisponivel").checked = !!data.disponivel;
-
-    qs("#produtoDestaque").checked = !!data.destaque;
-
-  }
-
- 
-
-  if (kind === "servico") {
-
-    qs("#servicoId").value = data.id || "";
-
-    qs("#servicoNome").value = data.nome || "";
-
-    qs("#servicoDescricao").value = data.descricao || "";
-
-    qs("#servicoImagem").value = data.imagem_capa || "";
-
-    qs("#servicoAtivo").checked = !!data.ativo;
-
-  }
-
- 
-
-  if (kind === "projeto") {
-
-    qs("#projetoId").value = data.id || "";
-
-    qs("#projetoTitulo").value = data.titulo || "";
-
-    qs("#projetoCategoria").value = data.categoria || "";
-
-    qs("#projetoDescricao").value = data.descricao || "";
-
-    qs("#projetoImagem").value = data.imagem_capa || "";
-
-    qs("#projetoPublicado").checked = !!data.publicado;
-
-  }
-
- 
-
-  if (kind === "publicacao") {
-
-    qs("#publicacaoId").value = data.id || "";
-
-    qs("#publicacaoTitulo").value = data.titulo || "";
-
-    qs("#publicacaoResumo").value = data.resumo || "";
-
-    qs("#publicacaoConteudo").value = data.conteudo || "";
-
-    qs("#publicacaoImagem").value = data.imagem_capa || "";
-
-    qs("#publicacaoPublicado").checked = !!data.publicado;
-
-  }
-
- 
-
-  form.scrollIntoView({
-
-    behavior: "smooth",
-
-    block: "start"
-
-  });
-
-}
-
- 
-
-/* =========================================================
-
-   35. ADMIN - SALVAR
-
-   ========================================================= */
-
- 
-
-async function saveAdminRecord(
-
-  table,
-
-  id,
-
-  payload,
-
-  form
-
-) {
-
-  if (!await requireAdmin()) {
-
-    return false;
-
-  }
-
- 
-
-  const query = id
-
-    ? supabase
-
-        .from(table)
-
-        .update(payload)
-
-        .eq("id", id)
-
-    : supabase
-
-        .from(table)
-
-        .insert(payload);
-
- 
-
-  const {
-
-    error
-
-  } = await query;
-
- 
-
-  if (error) {
-
-    alert(
-
-      dbError(
-
-        error,
-
-        "Nao foi possivel salvar os dados."
-
-      )
-
-    );
-
-    return false;
-
-  }
-
- 
-
-  if (form) {
-
-    form.reset();
-
- 
-
-    const idInput =
-
-      form.querySelector(
-
-        "input[type='hidden']"
-
-      );
-
- 
-
-    if (idInput) {
-
-      idInput.value = "";
-
-    }
-
-  }
-
- 
-
-  return true;
-
-}
-
- 
-
-/* =========================================================
-
-   36. ADMIN - FORMULARIOS
-
-   ========================================================= */
-
- 
-
-function setupAdminForms() {
-
-  const productForm = qs(
-
-    "#produtoForm"
-
-  );
-
- 
-
-  if (productForm && productForm.dataset.bound !== "true") {
-
-    productForm.dataset.bound = "true";
-
- 
-
-    productForm.addEventListener("submit", async (event) => {
-
-      event.preventDefault();
-
- 
-
-      const id = qs("#produtoId")?.value || "";
-
- 
-
-      const payload = {
-
-        nome: qs("#produtoNome")?.value.trim() || "",
-
-        modelo: qs("#produtoModelo")?.value.trim() || null,
-
-        descricao: qs("#produtoDescricao")?.value.trim() || null,
-
-        imagem_capa: qs("#produtoImagem")?.value.trim() || null,
-
-        disponivel: !!qs("#produtoDisponivel")?.checked,
-
-        destaque: !!qs("#produtoDestaque")?.checked
-
-      };
-
- 
-
-      const saved = await saveAdminRecord(
-
-        TABLES.PRODUTOS,
-
-        id,
-
-        payload,
-
-        productForm
-
-      );
-
- 
-
-      if (saved) {
-
-        await loadAdminProducts();
-
-        await adminStats();
-
-      }
-
-    });
-
-  }
-
- 
-
-  const serviceForm = qs(
-
-    "#servicoForm"
-
-  );
-
- 
-
-  if (serviceForm && serviceForm.dataset.bound !== "true") {
-
-    serviceForm.dataset.bound = "true";
-
- 
-
-    serviceForm.addEventListener("submit", async (event) => {
-
-      event.preventDefault();
-
- 
-
-      const id = qs("#servicoId")?.value || "";
-
- 
-
-      const payload = {
-
-        nome: qs("#servicoNome")?.value.trim() || "",
-
-        descricao: qs("#servicoDescricao")?.value.trim() || null,
-
-        imagem_capa: qs("#servicoImagem")?.value.trim() || null,
-
-        ativo: !!qs("#servicoAtivo")?.checked
-
-      };
-
- 
-
-      const saved = await saveAdminRecord(
-
-        TABLES.SERVICOS,
-
-        id,
-
-        payload,
-
-        serviceForm
-
-      );
-
- 
-
-      if (saved) {
-
-        await loadAdminServices();
-
-        await adminStats();
-
-      }
-
-    });
-
-  }
-
- 
-
-  const projectForm = qs(
-
-    "#projetoForm"
-
-  );
-
- 
-
-  if (projectForm && projectForm.dataset.bound !== "true") {
-
-    projectForm.dataset.bound = "true";
-
- 
-
-    projectForm.addEventListener("submit", async (event) => {
-
-      event.preventDefault();
-
- 
-
-      const id = qs("#projetoId")?.value || "";
-
- 
-
-      const payload = {
-
-        titulo: qs("#projetoTitulo")?.value.trim() || "",
-
-        categoria: qs("#projetoCategoria")?.value.trim() || null,
-
-        descricao: qs("#projetoDescricao")?.value.trim() || null,
-
-        imagem_capa: qs("#projetoImagem")?.value.trim() || null,
-
-        publicado: !!qs("#projetoPublicado")?.checked
-
-      };
-
- 
-
-      const saved = await saveAdminRecord(
-
-        TABLES.PROJETOS,
-
-        id,
-
-        payload,
-
-        projectForm
-
-      );
-
- 
-
-      if (saved) {
-
-        await loadAdminProjects();
-
-        await adminStats();
-
-      }
-
-    });
-
-  }
-
- 
-
-  const publicationForm = qs(
-
-    "#publicacaoForm"
-
-  );
-
- 
-
-  if (publicationForm && publicationForm.dataset.bound !== "true") {
-
-    publicationForm.dataset.bound = "true";
-
- 
-
-    publicationForm.addEventListener("submit", async (event) => {
-
-      event.preventDefault();
-
- 
-
-      const id = qs("#publicacaoId")?.value || "";
-
- 
-
-      const payload = {
-
-        titulo: qs("#publicacaoTitulo")?.value.trim() || "",
-
-        resumo: qs("#publicacaoResumo")?.value.trim() || null,
-
-        conteudo: qs("#publicacaoConteudo")?.value.trim() || null,
-
-        imagem_capa: qs("#publicacaoImagem")?.value.trim() || null,
-
-        publicado: !!qs("#publicacaoPublicado")?.checked,
-
-        data_publicacao: new Date().toISOString()
-
-      };
-
- 
-
-      const saved = await saveAdminRecord(
-
-        TABLES.PUBLICACOES,
-
-        id,
-
-        payload,
-
-        publicationForm
-
-      );
-
- 
-
-      if (saved) {
-
-        await loadAdminPosts();
-
-        await adminStats();
-
-      }
-
-    });
-
-  }
-
-}
-
- 
-
-/* =========================================================
-
-   37. ADMIN - EDITAR / EXCLUIR
-
-   ========================================================= */
-
- 
-
-function setupAdminActions() {
-
-  qsa("[data-admin-edit]").forEach((button) => {
-
-    if (button.dataset.actionBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.actionBound = "true";
-
- 
-
-    button.addEventListener("click", async () => {
-
-      await editAdminItem(
-
-        button.dataset.adminEdit,
-
-        button.dataset.id
-
-      );
-
-    });
-
-  });
-
- 
-
-  qsa("[data-admin-delete]").forEach((button) => {
-
-    if (button.dataset.actionBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.actionBound = "true";
-
- 
-
-    button.addEventListener("click", async () => {
-
-      const table =
-
-        button.dataset.adminDelete;
-
- 
-
-      const id =
-
-        button.dataset.id;
-
- 
-
-      if (!table || !id) return;
-
- 
-
-      const confirmed = window.confirm(
-
-        "Tem certeza que deseja excluir este item?"
-
-      );
-
- 
-
-      if (!confirmed) return;
-
- 
-
-      if (!await requireAdmin()) return;
-
- 
-
-      const {
-
-        error
-
-      } = await supabase
-
-        .from(table)
-
-        .delete()
-
-        .eq("id", id);
-
- 
-
-      if (error) {
-
-        alert(
-
-          "Nao foi possivel excluir este item."
-
-        );
-
-        console.error(error);
-
-        return;
-
-      }
-
- 
-
-      button
-
-        .closest("[data-admin-item]")
-
-        ?.remove();
-
- 
-
-      await adminStats();
-
-    });
-
-  });
-
-}
-
- 
-
-/* =========================================================
-
-   38. ADMIN - MENU
-
-   ========================================================= */
-
- 
-
-function setupAdminMenu() {
-
-  const buttons = qsa(
-
-    "[data-panel]"
-
-  );
-
- 
-
-  if (!buttons.length) return;
-
- 
-
-  const panels = qsa(
-
-    ".admin-panel"
-
-  );
-
- 
-
-  buttons.forEach((button) => {
-
-    if (button.dataset.panelBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    button.dataset.panelBound = "true";
-
- 
-
-    button.addEventListener("click", () => {
-
-      const target =
-
-        button.dataset.panel;
-
- 
-
-      buttons.forEach((item) => {
-
-        item.classList.toggle(
-
-          "active",
-
-          item === button
-
-        );
-
-      });
-
- 
-
-      panels.forEach((panel) => {
-
-        panel.style.display =
-
-          panel.id === target
-
-            ? "block"
-
-            : "none";
-
-      });
-
-    });
-
-  });
-
- 
-
-  const firstButton =
-
-    buttons[0];
-
- 
-
-  firstButton?.click();
-
-}
-
- 
-
-/* =========================================================
-
-   39. ADMIN - CARREGAR
-
-   ========================================================= */
-
- 
-
-async function loadAdminArea() {
-
-  if (getCurrentPage() !== "admin.html") {
-
-    return;
-
-  }
-
- 
-
-  const allowed =
-
-    await requireAdmin();
-
- 
-
-  if (!allowed) return;
-
- 
-
-  await adminStats();
-
-  await adminUsers();
-
-  await adminRequests();
-
-  await loadAdminProducts();
-
-  await loadAdminServices();
-
-  await loadAdminProjects();
-
-  await loadAdminPosts();
-
- 
-
-  setupAdminMenu();
-
-  setupAdminForms();
-
-  setupAdminActions();
-
-}
-
- 
-
-/* =========================================================
-
-   40. LINKS E INTERFACE
-
-   ========================================================= */
-
- 
-
-function setupServiceLinks() {
-
-  qsa("[data-service]").forEach((element) => {
-
-    if (element.dataset.serviceBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    element.dataset.serviceBound = "true";
-
- 
-
-    element.addEventListener("click", (event) => {
-
-      event.preventDefault();
-
- 
-
-      const service =
-
-        element.dataset.service ||
-
-        element.textContent.trim() ||
-
-        "Atendimento";
-
- 
-
-      window.location.href =
-
-        `atendimento.html?servico=${encodeURIComponent(service)}`;
-
-    });
-
-  });
-
-}
-
- 
-
-function setupWhatsApp() {
-
-  qsa("[data-whatsapp]").forEach((element) => {
-
-    if (element.dataset.whatsappBound === "true") {
-
-      return;
-
-    }
-
- 
-
-    element.dataset.whatsappBound = "true";
-
- 
-
-    element.addEventListener("click", (event) => {
-
-      event.preventDefault();
-
- 
-
-      const message =
-
-        element.dataset.whatsappMessage ||
-
-        "Ola! Gostaria de falar com a Max Som.";
-
- 
-
-      const url =
-
-        `https://wa.me/5565996262514?text=${encodeURIComponent(message)}`;
-
- 
-
-      window.open(
-
-        url,
-
-        "_blank",
-
-        "noopener,noreferrer"
-
-      );
-
-    });
-
-  });
-
-}
-
- 
-
-function markCurrentPage() {
-
-  const page = getCurrentPage();
-
- 
-
-  qsa("nav a[href]").forEach((link) => {
-
-    const href =
-
-      link
-
-        .getAttribute("href")
-
-        ?.split("?")[0]
-
-        .toLowerCase();
-
- 
-
-    if (href === page) {
-
-      link.classList.add("active");
-
-      link.classList.add("nav-current");
+      console.warn("Não foi possível remover canal:", error);
 
     }
 
@@ -7320,101 +4403,36 @@ function markCurrentPage() {
 
 }
 
- 
 
 /* =========================================================
 
-   41. REALTIME DAS CONVERSAS
+   31. INTERFACE
 
    ========================================================= */
 
- 
-
-function setupConversationPageRealtime() {
-
-  if (!currentUser) return;
-
- 
-
-  if (getCurrentPage() === "conversas.html") {
-
-    setupConversationListRealtime();
-
-  }
-
- 
-
-  if (getCurrentPage() === "conta.html") {
-
-    setupConversationListRealtime();
-
-  }
-
-}
-
- 
-
-/* =========================================================
-
-   42. LIMPAR ESTADOS DE EDICAO
-
-   ========================================================= */
-
- 
 
 function setupCancelButtons() {
 
   qsa(
 
-    "#produtoCancelar",
-
-    "#servicoCancelar",
-
-    "#projetoCancelar",
-
-    "#publicacaoCancelar",
-
-    "[data-cancel-form]"
+    "#produtoCancelar, #servicoCancelar, #projetoCancelar, #publicacaoCancelar, [data-cancel-form]"
 
   ).forEach((button) => {
 
-    if (button.dataset.cancelBound === "true") {
+    if (button.dataset.cancelBound === "true") return;
 
-      return;
-
-    }
-
- 
 
     button.dataset.cancelBound = "true";
-
- 
 
     button.addEventListener("click", () => {
 
       const form = button.closest("form");
 
- 
+      form?.reset();
 
-      if (!form) return;
+      form?.querySelector("input[type='hidden']") &&
 
- 
-
-      form.reset();
-
- 
-
-      const hidden =
-
-        form.querySelector(
-
-          "input[type='hidden']"
-
-        );
-
- 
-
-      if (hidden) hidden.value = "";
+        (form.querySelector("input[type='hidden']").value = "");
 
     });
 
@@ -7422,15 +4440,50 @@ function setupCancelButtons() {
 
 }
 
- 
 
-/* =========================================================
+function markCurrentPage() {
 
-   43. INTERFACE PUBLICA
+  const page = getCurrentPage();
 
-   ========================================================= */
 
- 
+  qsa("nav a[href]").forEach((link) => {
+
+    const href =
+
+      link.getAttribute("href")?.split("?")[0]?.toLowerCase();
+
+
+    if (href === page) {
+
+      link.classList.add("active", "nav-current");
+
+    }
+
+  });
+
+
+  qsa("[data-admin-only]").forEach((element) => {
+
+    element.style.display = "none";
+
+  });
+
+
+  qsa("[data-guest-only]").forEach((element) => {
+
+    element.style.display = "";
+
+  });
+
+
+  qsa("[data-logged-only]").forEach((element) => {
+
+    element.style.display = "none";
+
+  });
+
+}
+
 
 function enhancePublicInterface() {
 
@@ -7440,63 +4493,24 @@ function enhancePublicInterface() {
 
   ).forEach((card, index) => {
 
-    card.style.animationDelay =
-
-      `${Math.min(index * 45, 250)}ms`;
+    card.style.animationDelay = `${Math.min(index * 45, 250)}ms`;
 
   });
 
 }
 
- 
 
 /* =========================================================
 
-   44. CARREGAMENTO DA PAGINA
+   32. CARREGAMENTO POR PAGINA
 
    ========================================================= */
 
- 
 
 async function loadCurrentPageData() {
 
   const page = getCurrentPage();
 
- 
-
-  if (page === "conta.html") {
-
-    await loadAccountPage();
-
-  }
-
- 
-
-  if (page === "conversas.html") {
-
-    await loadConversations();
-
-    setupConversationButtons();
-
-  }
-
- 
-
-  if (page === "conversa.html") {
-
-    await loadConversation();
-
-  }
-
- 
-
-  if (page === "atendimento.html") {
-
-    await setupAttendancePage();
-
-  }
-
- 
 
   await Promise.allSettled([
 
@@ -7510,7 +4524,34 @@ async function loadCurrentPageData() {
 
   ]);
 
- 
+
+  if (page === "conta.html") {
+
+    await loadAccountPage();
+
+  }
+
+
+  if (page === "conversas.html") {
+
+    await loadConversations();
+
+  }
+
+
+  if (page === "conversa.html") {
+
+    await loadConversation();
+
+  }
+
+
+  if (page === "atendimento.html") {
+
+    await setupAttendancePage();
+
+  }
+
 
   if (currentUser) {
 
@@ -7518,17 +4559,22 @@ async function loadCurrentPageData() {
 
   }
 
+
+  if (page === "admin.html") {
+
+    await loadAdminArea();
+
+  }
+
 }
 
- 
 
 /* =========================================================
 
-   45. INICIALIZACAO PRINCIPAL
+   33. INICIALIZACAO
 
    ========================================================= */
 
- 
 
 async function initializeMaxSom() {
 
@@ -7536,31 +4582,33 @@ async function initializeMaxSom() {
 
     if (!isSupabaseReady()) {
 
+      console.error("Supabase JS não foi carregado.");
+
       return;
 
     }
 
- 
-
-    /*
-
-     * 1. Recupera a sessao antes de qualquer verificacao.
-
-     */
 
     const {
 
-      data: sessionData
+      data,
+
+      error
 
     } = await supabase.auth.getSession();
 
- 
 
-    currentUser =
+    if (error) {
 
-      sessionData?.session?.user || null;
+      console.error("Erro ao recuperar sessão:", error);
 
- 
+      return;
+
+    }
+
+
+    currentUser = data?.session?.user || null;
+
 
     if (currentUser) {
 
@@ -7572,23 +4620,16 @@ async function initializeMaxSom() {
 
     }
 
- 
-
-    /*
-
-     * 2. Atualiza menu.
-
-     */
 
     await updateNav();
 
- 
+    markCurrentPage();
 
-    setupLogoutButtons();
+    setupLogin();
+
+    setupSignup();
 
     setupGeneralNavigation();
-
-    markCurrentPage();
 
     setupServiceLinks();
 
@@ -7596,139 +4637,46 @@ async function initializeMaxSom() {
 
     setupConversationButtons();
 
-    setupAdminRequestButton();
-
     setupCancelButtons();
 
- 
+    setupAdminRequestButton();
 
-    /*
 
-     * 3. Login/cadastro sao ligados cedo.
+    if (currentUser && getCurrentPage() === "login.html") {
 
-     */
-
-    await setupLogin();
-
-    await setupSignup();
-
- 
-
-    /*
-
-     * 4. Paginas protegidas.
-
-     */
-
-    const allowed =
-
-      await enforcePageAccess();
-
- 
-
-    if (!allowed) {
+      await redirectAuthenticatedUser();
 
       return;
 
     }
 
- 
 
-    /*
+    const allowed = await enforcePageAccess();
 
-     * 5. Se alguem abriu login ja estando logado,
+    if (!allowed) return;
 
-     * vai para Minha conta.
-
-     */
-
-    await redirectAuthenticatedUser();
-
- 
-
-    /*
-
-     * 6. Pagina atual.
-
-     */
 
     await loadCurrentPageData();
 
- 
-
-    /*
-
-     * 7. Area administrativa.
-
-     */
-
-    await loadAdminArea();
-
- 
-
-    /*
-
-     * 8. Realtime.
-
-     */
-
-    if (currentUser) {
-
-      setupConversationPageRealtime();
-
-      setupNotificationRealtime();
-
-    }
-
- 
-
-    /*
-
-     * 9. Listener unico de autenticacao.
-
-     */
-
-    setupAuthListener();
-
- 
+    setupRealtime();
 
     enhancePublicInterface();
 
- 
+    setupAuthListener();
+
 
   } catch (error) {
 
-    console.error(
-
-      "Erro na inicializacao do Max Som:",
-
-      error
-
-    );
+    console.error("Erro na inicialização do Max Som:", error);
 
   }
 
 }
 
- 
-
-/* =========================================================
-
-   46. EXECUCAO
-
-   ========================================================= */
-
- 
 
 if (document.readyState === "loading") {
 
-  document.addEventListener(
-
-    "DOMContentLoaded",
-
-    initializeMaxSom
-
-  );
+  document.addEventListener("DOMContentLoaded", initializeMaxSom);
 
 } else {
 
@@ -7736,19 +4684,10 @@ if (document.readyState === "loading") {
 
 }
 
- 
-
-/* =========================================================
-
-   47. API PUBLICA
-
-   ========================================================= */
-
- 
 
 window.MaxSom = {
 
-  reload: initializeMaxSom,
+  initialize: initializeMaxSom,
 
   updateNav,
 
