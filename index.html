@@ -1,46 +1,72 @@
- <!-- =========================
-       INDEX
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Max Som | Soluções em Som</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>
+        Max Som | Soluções em Som
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
+
 <body class="home-page">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
 
 <header>
 
     <div class="container header-content">
 
-        <!-- LOGO ORIGINAL -->
+
+        <!-- LOGO -->
+
         <a
             class="logo"
             href="index.html"
-            aria-label="Max Som - Início"
         >
+
             <img
                 src="logo-maxsom-white.png"
                 alt="Max Som"
             >
+
         </a>
 
 
-        <!-- WHATSAPP ORIGINAL -->
+        <!-- WHATSAPP -->
+
         <a
             class="header-whatsapp"
             href="https://wa.me/5565996262514"
@@ -57,795 +83,8 @@
 
 
         <!-- MENU -->
+
         <nav>
-
-            <a
-                href="index.html"
-                class="active"
-            >
-                Início
-            </a>
-
-            <a href="produtos.html">
-                Produtos
-            </a>
-
-            <a href="servicos.html">
-                Serviços
-            </a>
-
-            <a href="projetos.html">
-                Projetos
-            </a>
-
-            <a href="publicacoes.html">
-                Publicações
-            </a>
-
-            <a href="atendimento.html">
-                Atendimento
-            </a>
-
-
-            <!-- ADMIN -->
-            <a
-                href="admin.html"
-                id="adminLink"
-                data-admin-only
-                style="display:none;"
-            >
-                ⚙ Painel
-            </a>
-
-
-            <!-- CLIENTE LOGADO -->
-            <a
-                href="conta.html"
-                id="accountLink"
-                data-logged-only
-                style="display:none;"
-            >
-                Minha conta
-            </a>
-
-
-            <!-- CONVERSAS -->
-            <a
-                href="conversas.html"
-                id="conversationsLink"
-                data-logged-only
-                style="display:none;"
-            >
-                Conversas
-            </a>
-
-
-            <!-- VISITANTE -->
-            <a
-                href="login.html"
-                id="loginLink"
-                data-guest-only
-            >
-                Entrar
-            </a>
-
-
-            <a
-                href="cadastro.html"
-                data-guest-only
-            >
-                Criar conta
-            </a>
-
-
-            <!-- SAIR -->
-            <button
-                class="btn btn-outline"
-                data-logout
-                data-logged-only
-                type="button"
-                style="display:none;"
-            >
-                Sair
-            </button>
-
-        </nav>
-
-    </div>
-
-</header>
-
-
-<main>
-
-
-<!-- =========================================================
-     HERO
-========================================================= -->
-
-<section class="hero hero-v2">
-
-    <div
-        class="hero-v2-media"
-        aria-hidden="true"
-    >
-
-        <!-- FOTO ORIGINAL -->
-        <div class="hero-photo hero-photo-main">
-
-            <img
-                src="projeto-03.png"
-                alt=""
-            >
-
-        </div>
-
-    </div>
-
-
-    <div class="container hero-v2-content">
-
-        <div class="hero-copy">
-
-            <span class="hero-label">
-                MAX SOM • SOLUÇÕES EM ÁUDIO
-            </span>
-
-
-            <h1>
-                Som que chama atenção.
-                <span>
-                    Experiência que fica.
-                </span>
-            </h1>
-
-
-            <p>
-                Equipamentos, projetos e serviços para quem quer
-                potência, qualidade e um sistema de som pensado
-                de verdade para cada ambiente.
-            </p>
-
-
-            <div class="hero-buttons">
-
-                <a
-                    class="btn btn-primary btn-large"
-                    href="atendimento.html"
-                >
-                    Falar com a Max Som
-                </a>
-
-
-                <a
-                    class="btn btn-outline btn-large"
-                    href="projetos.html"
-                >
-                    Ver projetos
-                </a>
-
-            </div>
-
-
-            <div class="hero-trust">
-
-                <span>
-                    <b>01</b>
-                    Atendimento direto
-                </span>
-
-                <span>
-                    <b>02</b>
-                    Projetos personalizados
-                </span>
-
-                <span>
-                    <b>03</b>
-                    Soluções em som
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     INTRO
-========================================================= -->
-
-<section class="intro-section">
-
-    <div class="container intro-grid">
-
-        <div class="section-title intro-title">
-
-            <span>
-                Max Som
-            </span>
-
-            <h2>
-                Uma empresa de som feita para quem leva
-                o áudio a sério.
-            </h2>
-
-        </div>
-
-
-        <div class="intro-text">
-
-            <p>
-                Da escolha do equipamento ao projeto final,
-                a Max Som reúne informação, atendimento e
-                experiência para ajudar você a chegar no
-                resultado que procura.
-            </p>
-
-
-            <a
-                class="text-link"
-                href="atendimento.html"
-            >
-                Conhecer nosso atendimento
-                <span>→</span>
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     BENEFÍCIOS
-========================================================= -->
-
-<section class="visual-benefits">
-
-    <div class="container">
-
-        <div class="section-title section-title-light">
-
-            <span>
-                O que fazemos
-            </span>
-
-            <h2>
-                Mais que equipamento. Uma solução completa.
-            </h2>
-
-            <p>
-                Conheça os principais pontos que fazem parte
-                da experiência Max Som.
-            </p>
-
-        </div>
-
-
-        <div class="benefits-grid benefits-v2">
-
-
-            <!-- FOTO ORIGINAL 01 -->
-            <article class="benefit-card benefit-image-card">
-
-                <img
-                    src="projeto-01.png"
-                    alt="Sistema de som automotivo"
-                >
-
-                <div>
-
-                    <span>
-                        01
-                    </span>
-
-                    <h3>
-                        Projetos personalizados
-                    </h3>
-
-                    <p>
-                        Estruturas pensadas para o espaço,
-                        objetivo e resultado que você busca.
-                    </p>
-
-                </div>
-
-            </article>
-
-
-            <!-- FOTO ORIGINAL 02 -->
-            <article class="benefit-card benefit-image-card">
-
-                <img
-                    src="projeto-02.png"
-                    alt="Equipamento de som"
-                >
-
-                <div>
-
-                    <span>
-                        02
-                    </span>
-
-                    <h3>
-                        Equipamentos
-                    </h3>
-
-                    <p>
-                        Uma vitrine para conhecer modelos,
-                        marcas e soluções disponíveis.
-                    </p>
-
-                </div>
-
-            </article>
-
-
-            <!-- FOTO ORIGINAL 03 -->
-            <article class="benefit-card benefit-image-card">
-
-                <img
-                    src="projeto-03.png"
-                    alt="Projeto de som instalado em veículo"
-                >
-
-                <div>
-
-                    <span>
-                        03
-                    </span>
-
-                    <h3>
-                        Atendimento especializado
-                    </h3>
-
-                    <p>
-                        Você explica o que precisa e a equipe
-                        ajuda a encontrar o melhor caminho.
-                    </p>
-
-                </div>
-
-            </article>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     PRODUTOS
-========================================================= -->
-
-<section>
-
-    <div class="container">
-
-        <div class="section-title section-title-row">
-
-            <div>
-
-                <span>
-                    Equipamentos
-                </span>
-
-                <h2>
-                    Produtos em destaque.
-                </h2>
-
-                <p>
-                    Conheça os equipamentos cadastrados pela
-                    Max Som. O site é informativo, sem venda online.
-                </p>
-
-            </div>
-
-
-            <a
-                class="text-link"
-                href="produtos.html"
-            >
-                Ver todos
-                <span>→</span>
-            </a>
-
-        </div>
-
-
-        <!-- O MAIN.JS PODE CARREGAR OS PRODUTOS AQUI -->
-        <div
-            class="products-grid products-v2"
-            id="productsGrid"
-        >
-
-            <div class="empty">
-                Carregando produtos...
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     SERVIÇOS
-========================================================= -->
-
-<section class="dark-section">
-
-    <div class="container">
-
-        <div class="section-title section-title-light section-title-row">
-
-            <div>
-
-                <span>
-                    Serviços
-                </span>
-
-                <h2>
-                    Do planejamento à execução.
-                </h2>
-
-                <p>
-                    Serviços para transformar uma necessidade
-                    de áudio em uma solução bem montada.
-                </p>
-
-            </div>
-
-
-            <a
-                class="text-link text-link-light"
-                href="servicos.html"
-            >
-                Conhecer serviços
-                <span>→</span>
-            </a>
-
-        </div>
-
-
-        <div
-            class="services-grid services-v2"
-            id="servicesGrid"
-        >
-
-            <div class="empty">
-                Carregando serviços...
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     PROJETOS
-========================================================= -->
-
-<section class="projects-showcase">
-
-    <div class="container">
-
-        <div class="section-title section-title-row">
-
-            <div>
-
-                <span>
-                    Projetos reais
-                </span>
-
-                <h2>
-                    Veja a Max Som em ação.
-                </h2>
-
-                <p>
-                    Uma seleção visual de trabalhos e sistemas
-                    de som.
-                </p>
-
-            </div>
-
-
-            <a
-                class="text-link"
-                href="projetos.html"
-            >
-                Ver galeria
-                <span>→</span>
-            </a>
-
-        </div>
-
-
-        <div
-            class="projects-grid projects-v2"
-            id="projectsGrid"
-        >
-
-            <div class="empty">
-                Carregando projetos...
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     SOBRE
-========================================================= -->
-
-<section class="about-visual">
-
-    <div class="container about-grid">
-
-        <div class="about-image">
-
-            <!-- FOTO ORIGINAL -->
-            <img
-                src="projeto-01.png"
-                alt="Detalhe de um projeto Max Som"
-            >
-
-
-            <div class="about-image-label">
-
-                MAX SOM
-
-                <br>
-
-                <span>
-                    Qualidade em cada detalhe
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="about-copy">
-
-            <span class="hero-label">
-                SOBRE A MAX SOM
-            </span>
-
-
-            <h2>
-                Potência é importante.
-                Projeto bem pensado também.
-            </h2>
-
-
-            <p>
-                A proposta da Max Som é facilitar a escolha
-                e o atendimento para quem precisa de som.
-                Aqui, equipamentos, serviços, projetos e
-                comunicação ficam reunidos em um só lugar.
-            </p>
-
-
-            <div class="about-points">
-
-                <div>
-                    <strong>
-                        01
-                    </strong>
-
-                    <span>
-                        Informação clara sobre equipamentos
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        02
-                    </strong>
-
-                    <span>
-                        Serviços sob orçamento
-                    </span>
-                </div>
-
-
-                <div>
-                    <strong>
-                        03
-                    </strong>
-
-                    <span>
-                        Atendimento pelo site e WhatsApp
-                    </span>
-                </div>
-
-            </div>
-
-
-            <a
-                class="btn btn-light"
-                href="atendimento.html"
-            >
-                Solicitar atendimento
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     PUBLICAÇÕES
-========================================================= -->
-
-<section>
-
-    <div class="container">
-
-        <div class="section-title section-title-row">
-
-            <div>
-
-                <span>
-                    Conteúdo
-                </span>
-
-                <h2>
-                    Publicações e novidades.
-                </h2>
-
-                <p>
-                    Dicas e informações publicadas pela Max Som.
-                </p>
-
-            </div>
-
-
-            <a
-                class="text-link"
-                href="publicacoes.html"
-            >
-                Ver publicações
-                <span>→</span>
-            </a>
-
-        </div>
-
-
-        <div
-            class="posts-grid posts-v2"
-            id="postsGrid"
-        >
-
-            <div class="empty">
-                Carregando publicações...
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     CTA
-========================================================= -->
-
-<section class="cta-section">
-
-    <div class="container cta-box">
-
-        <div>
-
-            <span class="hero-label">
-                ATENDIMENTO MAX SOM
-            </span>
-
-
-            <h2>
-                Já sabe o que precisa ou ainda está em dúvida?
-            </h2>
-
-
-            <p>
-                Conte para a gente o que você procura e receba
-                orientação para o seu projeto.
-            </p>
-
-        </div>
-
-
-        <div class="cta-actions">
-
-            <a
-                class="btn btn-light btn-large"
-                href="atendimento.html"
-            >
-                Solicitar atendimento
-            </a>
-
-
-            <a
-                class="btn btn-outline-dark btn-large"
-                href="https://wa.me/5565996262514"
-                target="_blank"
-                rel="noopener"
-            >
-                WhatsApp
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-</main>
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-<footer class="footer footer-v2">
-
-    <div class="container footer-content">
-
-
-        <div class="footer-column footer-brand">
-
-            <a
-                class="logo"
-                href="index.html"
-            >
-
-                <img
-                    src="logo-maxsom-white.png"
-                    alt="Max Som"
-                >
-
-            </a>
-
-
-            <p>
-                Soluções em som, equipamentos,
-                serviços e atendimento.
-            </p>
-
-
-            <a
-                class="footer-whatsapp"
-                href="https://wa.me/5565996262514"
-                target="_blank"
-                rel="noopener"
-            >
-                WhatsApp: (65) 99626-2514
-            </a>
-
-        </div>
-
-
-        <div class="footer-column">
-
-            <h3>
-                Navegação
-            </h3>
 
             <a href="index.html">
                 Início
@@ -867,79 +106,1141 @@
                 Publicações
             </a>
 
+            <a href="atendimento.html">
+                Atendimento
+            </a>
+
+
+            <a
+                href="admin.html"
+                data-admin-only
+            >
+                ⚙ Painel
+            </a>
+
+
+            <a
+                href="conta.html"
+                data-logged-only
+            >
+                Minha conta
+            </a>
+
+
+            <a
+                href="login.html"
+                data-guest-only
+            >
+                Entrar
+            </a>
+
+
+            <a
+                href="cadastro.html"
+                data-guest-only
+            >
+                Criar conta
+            </a>
+
+
+            <button
+                class="btn btn-outline"
+                data-logout
+                data-logged-only
+                type="button"
+            >
+                Sair
+            </button>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     CONTEÚDO PRINCIPAL
+========================================================= -->
+
+<main>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero hero-v2">
+
+
+    <div
+        class="hero-v2-media"
+        aria-hidden="true"
+    >
+
+        <div class="hero-photo hero-photo-main">
+
+            <img
+                src="projeto-03.png"
+                alt=""
+            >
+
+        </div>
+
+    </div>
+
+
+
+    <div class="container hero-v2-content">
+
+
+        <div class="hero-copy">
+
+
+            <span class="hero-label">
+                MAX SOM • SOLUÇÕES EM ÁUDIO
+            </span>
+
+
+            <h1>
+
+                Som que chama atenção.
+
+                <span>
+                    Experiência que fica.
+                </span>
+
+            </h1>
+
+
+            <p>
+
+                Equipamentos, projetos e serviços
+                para quem quer potência, qualidade
+                e um sistema de som pensado de
+                verdade para cada ambiente.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+
+                <a
+                    class="btn btn-primary btn-large"
+                    href="atendimento.html"
+                >
+                    Falar com a Max Som
+                </a>
+
+
+                <a
+                    class="btn btn-outline btn-large"
+                    href="projetos.html"
+                >
+                    Ver projetos
+                </a>
+
+
+            </div>
+
+
+            <div class="hero-trust">
+
+
+                <span>
+
+                    <b>
+                        01
+                    </b>
+
+                    Atendimento direto
+
+                </span>
+
+
+                <span>
+
+                    <b>
+                        02
+                    </b>
+
+                    Projetos personalizados
+
+                </span>
+
+
+                <span>
+
+                    <b>
+                        03
+                    </b>
+
+                    Soluções em som
+
+                </span>
+
+
+            </div>
+
+
         </div>
 
 
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     INTRO
+========================================================= -->
+
+<section class="intro-section">
+
+
+    <div class="container intro-grid">
+
+
+        <div class="section-title intro-title">
+
+
+            <span>
+                Max Som
+            </span>
+
+
+            <h2>
+
+                Uma empresa de som feita
+                para quem leva o áudio a sério.
+
+            </h2>
+
+
+        </div>
+
+
+
+        <div class="intro-text">
+
+
+            <p>
+
+                Da escolha do equipamento ao
+                projeto final, a Max Som reúne
+                informação, atendimento e experiência
+                para ajudar você a chegar no
+                resultado que procura.
+
+            </p>
+
+
+            <a
+                class="text-link"
+                href="atendimento.html"
+            >
+
+                Conhecer nosso atendimento
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     BENEFÍCIOS
+========================================================= -->
+
+<section class="visual-benefits">
+
+
+    <div class="container">
+
+
+        <div class="section-title section-title-light">
+
+
+            <span>
+                O que fazemos
+            </span>
+
+
+            <h2>
+
+                Mais que equipamento.
+                Uma solução completa.
+
+            </h2>
+
+
+            <p>
+
+                Conheça os principais pontos
+                que fazem parte da experiência
+                Max Som.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="benefits-grid benefits-v2">
+
+
+            <article
+                class="benefit-card benefit-image-card"
+            >
+
+
+                <img
+                    src="projeto-01.png"
+                    alt="Sistema de som automotivo"
+                >
+
+
+                <div>
+
+
+                    <span>
+                        01
+                    </span>
+
+
+                    <h3>
+                        Projetos personalizados
+                    </h3>
+
+
+                    <p>
+
+                        Estruturas pensadas para o
+                        espaço, objetivo e resultado
+                        que você busca.
+
+                    </p>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <article
+                class="benefit-card benefit-image-card"
+            >
+
+
+                <img
+                    src="projeto-02.png"
+                    alt="Equipamento de som"
+                >
+
+
+                <div>
+
+
+                    <span>
+                        02
+                    </span>
+
+
+                    <h3>
+                        Equipamentos
+                    </h3>
+
+
+                    <p>
+
+                        Uma vitrine para conhecer
+                        modelos, marcas e soluções
+                        disponíveis.
+
+                    </p>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <article
+                class="benefit-card benefit-image-card"
+            >
+
+
+                <img
+                    src="projeto-03.png"
+                    alt="Projeto de som instalado em veículo"
+                >
+
+
+                <div>
+
+
+                    <span>
+                        03
+                    </span>
+
+
+                    <h3>
+                        Atendimento especializado
+                    </h3>
+
+
+                    <p>
+
+                        Você explica o que precisa
+                        e a equipe ajuda a encontrar
+                        o melhor caminho.
+
+                    </p>
+
+
+                </div>
+
+
+            </article>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     PRODUTOS
+========================================================= -->
+
+<section>
+
+
+    <div class="container">
+
+
+        <div class="section-title section-title-row">
+
+
+            <div>
+
+
+                <span>
+                    Equipamentos
+                </span>
+
+
+                <h2>
+                    Produtos em destaque.
+                </h2>
+
+
+                <p>
+
+                    Conheça os equipamentos cadastrados
+                    pela Max Som. O site é informativo,
+                    sem venda online.
+
+                </p>
+
+
+            </div>
+
+
+
+            <a
+                class="text-link"
+                href="produtos.html"
+            >
+
+                Ver todos
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+
+        <div
+            class="products-grid products-v2"
+            id="productsGrid"
+        >
+
+            <div class="empty">
+                Carregando produtos...
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     SERVIÇOS
+========================================================= -->
+
+<section class="dark-section">
+
+
+    <div class="container">
+
+
+        <div class="section-title section-title-light section-title-row">
+
+
+            <div>
+
+
+                <span>
+                    Serviços
+                </span>
+
+
+                <h2>
+                    Do planejamento à execução.
+                </h2>
+
+
+                <p>
+
+                    Serviços para transformar uma
+                    necessidade de áudio em uma
+                    solução bem montada.
+
+                </p>
+
+
+            </div>
+
+
+
+            <a
+                class="text-link text-link-light"
+                href="servicos.html"
+            >
+
+                Conhecer serviços
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+
+        <div
+            class="services-grid services-v2"
+            id="servicesGrid"
+        >
+
+            <div class="empty">
+                Carregando serviços...
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     PROJETOS
+========================================================= -->
+
+<section class="projects-showcase">
+
+
+    <div class="container">
+
+
+        <div class="section-title section-title-row">
+
+
+            <div>
+
+
+                <span>
+                    Projetos reais
+                </span>
+
+
+                <h2>
+                    Veja a Max Som em ação.
+                </h2>
+
+
+                <p>
+
+                    Uma seleção visual de trabalhos
+                    e sistemas de som.
+
+                </p>
+
+
+            </div>
+
+
+
+            <a
+                class="text-link"
+                href="projetos.html"
+            >
+
+                Ver galeria
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+
+        <div
+            class="projects-grid projects-v2"
+            id="projectsGrid"
+        >
+
+            <div class="empty">
+                Carregando projetos...
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     SOBRE A MAX SOM
+========================================================= -->
+
+<section class="about-visual">
+
+
+    <div class="container about-grid">
+
+
+        <div class="about-image">
+
+
+            <img
+                src="projeto-01.png"
+                alt="Detalhe de um projeto Max Som"
+            >
+
+
+            <div class="about-image-label">
+
+                MAX SOM
+
+                <br>
+
+                <span>
+                    Qualidade em cada detalhe
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="about-copy">
+
+
+            <span class="hero-label">
+                SOBRE A MAX SOM
+            </span>
+
+
+            <h2>
+
+                Potência é importante.
+                Projeto bem pensado também.
+
+            </h2>
+
+
+            <p>
+
+                A proposta da Max Som é facilitar
+                a escolha e o atendimento para quem
+                precisa de som. Aqui, equipamentos,
+                serviços, projetos e comunicação
+                ficam reunidos em um só lugar.
+
+            </p>
+
+
+
+            <div class="about-points">
+
+
+                <div>
+
+                    <strong>
+                        01
+                    </strong>
+
+                    <span>
+                        Informação clara sobre equipamentos
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        02
+                    </strong>
+
+                    <span>
+                        Serviços sob orçamento
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        03
+                    </strong>
+
+                    <span>
+                        Atendimento pelo site e WhatsApp
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <a
+                class="btn btn-light"
+                href="atendimento.html"
+            >
+                Solicitar atendimento
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     PUBLICAÇÕES
+========================================================= -->
+
+<section>
+
+
+    <div class="container">
+
+
+        <div class="section-title section-title-row">
+
+
+            <div>
+
+
+                <span>
+                    Conteúdo
+                </span>
+
+
+                <h2>
+                    Publicações e novidades.
+                </h2>
+
+
+                <p>
+
+                    Dicas e informações publicadas
+                    pela Max Som.
+
+                </p>
+
+
+            </div>
+
+
+
+            <a
+                class="text-link"
+                href="publicacoes.html"
+            >
+
+                Ver publicações
+
+                <span>
+                    →
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+
+        <div
+            class="posts-grid posts-v2"
+            id="postsGrid"
+        >
+
+            <div class="empty">
+                Carregando publicações...
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     CTA
+========================================================= -->
+
+<section class="cta-section">
+
+
+    <div class="container cta-box">
+
+
+        <div>
+
+
+            <span class="hero-label">
+                ATENDIMENTO MAX SOM
+            </span>
+
+
+            <h2>
+
+                Já sabe o que precisa
+                ou ainda está em dúvida?
+
+            </h2>
+
+
+            <p>
+
+                Conte para a gente o que você procura
+                e receba orientação para o seu projeto.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="cta-actions">
+
+
+            <a
+                class="btn btn-light btn-large"
+                href="atendimento.html"
+            >
+                Solicitar atendimento
+            </a>
+
+
+            <a
+                class="btn btn-outline-dark btn-large"
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
+                WhatsApp
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer footer-v2">
+
+
+    <div class="container footer-content">
+
+
+        <!-- SOBRE -->
+
+        <div class="footer-column footer-brand">
+
+
+            <a
+                class="logo"
+                href="index.html"
+            >
+
+                <img
+                    src="logo-maxsom-white.png"
+                    alt="Max Som"
+                >
+
+            </a>
+
+
+            <p>
+
+                Soluções em som, equipamentos,
+                serviços e atendimento.
+
+            </p>
+
+
+            <a
+                class="footer-whatsapp"
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
+
+                WhatsApp: (65) 99626-2514
+
+            </a>
+
+
+        </div>
+
+
+
+        <!-- NAVEGAÇÃO -->
+
         <div class="footer-column">
+
+
+            <h3>
+                Navegação
+            </h3>
+
+
+            <a href="index.html">
+                Início
+            </a>
+
+
+            <a href="produtos.html">
+                Produtos
+            </a>
+
+
+            <a href="servicos.html">
+                Serviços
+            </a>
+
+
+            <a href="projetos.html">
+                Projetos
+            </a>
+
+
+            <a href="publicacoes.html">
+                Publicações
+            </a>
+
+
+            <a href="atendimento.html">
+                Atendimento
+            </a>
+
+
+        </div>
+
+
+
+        <!-- ATENDIMENTO -->
+
+        <div class="footer-column">
+
 
             <h3>
                 Atendimento
             </h3>
 
+
             <a href="atendimento.html">
                 Solicitar atendimento
             </a>
 
-            <a href="conta.html">
+
+            <a
+                href="conta.html"
+                data-logged-only
+            >
                 Minha conta
             </a>
 
-            <a href="login.html">
+
+            <a
+                href="conversas.html"
+                data-conversations-link
+                data-logged-only
+            >
+                Minhas conversas
+            </a>
+
+
+            <a
+                href="login.html"
+                data-guest-only
+            >
                 Entrar
             </a>
 
-            <a href="conversas.html">
-                Conversas
-            </a>
 
         </div>
 
 
+
+        <!-- CONTATO -->
+
         <div class="footer-column">
+
 
             <h3>
                 Contato
             </h3>
 
-            <p>
-                Telefone: +55 (65) 99626-2514
-            </p>
 
-            <p>
+            <a href="tel:+5565996262514">
+                (65) 99626-2514
+            </a>
+
+
+            <a
+                href="https://wa.me/5565996262514"
+                target="_blank"
+                rel="noopener"
+            >
                 WhatsApp: (65) 99626-2514
-            </p>
+            </a>
 
-            <p>
+
+            <a href="mailto:lojamaxsom2@gmail.com">
                 lojamaxsom2@gmail.com
-            </p>
+            </a>
+
 
         </div>
 
+
     </div>
+
 
 
     <div class="footer-bottom">
 
+
         <div class="container">
 
-            © 2026 Max Som. Todos os direitos reservados.
+            © 2026 Max Som.
+            Todos os direitos reservados.
 
         </div>
 
+
     </div>
+
 
 </footer>
 
 
+
 <!-- =========================================================
-     SUPABASE + MAIN
+     SCRIPTS
 ========================================================= -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
 
-<script src="supabase.js"></script>
-
-<script src="main.js"></script>
+<script
+    src="main.js"
+></script>
 
 
 </body>
