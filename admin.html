@@ -3,38 +3,77 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Painel Max Som</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <header>
+  <!-- =========================
+       CABEÇALHO
+  ========================== -->
+  <header class="header">
+
     <div class="container header-content">
 
-      <a class="logo" href="index.html">
-        <img src="logo-maxsom-white.png" alt="Max Som">
-      </a>
-
       <a
-        class="header-whatsapp"
-        href="https://wa.me/5565996262514"
-        target="_blank"
-        rel="noopener"
+        href="index.html"
+        class="logo-link"
       >
-        WhatsApp
+        <img
+          src="logo-maxsom-white.png"
+          alt="Max Som"
+          class="logo"
+        >
       </a>
 
-      <span class="phone">
-       +55 65 99626-2514
-      </span>
 
-      <nav>
-        <a href="index.html">Ver site</a>
-        <a href="admin.html">Painel</a>
-        <a href="conta.html">Minha conta</a>
+      <div class="header-contact">
+
+        <a
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="whatsapp-link"
+        >
+          WhatsApp
+        </a>
+
+        <span class="header-phone">
+          +55 65 99626-2514
+        </span>
+
+      </div>
+
+
+      <nav class="nav">
+
+        <a href="index.html">
+          Ver site
+        </a>
+
+        <a href="admin.html">
+          Painel
+        </a>
+
+        <a href="conta.html">
+          Minha conta
+        </a>
 
         <button
           class="btn btn-outline"
@@ -43,74 +82,122 @@
         >
           Sair
         </button>
+
       </nav>
 
     </div>
+
   </header>
 
 
+  <!-- =========================
+       CONTEÚDO
+  ========================== -->
   <main class="account-page">
 
     <div class="container">
 
-      <div class="section-title">
-        <span>Área administrativa</span>
 
-        <h1>Painel Max Som</h1>
+      <!-- TÍTULO -->
+      <div class="section-title">
+
+        <span>
+          Área administrativa
+        </span>
+
+        <h1>
+          Painel Max Som
+        </h1>
 
         <p class="muted">
-          Tudo em botões simples. O visualizador não vê esta área.
+          Gerencie as informações do site de forma simples.
         </p>
+
       </div>
 
 
+      <!-- MENSAGEM DO PAINEL -->
       <div
         id="adminMensagem"
         class="message hidden"
       ></div>
 
 
+      <!-- =========================
+           ESTRUTURA DO PAINEL
+      ========================== -->
       <div class="admin-shell">
 
-        <!-- MENU LATERAL -->
+
+        <!-- =========================
+             MENU LATERAL
+        ========================== -->
         <aside class="admin-sidebar">
 
-          <h2>Max Som</h2>
+          <h2>
+            Max Som
+          </h2>
 
           <p>
             Escolha o que deseja administrar.
           </p>
+
 
           <div class="admin-menu">
 
             <button
               class="active"
               data-panel="resumo"
+              type="button"
             >
               🏠 Resumo
             </button>
 
-            <button data-panel="produtosAdmin">
+
+            <button
+              data-panel="produtosAdmin"
+              type="button"
+            >
               📦 Produtos
             </button>
 
-            <button data-panel="servicosAdmin">
+
+            <button
+              data-panel="servicosAdmin"
+              type="button"
+            >
               🔧 Serviços
             </button>
 
-            <button data-panel="projetosAdmin">
+
+            <button
+              data-panel="projetosAdmin"
+              type="button"
+            >
               📸 Projetos
             </button>
 
-            <button data-panel="publicacoesAdmin">
+
+            <button
+              data-panel="publicacoesAdmin"
+              type="button"
+            >
               📰 Publicações
             </button>
 
-            <button data-panel="usuariosAdmin">
+
+            <button
+              data-panel="usuariosAdmin"
+              type="button"
+            >
               👥 Usuários
             </button>
 
-            <button data-panel="solicitacoesAdmin">
+
+            <button
+              data-panel="solicitacoesAdmin"
+              type="button"
+            >
               💬 Solicitações
             </button>
 
@@ -119,11 +206,15 @@
         </aside>
 
 
-        <!-- CONTEÚDO -->
+        <!-- =========================
+             CONTEÚDO DOS PAINÉIS
+        ========================== -->
         <section class="admin-content">
 
 
-          <!-- RESUMO -->
+          <!-- =========================
+               RESUMO
+          ========================== -->
           <div
             class="admin-panel active"
             id="resumo"
@@ -133,6 +224,7 @@
               class="admin-grid"
               id="adminStats"
             ></div>
+
 
             <div
               class="account-card"
@@ -144,9 +236,8 @@
               </h2>
 
               <p class="muted">
-                Use os botões ao lado para cadastrar,
-                editar ou remover informações.
-                Nada de gráficos complicados.
+                Use o menu ao lado para cadastrar,
+                editar ou remover informações do site.
               </p>
 
             </div>
@@ -154,7 +245,9 @@
           </div>
 
 
-          <!-- PRODUTOS -->
+          <!-- =========================
+               PRODUTOS
+          ========================== -->
           <div
             class="admin-panel"
             id="produtosAdmin"
@@ -167,9 +260,8 @@
               </h2>
 
               <div class="admin-help">
-                Cadastre o nome, descrição e,
-                se quiser, o link de uma imagem.
-                Sem carrinho e sem pagamento.
+                Cadastre produtos apenas para divulgação.
+                O site não possui carrinho nem venda online.
               </div>
 
 
@@ -186,7 +278,7 @@
 
                 <div class="form-group">
 
-                  <label>
+                  <label for="produtoNome">
                     Nome
                   </label>
 
@@ -200,7 +292,7 @@
 
                 <div class="form-group">
 
-                  <label>
+                  <label for="produtoModelo">
                     Modelo
                   </label>
 
@@ -213,7 +305,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="produtoDescricao">
                     Descrição
                   </label>
 
@@ -226,7 +318,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="produtoImagem">
                     Link da imagem
                   </label>
 
@@ -241,6 +333,7 @@
                 <div class="form-group">
 
                   <label>
+
                     <input
                       type="checkbox"
                       id="produtoDisponivel"
@@ -248,6 +341,7 @@
                     >
 
                     Disponível
+
                   </label>
 
                 </div>
@@ -256,12 +350,14 @@
                 <div class="form-group">
 
                   <label>
+
                     <input
                       type="checkbox"
                       id="produtoDestaque"
                     >
 
                     Destaque
+
                   </label>
 
                 </div>
@@ -275,6 +371,7 @@
                   >
                     Salvar produto
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -299,7 +396,9 @@
           </div>
 
 
-          <!-- SERVIÇOS -->
+          <!-- =========================
+               SERVIÇOS
+          ========================== -->
           <div
             class="admin-panel"
             id="servicosAdmin"
@@ -312,8 +411,8 @@
               </h2>
 
               <div class="admin-help">
-                Quando o preço variar conforme o projeto,
-                deixe o valor como
+                Quando o valor depender do projeto,
+                o serviço será apresentado como
                 <strong>Sob orçamento</strong>.
               </div>
 
@@ -331,7 +430,7 @@
 
                 <div class="form-group">
 
-                  <label>
+                  <label for="servicoNome">
                     Nome
                   </label>
 
@@ -359,7 +458,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="servicoDescricao">
                     Descrição
                   </label>
 
@@ -372,7 +471,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="servicoImagem">
                     Link da imagem
                   </label>
 
@@ -387,6 +486,7 @@
                 <div class="form-group">
 
                   <label>
+
                     <input
                       type="checkbox"
                       id="servicoAtivo"
@@ -394,6 +494,7 @@
                     >
 
                     Ativo
+
                   </label>
 
                 </div>
@@ -407,6 +508,7 @@
                   >
                     Salvar serviço
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -431,7 +533,9 @@
           </div>
 
 
-          <!-- PROJETOS -->
+          <!-- =========================
+               PROJETOS
+          ========================== -->
           <div
             class="admin-panel"
             id="projetosAdmin"
@@ -457,7 +561,7 @@
 
                 <div class="form-group">
 
-                  <label>
+                  <label for="projetoTitulo">
                     Título
                   </label>
 
@@ -471,7 +575,7 @@
 
                 <div class="form-group">
 
-                  <label>
+                  <label for="projetoCategoria">
                     Categoria
                   </label>
 
@@ -484,7 +588,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="projetoDescricao">
                     Descrição
                   </label>
 
@@ -497,7 +601,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="projetoImagem">
                     Link da imagem
                   </label>
 
@@ -512,6 +616,7 @@
                 <div class="form-group">
 
                   <label>
+
                     <input
                       type="checkbox"
                       id="projetoPublicado"
@@ -519,6 +624,7 @@
                     >
 
                     Publicado
+
                   </label>
 
                 </div>
@@ -532,6 +638,7 @@
                   >
                     Salvar projeto
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -556,7 +663,9 @@
           </div>
 
 
-          <!-- PUBLICAÇÕES -->
+          <!-- =========================
+               PUBLICAÇÕES
+          ========================== -->
           <div
             class="admin-panel"
             id="publicacoesAdmin"
@@ -582,7 +691,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="publicacaoTitulo">
                     Título
                   </label>
 
@@ -596,7 +705,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="publicacaoResumo">
                     Resumo
                   </label>
 
@@ -609,7 +718,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="publicacaoConteudo">
                     Conteúdo
                   </label>
 
@@ -622,7 +731,7 @@
 
                 <div class="form-group full">
 
-                  <label>
+                  <label for="publicacaoImagem">
                     Link da imagem
                   </label>
 
@@ -637,6 +746,7 @@
                 <div class="form-group">
 
                   <label>
+
                     <input
                       type="checkbox"
                       id="publicacaoPublicado"
@@ -644,6 +754,7 @@
                     >
 
                     Publicado
+
                   </label>
 
                 </div>
@@ -657,6 +768,7 @@
                   >
                     Salvar publicação
                   </button>
+
 
                   <button
                     class="btn btn-outline"
@@ -681,7 +793,9 @@
           </div>
 
 
-          <!-- USUÁRIOS -->
+          <!-- =========================
+               USUÁRIOS
+          ========================== -->
           <div
             class="admin-panel"
             id="usuariosAdmin"
@@ -693,6 +807,12 @@
                 Usuários e pedidos de administrador
               </h2>
 
+              <p class="muted">
+                Consulte os usuários cadastrados e gerencie
+                as solicitações de acesso administrativo.
+              </p>
+
+
               <div id="adminUsuariosLista">
                 Carregando...
               </div>
@@ -702,7 +822,9 @@
           </div>
 
 
-          <!-- SOLICITAÇÕES E CONVERSAS -->
+          <!-- =========================
+               SOLICITAÇÕES E CONVERSAS
+          ========================== -->
           <div
             class="admin-panel"
             id="solicitacoesAdmin"
@@ -711,11 +833,17 @@
             <div class="account-layout">
 
 
+              <!-- SOLICITAÇÕES -->
               <div class="account-card">
 
                 <h2>
                   Solicitações de serviço
                 </h2>
+
+                <p class="muted">
+                  Solicitações enviadas pelos clientes.
+                </p>
+
 
                 <div id="adminSolicitacoes">
                   Carregando...
@@ -724,18 +852,23 @@
               </div>
 
 
+              <!-- CONVERSAS -->
               <div class="account-card">
 
                 <h2>
                   Conversas
                 </h2>
 
+                <p class="muted">
+                  Atendimentos e conversas com clientes.
+                </p>
+
+
                 <div id="adminConversas">
                   Carregando...
                 </div>
 
               </div>
-
 
             </div>
 
@@ -751,8 +884,135 @@
   </main>
 
 
+  <!-- =========================
+       RODAPÉ
+  ========================== -->
+  <footer class="footer footer-v2">
+
+    <div class="container">
+
+      <div class="footer-grid">
+
+
+        <!-- SOBRE -->
+        <div class="footer-column">
+
+          <img
+            src="logo-maxsom-white.png"
+            alt="Max Som"
+            class="footer-logo"
+          >
+
+          <p>
+            Painel administrativo da Max Som
+            para gerenciamento do site.
+          </p>
+
+        </div>
+
+
+        <!-- NAVEGAÇÃO -->
+        <div class="footer-column">
+
+          <h3>
+            Navegação
+          </h3>
+
+          <a href="index.html">
+            Ver site
+          </a>
+
+          <a href="produtos.html">
+            Produtos
+          </a>
+
+          <a href="servicos.html">
+            Serviços
+          </a>
+
+          <a href="projetos.html">
+            Projetos
+          </a>
+
+          <a href="publicacoes.html">
+            Publicações
+          </a>
+
+        </div>
+
+
+        <!-- ADMINISTRAÇÃO -->
+        <div class="footer-column">
+
+          <h3>
+            Administração
+          </h3>
+
+          <a href="admin.html">
+            Painel
+          </a>
+
+          <a href="conta.html">
+            Minha conta
+          </a>
+
+          <a href="conversas.html">
+            Minhas conversas
+          </a>
+
+        </div>
+
+
+        <!-- CONTATO -->
+        <div class="footer-column">
+
+          <h3>
+            Contato
+          </h3>
+
+          <a href="tel:+5565996262514">
+            +55 65 99626-2514
+          </a>
+
+          <a
+            href="https://wa.me/5565996262514"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp: (65) 99626-2514
+          </a>
+
+          <a href="mailto:lojamaxsom2@gmail.com">
+            lojamaxsom2@gmail.com
+          </a>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <p>
+          © 2026 Max Som. Todos os direitos reservados.
+        </p>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =========================
+       SCRIPTS
+  ========================== -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="supabase.js"></script>
+
   <script src="main.js"></script>
 
 </body>
