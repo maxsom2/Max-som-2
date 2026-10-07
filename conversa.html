@@ -1,9 +1,8 @@
- <!-- =========================
-       CONVERSA
-  ========================== -->
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -13,56 +12,78 @@
 
   <title>Conversa | Max Som</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- =========================
-       CABEÇALHO
-  ========================== -->
 
-  <header class="header">
+  <!-- =========================================================
+       CABEÇALHO
+  ========================================================== -->
+
+  <header>
 
     <div class="container header-content">
 
+
+      <!-- LOGO -->
+
       <a
+        class="logo"
         href="index.html"
-        class="logo-link"
+        aria-label="Max Som - Início"
       >
+
         <img
           src="logo-maxsom-white.png"
           alt="Max Som"
-          class="logo"
         >
+
       </a>
 
-      <div class="header-contact">
 
-        <a
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="whatsapp-link"
-        >
-          WhatsApp
-        </a>
+      <!-- WHATSAPP -->
 
-        <span class="header-phone">
-          +55 65 99626-2514
-        </span>
+      <a
+        class="header-whatsapp"
+        href="https://wa.me/5565996262514"
+        target="_blank"
+        rel="noopener"
+      >
+        WhatsApp
+      </a>
 
-      </div>
 
-      <nav class="nav">
+      <span class="phone">
+        65 99626-2514
+      </span>
+
+
+      <!-- MENU -->
+
+      <nav>
 
         <a href="index.html">
           Início
@@ -88,12 +109,249 @@
           Atendimento
         </a>
 
+
         <a
           href="admin.html"
           data-admin-only
         >
           ⚙ Painel
         </a>
+
+
+        <a
+          href="conta.html"
+          data-logged-only
+        >
+          Minha conta
+        </a>
+
+
+        <a
+          href="conversas.html"
+          data-conversations-link
+          data-logged-only
+          class="active"
+        >
+          Minhas conversas
+        </a>
+
+
+        <a
+          href="login.html"
+          data-guest-only
+        >
+          Entrar
+        </a>
+
+
+        <a
+          href="cadastro.html"
+          data-guest-only
+        >
+          Criar conta
+        </a>
+
+
+        <button
+          class="btn btn-outline"
+          data-logout
+          data-logged-only
+          type="button"
+        >
+          Sair
+        </button>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =========================================================
+       CONTEÚDO
+  ========================================================== -->
+
+  <main class="account-page">
+
+    <div class="container">
+
+
+      <!-- VOLTAR -->
+
+      <div class="actions">
+
+        <a
+          href="conversas.html"
+          class="btn btn-outline"
+        >
+          ← Voltar para conversas
+        </a>
+
+      </div>
+
+
+      <!-- =======================================================
+           CONVERSA
+      ======================================================== -->
+
+      <section class="section">
+
+        <div
+          id="conversaContainer"
+          class="conversation-card"
+        >
+
+          <div class="empty">
+            Carregando conversa...
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =======================================================
+           AJUDA
+      ======================================================== -->
+
+      <section class="section">
+
+        <div class="account-card">
+
+          <span class="account-label">
+            Atendimento
+          </span>
+
+          <h2>
+            Precisa de ajuda?
+          </h2>
+
+          <p class="muted">
+            Você também pode entrar em contato diretamente
+            com a Max Som pelo WhatsApp.
+          </p>
+
+
+          <div class="actions">
+
+            <a
+              href="atendimento.html"
+              class="btn btn-primary"
+            >
+              Novo atendimento
+            </a>
+
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline"
+            >
+              WhatsApp
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <!-- =========================================================
+       RODAPÉ
+  ========================================================== -->
+
+  <footer class="footer footer-v2">
+
+    <div class="container footer-content">
+
+
+      <!-- SOBRE -->
+
+      <div class="footer-column footer-brand">
+
+        <a
+          class="logo"
+          href="index.html"
+        >
+
+          <img
+            src="logo-maxsom-white.png"
+            alt="Max Som"
+          >
+
+        </a>
+
+        <p>
+          Soluções em som, equipamentos,
+          serviços e atendimento.
+        </p>
+
+
+        <a
+          class="footer-whatsapp"
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
+
+      </div>
+
+
+
+      <!-- NAVEGAÇÃO -->
+
+      <div class="footer-column">
+
+        <h3>
+          Navegação
+        </h3>
+
+        <a href="index.html">
+          Início
+        </a>
+
+        <a href="produtos.html">
+          Produtos
+        </a>
+
+        <a href="servicos.html">
+          Serviços
+        </a>
+
+        <a href="projetos.html">
+          Projetos
+        </a>
+
+        <a href="publicacoes.html">
+          Publicações
+        </a>
+
+        <a href="atendimento.html">
+          Atendimento
+        </a>
+
+      </div>
+
+
+
+      <!-- CONTA -->
+
+      <div class="footer-column">
+
+        <h3>
+          Minha conta
+        </h3>
 
         <a
           href="conta.html"
@@ -110,189 +368,54 @@
           Minhas conversas
         </a>
 
-        <button
-          type="button"
-          class="btn btn-outline"
-          data-logout
-          data-logged-only
+        <a
+          href="admin.html"
+          data-admin-only
         >
-          Sair
-        </button>
+          ⚙ Painel
+        </a>
 
-      </nav>
+      </div>
+
+
+
+      <!-- CONTATO -->
+
+      <div class="footer-column">
+
+        <h3>
+          Contato
+        </h3>
+
+        <a href="tel:+5565996262514">
+          +55 65 99626-2514
+        </a>
+
+        <a
+          href="https://wa.me/5565996262514"
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp: (65) 99626-2514
+        </a>
+
+        <a href="mailto:lojamaxsom2@gmail.com">
+          lojamaxsom2@gmail.com
+        </a>
+
+      </div>
 
     </div>
 
-  </header>
 
 
-  <!-- =========================
-       CONTEÚDO PRINCIPAL
-  ========================== -->
+    <!-- COPYRIGHT -->
 
-  <main>
-
-    <section class="section">
+    <div class="footer-bottom">
 
       <div class="container">
 
-        <div
-          id="conversaContainer"
-          class="account-layout"
-        >
-
-          <div class="account-card">
-
-            <div class="section-heading">
-
-              <span class="eyebrow">
-                Atendimento
-              </span>
-
-              <h1>
-                Conversa
-              </h1>
-
-              <p class="muted">
-                Carregando conversa...
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =========================
-       RODAPÉ
-  ========================== -->
-
-  <footer class="footer footer-v2">
-
-    <div class="container">
-
-      <div class="footer-grid">
-
-        <!-- Sobre -->
-
-        <div class="footer-column">
-
-          <img
-            src="logo-maxsom-white.png"
-            alt="Max Som"
-            class="footer-logo"
-          >
-
-          <p>
-            Soluções em som, equipamentos e atendimento
-            para diferentes projetos.
-          </p>
-
-        </div>
-
-
-        <!-- Navegação -->
-
-        <div class="footer-column">
-
-          <h3>
-            Navegação
-          </h3>
-
-          <a href="index.html">
-            Início
-          </a>
-
-          <a href="produtos.html">
-            Produtos
-          </a>
-
-          <a href="servicos.html">
-            Serviços
-          </a>
-
-          <a href="projetos.html">
-            Projetos
-          </a>
-
-          <a href="publicacoes.html">
-            Publicações
-          </a>
-
-        </div>
-
-
-        <!-- Atendimento -->
-
-        <div class="footer-column">
-
-          <h3>
-            Atendimento
-          </h3>
-
-          <a href="atendimento.html">
-            Solicitar atendimento
-          </a>
-
-          <a
-            href="conversas.html"
-            data-conversations-link
-            data-logged-only
-          >
-            Minhas conversas
-          </a>
-
-          <a
-            href="conta.html"
-            data-logged-only
-          >
-            Minha conta
-          </a>
-
-        </div>
-
-
-        <!-- Contato -->
-
-        <div class="footer-column">
-
-          <h3>
-            Contato
-          </h3>
-
-          <a href="tel:+5565996262514">
-            +55 65 99626-2514
-          </a>
-
-          <a
-            href="https://wa.me/5565996262514"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp: (65) 99626-2514
-          </a>
-
-          <a href="mailto:lojamaxsom2@gmail.com">
-            lojamaxsom2@gmail.com
-          </a>
-
-        </div>
-
-      </div>
-
-
-      <div class="footer-bottom">
-
-        <p>
-          © 2026 Max Som. Todos os direitos reservados.
-        </p>
+        © 2026 Max Som. Todos os direitos reservados.
 
       </div>
 
@@ -301,16 +424,16 @@
   </footer>
 
 
-  <!-- =========================
+
+  <!-- =========================================================
        SCRIPTS
-  ========================== -->
+  ========================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="supabase.js"></script>
-
   <script src="main.js"></script>
 
-</body>
-</html>
 
+</body>
+
+</html>
