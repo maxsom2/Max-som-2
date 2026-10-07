@@ -42,7 +42,9 @@ const TABLES = {
   CONVERSAS: "conversas",
   MENSAGENS: "mensagens",
   ARQUIVOS: "arquivos",
-  NOTIFICACOES: "notificacoes"
+  NOTIFICACOES: "notificacoes",
+  PROJETOS: "projetos",
+  PUBLICACOES: "publicacoes"
 };
 
 
@@ -65,6 +67,7 @@ function qs(...selectors) {
       .find(Boolean) || null
   );
 }
+
 
 function esc(value) {
   return String(value ?? "")
@@ -180,12 +183,10 @@ async function ensureProfile() {
     return null;
   }
 
-  currentProfile = data;
+  currentProfile = data || null;
 
-  return data;
+  return currentProfile;
 }
-
-
 /* =========================================================
    6. NAVEGAÇÃO
    ========================================================= */
@@ -267,15 +268,23 @@ async function updateNav() {
   }
 
   logoutLinks.forEach((element) => {
-    element.style.display = profile ? "" : "none";
+
+    element.style.display =
+      profile ? "" : "none";
 
     if (!element.dataset.logoutBound) {
+
       element.dataset.logoutBound = "true";
 
-      element.addEventListener("click", (event) => {
-        event.preventDefault();
-        logout();
-      });
+      element.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          logout();
+        }
+      );
     }
   });
 }
@@ -863,58 +872,36 @@ function bindUserActions() {
 
 async function account() {
 
-  const container =
-    document.querySelector(
-      "#accountContent"
-    );
+  const legacyContainer =
+    document.querySelector("#accountContent");
 
-  if (!container) return;
+  const accountPage =
+    document.querySelector(".account-page") ||
+    document.querySelector("[data-account-page]");
 
-
-  const {
-    data: { user },
-    error
-  } =
-    await supabase.auth.getUser();
+  if (!legacyContainer && !accountPage) return;
 
 
-  if (error || !user) {
+  const profile =
+    await ensureProfile();
 
-    container.innerHTML = `
-      <p>Você precisa estar logado.</p>
-    `;
+
+  if (!profile || !currentUser) {
+
+    if (legacyContainer) {
+
+      legacyContainer.innerHTML = `
+        <p>Você precisa estar logado.</p>
+      `;
+    }
 
     return;
   }
 
 
-  const {
-    data: profile,
-    error: profileError
-  } =
-    await supabase
-      .from(TABLES.USUARIO)
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
-
-
-  if (profileError) {
-
-    console.error(
-      "Erro ao carregar conta:",
-      profileError
-    );
-  }
-
-
-  currentUser = user;
-  currentProfile = profile;
-
-
   const type =
     normalizeType(
-      profile?.tipo_usuario ||
+      profile.tipo_usuario ||
       "cliente"
     );
 
@@ -929,7 +916,8 @@ async function account() {
       "Administrador";
 
   } else if (
-    type === "solicitante_admin"
+    type ===
+    "solicitante_admin"
   ) {
 
     typeLabel =
@@ -937,80 +925,135 @@ async function account() {
   }
 
 
-  container.innerHTML = `
+  /*
+   * A conta atual usa elementos já existentes
+   * no HTML. Não substituímos o conteúdo da página,
+   * para não apagar as solicitações e conversas.
+   */
 
-    <div class="account-card">
+  const title =
+    document.querySelector(
+      "#contaNomeTitulo"
+    );
 
-      <div class="account-header">
+  const name =
+    document.querySelector(
+      "#contaNome"
+    );
 
-        <div>
+  const email =
+    document.querySelector(
+      "#contaEmail"
+    );
 
-          <span class="account-label">
-            Minha conta
-          </span>
+  const phone =
+    document.querySelector(
+      "#contaTelefone"
+    );
 
-          <h2>
-            ${esc(
-              profile?.nome ||
-              "Usuário"
-            )}
-          </h2>
+  const typeElement =
+    document.querySelector(
+      "#contaTipo"
+    );
+
+
+  const displayName =
+    profile.nome ||
+    currentUser.email ||
+    "Usuário";
+
+
+  if (title) {
+    title.textContent =
+      displayName;
+  }
+
+  if (name) {
+    name.textContent =
+      displayName;
+  }
+
+  if (email) {
+    email.textContent =
+      currentUser.email ||
+      "-";
+  }
+
+  if (phone) {
+
+    phone.textContent =
+      profile.telefone ||
+      profile.whatsapp ||
+      "-";
+  }
+
+  if (typeElement) {
+
+    typeElement.textContent =
+      typeLabel;
+  }
+
+
+  /* Compatibilidade com versões antigas da conta */
+
+  if (legacyContainer) {
+
+    legacyContainer.innerHTML = `
+      <div class="account-card">
+
+        <div class="account-header">
+
+          <div>
+
+            <span class="account-label">
+              Minha conta
+            </span>
+
+            <h2>
+              ${esc(displayName)}
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="account-info">
+
+          <p>
+            <strong>E-mail</strong>
+            ${esc(currentUser.email || "")}
+          </p>
+
+          <p>
+            <strong>Tipo de conta</strong>
+            ${esc(typeLabel)}
+          </p>
+
+        </div>
+
+
+        <div class="account-actions">
+
+          <a
+            href="conversas.html"
+            class="btn-primary"
+          >
+            Minhas conversas
+          </a>
+
+          <button
+            id="logoutButton"
+            class="btn-secondary"
+            type="button"
+          >
+            Sair
+          </button>
 
         </div>
 
       </div>
-
-
-      <div class="account-info">
-
-        <p>
-          <strong>E-mail</strong>
-          ${esc(user.email || "")}
-        </p>
-
-        <p>
-          <strong>Tipo de conta</strong>
-          ${esc(typeLabel)}
-        </p>
-
-      </div>
-
-
-      <div class="account-actions">
-
-        <a
-          href="conversas.html"
-          class="btn-primary"
-        >
-          Minhas conversas
-        </a>
-
-        <button
-          id="logoutButton"
-          class="btn-secondary"
-        >
-          Sair
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  const logoutButton =
-    document.querySelector(
-      "#logoutButton"
-    );
-
-
-  if (logoutButton) {
-
-    logoutButton.addEventListener(
-      "click",
-      logout
-    );
+    `;
   }
 }
 
@@ -1081,53 +1124,60 @@ async function requestAdminAccess() {
 function setupAdminRequestButton() {
 
   const button =
-    document.querySelector(
-      "#requestAdminButton"
+    qs(
+      "#requestAdminButton",
+      "#btnAdminRequest",
+      "[data-request-admin]"
     );
-
 
   if (!button) return;
 
+  if (button.dataset.bound === "true") return;
+
+  button.dataset.bound = "true";
 
   button.addEventListener(
     "click",
     requestAdminAccess
   );
 }
+
+
 /* =========================================================
    17. CONVERSAS
    ========================================================= */
 
+/*
+  A privacidade das conversas não depende do JavaScript.
+  O Supabase RLS deve permitir somente que participantes
+  autorizados leiam cada conversa e suas mensagens.
+*/
+
 async function loadConversations() {
 
   const container =
-    document.querySelector(
+    qs(
+      "#conversasLista",
+      "#conversationsList",
       "#conversationList"
     );
 
   if (!container) return;
 
 
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
+  const profile =
+    await ensureProfile();
 
-
-  if (userError || !user) {
+  if (!profile || !currentUser) {
 
     container.innerHTML = `
       <div class="empty">
-        Você precisa estar logado para visualizar suas conversas.
+        Faça login para visualizar suas conversas.
       </div>
     `;
 
     return;
   }
-
-
-  currentUser = user;
 
 
   const {
@@ -1136,12 +1186,17 @@ async function loadConversations() {
   } =
     await supabase
       .from(TABLES.CONVERSAS)
-      .select("*")
-      .or(
-        `cliente_id.eq.${user.id},funcionario_id.eq.${user.id}`
-      )
+      .select(`
+        id,
+        cliente_id,
+        funcionario_id,
+        assunto,
+        status,
+        criado_em,
+        atualizado_em
+      `)
       .order(
-        "created_at",
+        "atualizado_em",
         {
           ascending: false
         }
@@ -1168,8 +1223,17 @@ async function loadConversations() {
   if (!data?.length) {
 
     container.innerHTML = `
-      <div class="empty">
-        Você ainda não possui conversas.
+      <div class="empty-state">
+
+        <h3>
+          Nenhuma conversa ainda
+        </h3>
+
+        <p>
+          Quando você iniciar um atendimento,
+          sua conversa aparecerá aqui.
+        </p>
+
       </div>
     `;
 
@@ -1179,64 +1243,65 @@ async function loadConversations() {
 
   container.innerHTML =
     data
-      .map((conversation) => {
-
-        const title =
-          conversation.titulo ||
-          conversation.assunto ||
-          "Atendimento";
-
-
-        const status =
-          conversation.status ||
-          "aberta";
-
-
-        return `
+      .map(
+        (conversation) => `
 
           <a
-            class="conversation-card"
-            href="atendimento.html?conversa=${encodeURIComponent(
+            href="conversa.html?id=${encodeURIComponent(
               conversation.id
             )}"
+            class="conversation-card"
           >
 
-            <div>
+            <div class="conversation-card-content">
 
-              <strong>
-                ${esc(title)}
-              </strong>
+              <div>
 
-              <p>
-                ${esc(status)}
-              </p>
+                <h3>
+                  ${esc(
+                    conversation.assunto ||
+                    "Atendimento Max Som"
+                  )}
+                </h3>
+
+                <span>
+                  ${esc(
+                    conversation.status ||
+                    "aberta"
+                  )}
+                </span>
+
+              </div>
+
+
+              <time>
+                ${esc(
+                  formatDateTime(
+                    conversation.atualizado_em ||
+                    conversation.criado_em
+                  )
+                )}
+              </time>
 
             </div>
 
-
-            <span>
-              ${formatDate(
-                conversation.created_at
-              )}
-            </span>
-
           </a>
 
-        `;
-      })
+        `
+      )
       .join("");
 }
-
-
 /* =========================================================
-   18. CARREGAR UMA CONVERSA
+   18. CONVERSA INDIVIDUAL
    ========================================================= */
 
 async function loadConversation() {
 
   const container =
-    document.querySelector(
-      "#chatMessages"
+    qs(
+      "#conversaContainer",
+      "#conversationContainer",
+      "#conversa"
     );
 
   if (!container) return;
@@ -1247,17 +1312,23 @@ async function loadConversation() {
       window.location.search
     );
 
-
   const conversationId =
-    params.get("conversa") ||
-    params.get("conversation");
+    params.get("id");
 
 
   if (!conversationId) {
 
     container.innerHTML = `
-      <div class="empty">
-        Nenhuma conversa selecionada.
+      <div class="empty-state">
+
+        <h3>
+          Conversa não encontrada
+        </h3>
+
+        <p>
+          Nenhuma conversa foi selecionada.
+        </p>
+
       </div>
     `;
 
@@ -1265,49 +1336,66 @@ async function loadConversation() {
   }
 
 
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
+  const profile =
+    await ensureProfile();
 
 
-  if (userError || !user) {
+  if (!profile || !currentUser) {
 
     container.innerHTML = `
-      <div class="empty">
-        Você precisa estar logado.
+      <div class="empty-state">
+
+        <h3>
+          Faça login
+        </h3>
+
+        <p>
+          Você precisa estar logado para acessar esta conversa.
+        </p>
+
       </div>
     `;
 
     return;
   }
-
-
-  currentUser = user;
 
 
   const {
     data: conversation,
-    error: conversationError
+    error
   } =
     await supabase
       .from(TABLES.CONVERSAS)
-      .select("*")
-      .eq("id", conversationId)
+      .select(`
+        id,
+        cliente_id,
+        funcionario_id,
+        assunto,
+        status,
+        criado_em,
+        atualizado_em
+      `)
+      .eq(
+        "id",
+        conversationId
+      )
       .maybeSingle();
 
 
-  if (conversationError) {
+  if (error) {
 
     console.error(
-      "Erro ao carregar conversa:",
-      conversationError
+      "Erro ao buscar conversa:",
+      error
     );
 
     container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar a conversa.
+      <div class="empty-state">
+
+        <h3>
+          Erro ao carregar conversa
+        </h3>
+
       </div>
     `;
 
@@ -1318,8 +1406,12 @@ async function loadConversation() {
   if (!conversation) {
 
     container.innerHTML = `
-      <div class="empty">
-        Conversa não encontrada ou sem permissão de acesso.
+      <div class="empty-state">
+
+        <h3>
+          Conversa não encontrada
+        </h3>
+
       </div>
     `;
 
@@ -1327,17 +1419,24 @@ async function loadConversation() {
   }
 
 
-  const allowed =
-    conversation.cliente_id === user.id ||
-    conversation.funcionario_id === user.id ||
-    isAdmin(currentProfile);
+  const participant =
+    conversation.cliente_id === currentUser.id ||
+    conversation.funcionario_id === currentUser.id;
 
 
-  if (!allowed) {
+  if (!participant && !isAdmin(profile)) {
 
     container.innerHTML = `
-      <div class="empty">
-        Você não possui acesso a esta conversa.
+      <div class="empty-state">
+
+        <h3>
+          Acesso não permitido
+        </h3>
+
+        <p>
+          Você não participa desta conversa.
+        </p>
+
       </div>
     `;
 
@@ -1345,19 +1444,68 @@ async function loadConversation() {
   }
 
 
-  const title =
-    document.querySelector(
-      "#conversationTitle"
-    );
+  container.innerHTML = `
+
+    <div class="conversation-header">
+
+      <div>
+
+        <a
+          href="conversas.html"
+          class="conversation-back"
+        >
+          ← Voltar
+        </a>
+
+        <h1>
+          ${esc(
+            conversation.assunto ||
+            "Atendimento Max Som"
+          )}
+        </h1>
+
+        <span class="conversation-status">
+          ${esc(
+            conversation.status ||
+            "aberta"
+          )}
+        </span>
+
+      </div>
+
+    </div>
 
 
-  if (title) {
+    <div
+      id="mensagensLista"
+      class="messages-list"
+    ></div>
 
-    title.textContent =
-      conversation.titulo ||
-      conversation.assunto ||
-      "Atendimento";
-  }
+
+    <form
+      id="mensagemForm"
+      class="message-form"
+    >
+
+      <textarea
+        id="mensagemConteudo"
+        name="mensagem"
+        rows="3"
+        placeholder="Digite sua mensagem..."
+        required
+      ></textarea>
+
+
+      <button
+        type="submit"
+        class="btn-primary"
+      >
+        Enviar mensagem
+      </button>
+
+    </form>
+
+  `;
 
 
   await loadMessages(
@@ -1380,23 +1528,13 @@ async function loadMessages(
 ) {
 
   const container =
-    document.querySelector(
-      "#chatMessages"
+    qs(
+      "#mensagensLista",
+      "#messagesList",
+      "#messagesContainer"
     );
 
   if (!container) return;
-
-
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
-
-
-  if (userError || !user) {
-    return;
-  }
 
 
   const {
@@ -1405,13 +1543,20 @@ async function loadMessages(
   } =
     await supabase
       .from(TABLES.MENSAGENS)
-      .select("*")
+      .select(`
+        id,
+        conversa_id,
+        remetente_id,
+        conteudo,
+        lida,
+        criado_em
+      `)
       .eq(
         "conversa_id",
         conversationId
       )
       .order(
-        "created_at",
+        "criado_em",
         {
           ascending: true
         }
@@ -1438,8 +1583,12 @@ async function loadMessages(
   if (!data?.length) {
 
     container.innerHTML = `
-      <div class="empty">
-        Nenhuma mensagem ainda.
+      <div class="empty-state">
+
+        <p>
+          Nenhuma mensagem ainda.
+        </p>
+
       </div>
     `;
 
@@ -1449,42 +1598,46 @@ async function loadMessages(
 
   container.innerHTML =
     data
-      .map((message) => {
+      .map(
+        (message) => {
 
-        const mine =
-          message.usuario_id === user.id ||
-          message.autor_id === user.id;
-
-
-        const text =
-          message.mensagem ||
-          message.conteudo ||
-          message.texto ||
-          "";
+          const own =
+            message.remetente_id ===
+            currentUser?.id;
 
 
-        return `
+          return `
 
-          <div
-            class="chat-message ${
-              mine ? "mine" : ""
-            }"
-          >
+            <div
+              class="
+                message
+                ${own ? "message-own" : "message-other"}
+              "
+            >
 
-            <div>
-              ${esc(text)}
+              <div class="message-bubble">
+
+                <p>
+                  ${esc(
+                    message.conteudo
+                  )}
+                </p>
+
+                <time>
+                  ${esc(
+                    formatDateTime(
+                      message.criado_em
+                    )
+                  )}
+                </time>
+
+              </div>
+
             </div>
 
-            <small>
-              ${formatDateTime(
-                message.created_at
-              )}
-            </small>
-
-          </div>
-
-        `;
-      })
+          `;
+        }
+      )
       .join("");
 
 
@@ -1494,7 +1647,7 @@ async function loadMessages(
 
 
 /* =========================================================
-   20. FORMULÁRIO DE MENSAGEM
+   20. ENVIO DE MENSAGEM
    ========================================================= */
 
 function setupMessageForm(
@@ -1503,21 +1656,23 @@ function setupMessageForm(
 
   const form =
     qs(
-      "#messageForm",
-      "#formMensagem"
+      "#mensagemForm",
+      "#messageForm"
     );
 
   if (!form) return;
 
 
   if (
-    form.dataset.bound === "true"
+    form.dataset.bound ===
+    conversationId
   ) {
     return;
   }
 
 
-  form.dataset.bound = "true";
+  form.dataset.bound =
+    conversationId;
 
 
   form.addEventListener(
@@ -1529,30 +1684,21 @@ function setupMessageForm(
 
       const input =
         qs(
-          "#messageInput",
-          "#mensagem",
-          "#textoMensagem"
+          "#mensagemConteudo",
+          "#messageContent"
         );
 
 
-      if (!input) return;
+      const content =
+        input?.value.trim();
 
 
-      const text =
-        input.value.trim();
+      if (!content) {
+        return;
+      }
 
 
-      if (!text) return;
-
-
-      const {
-        data: { user },
-        error: userError
-      } =
-        await supabase.auth.getUser();
-
-
-      if (userError || !user) {
+      if (!currentUser) {
 
         alert(
           "Você precisa estar logado."
@@ -1562,18 +1708,15 @@ function setupMessageForm(
       }
 
 
-      const messageData = {
+      const button =
+        form.querySelector(
+          "button[type='submit']"
+        );
 
-        conversa_id:
-          conversationId,
 
-        usuario_id:
-          user.id,
-
-        mensagem:
-          text
-
-      };
+      if (button) {
+        button.disabled = true;
+      }
 
 
       const {
@@ -1581,9 +1724,21 @@ function setupMessageForm(
       } =
         await supabase
           .from(TABLES.MENSAGENS)
-          .insert(
-            messageData
-          );
+          .insert({
+
+            conversa_id:
+              conversationId,
+
+            remetente_id:
+              currentUser.id,
+
+            conteudo:
+              content,
+
+            lida:
+              false
+
+          });
 
 
       if (error) {
@@ -1597,47 +1752,43 @@ function setupMessageForm(
           "Não foi possível enviar a mensagem."
         );
 
-        return;
+      } else {
+
+        input.value = "";
+
+        await loadMessages(
+          conversationId
+        );
       }
 
 
-      input.value = "";
-
-
-      await loadMessages(
-        conversationId
-      );
+      if (button) {
+        button.disabled = false;
+      }
     }
   );
 }
 
 
 /* =========================================================
-   21. NOTIFICAÇÕES
+   21. CRIAR CONVERSA
    ========================================================= */
 
-async function loadNotifications() {
+async function createConversation(
+  assunto = "Atendimento Max Som"
+) {
 
-  const container =
-    document.querySelector(
-      "#notificationsList"
+  const profile =
+    await ensureProfile();
+
+
+  if (!profile || !currentUser) {
+
+    alert(
+      "Você precisa estar logado para iniciar uma conversa."
     );
 
-  if (!container) return;
-
-
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
-
-
-  if (userError || !user) {
-
-    container.innerHTML = "";
-
-    return;
+    return null;
   }
 
 
@@ -1646,372 +1797,184 @@ async function loadNotifications() {
     error
   } =
     await supabase
-      .from(TABLES.NOTIFICACOES)
-      .select("*")
-      .eq(
-        "usuario_id",
-        user.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+      .from(TABLES.CONVERSAS)
+      .insert({
 
+        cliente_id:
+          currentUser.id,
 
-  if (error) {
+        assunto:
+          assunto,
 
-    console.error(
-      "Erro ao carregar notificações:",
-      error
-    );
+        status:
+          "aberta"
 
-    return;
-  }
-
-
-  if (!data?.length) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Nenhuma notificação.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    data
-      .map((notification) => {
-
-        const title =
-          notification.titulo ||
-          "Notificação";
-
-
-        const message =
-          notification.mensagem ||
-          notification.conteudo ||
-          "";
-
-
-        const read =
-          notification.lida === true;
-
-
-        return `
-
-          <div
-            class="notification-card ${
-              read ? "read" : "unread"
-            }"
-          >
-
-            <div>
-
-              <strong>
-                ${esc(title)}
-              </strong>
-
-              <p>
-                ${esc(message)}
-              </p>
-
-            </div>
-
-            <small>
-              ${formatDateTime(
-                notification.created_at
-              )}
-            </small>
-
-          </div>
-
-        `;
       })
-      .join("");
-}
-
-
-/* =========================================================
-   22. MARCAR NOTIFICAÇÃO COMO LIDA
-   ========================================================= */
-
-async function markNotificationAsRead(
-  notificationId
-) {
-
-  if (!notificationId) return;
-
-
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
-
-
-  if (userError || !user) {
-    return;
-  }
-
-
-  const {
-    error
-  } =
-    await supabase
-      .from(TABLES.NOTIFICACOES)
-      .update({
-        lida: true
-      })
-      .eq(
-        "id",
-        notificationId
-      )
-      .eq(
-        "usuario_id",
-        user.id
-      );
+      .select()
+      .single();
 
 
   if (error) {
 
     console.error(
-      "Erro ao marcar notificação:",
-      error
-    );
-
-    return;
-  }
-
-
-  await loadNotifications();
-}
-
-
-/* =========================================================
-   23. SOLICITAÇÃO DE SERVIÇO
-   ========================================================= */
-
-async function createServiceRequest(
-  serviceId = null
-) {
-
-  const form =
-    qs(
-      "#serviceRequestForm",
-      "#formSolicitacao",
-      "#requestForm"
-    );
-
-
-  if (!form) return;
-
-
-  const {
-    data: { user },
-    error: userError
-  } =
-    await supabase.auth.getUser();
-
-
-  if (userError || !user) {
-
-    alert(
-      "Você precisa estar logado para solicitar atendimento."
-    );
-
-    window.location.href =
-      "login.html";
-
-    return;
-  }
-
-
-  const nome =
-    qs(
-      "#requestNome",
-      "#nomeSolicitante"
-    )?.value?.trim() || "";
-
-
-  const telefone =
-    qs(
-      "#requestTelefone",
-      "#telefone"
-    )?.value?.trim() || "";
-
-
-  const descricao =
-    qs(
-      "#requestDescricao",
-      "#descricao",
-      "#mensagem"
-    )?.value?.trim() || "";
-
-
-  const dataSolicitada =
-    qs(
-      "#requestData",
-      "#dataSolicitada"
-    )?.value || null;
-
-
-  const observacoes =
-    qs(
-      "#requestObservacoes",
-      "#observacoes"
-    )?.value?.trim() || "";
-
-
-  const serviceSelect =
-    qs(
-      "#requestServico",
-      "#servico",
-      "#servicoId"
-    );
-
-
-  const selectedService =
-    serviceId ||
-    serviceSelect?.value ||
-    null;
-
-
-  const payload = {
-
-    usuario_id:
-      user.id,
-
-    servico_id:
-      selectedService,
-
-    nome:
-      nome || null,
-
-    telefone:
-      telefone || null,
-
-    descricao:
-      descricao || null,
-
-    data_solicitada:
-      dataSolicitada,
-
-    observacoes:
-      observacoes || null,
-
-    status:
-      "pendente"
-
-  };
-
-
-  const {
-    error
-  } =
-    await supabase
-      .from(TABLES.SOLICITACOES)
-      .insert(
-        payload
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao criar solicitação:",
+      "Erro ao criar conversa:",
       error
     );
 
     alert(
-      "Não foi possível enviar a solicitação."
+      "Não foi possível criar a conversa."
     );
 
-    return;
+    return null;
   }
 
 
-  alert(
-    "Solicitação enviada com sucesso!"
-  );
-
-
-  form.reset();
+  return data;
 }
 
 
 /* =========================================================
-   24. CONFIGURAÇÃO DO FORMULÁRIO
+   22. ABRIR CONVERSA
    ========================================================= */
 
-function setupServiceRequestForm() {
+async function openConversation(
+  assunto
+) {
 
-  const form =
-    qs(
-      "#serviceRequestForm",
-      "#formSolicitacao",
-      "#requestForm"
+  const conversation =
+    await createConversation(
+      assunto
     );
 
 
-  if (!form) return;
+  if (!conversation) {
+    return;
+  }
+
+
+  window.location.href =
+    `conversa.html?id=${encodeURIComponent(
+      conversation.id
+    )}`;
+}
+
+
+/* =========================================================
+   23. TEMPO REAL DAS MENSAGENS
+   ========================================================= */
+
+function setupMessageRealtime() {
+
+  if (!currentUser) return;
 
 
   if (
-    form.dataset.bound === "true"
+    window.maxSomMessageChannel
   ) {
-    return;
-  }
 
-
-  form.dataset.bound = "true";
-
-
-  const params =
-    new URLSearchParams(
-      window.location.search
+    supabase.removeChannel(
+      window.maxSomMessageChannel
     );
-
-
-  const serviceFromUrl =
-    params.get("servico") ||
-    params.get("service");
-
-
-  if (serviceFromUrl) {
-
-    const select =
-      qs(
-        "#requestServico",
-        "#servico",
-        "#servicoId"
-      );
-
-
-    if (select) {
-
-      select.value =
-        serviceFromUrl;
-    }
   }
 
 
-  form.addEventListener(
-    "submit",
-    async (event) => {
+  window.maxSomMessageChannel =
+    supabase
+      .channel(
+        "maxsom-mensagens"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: TABLES.MENSAGENS
+        },
+        async (payload) => {
 
-      event.preventDefault();
+          const params =
+            new URLSearchParams(
+              window.location.search
+            );
+
+          const conversationId =
+            params.get("id");
 
 
-      await createServiceRequest(
-        serviceFromUrl
-      );
-    }
-  );
+          if (!conversationId) {
+            return;
+          }
+
+
+          const changedConversation =
+            payload.new?.conversa_id ||
+            payload.old?.conversa_id;
+
+
+          if (
+            changedConversation !==
+            conversationId
+          ) {
+            return;
+          }
+
+
+          await loadMessages(
+            conversationId
+          );
+        }
+      )
+      .subscribe();
+}
+
+
+/* =========================================================
+   24. TEMPO REAL DAS CONVERSAS
+   ========================================================= */
+
+function setupConversationRealtime() {
+
+  if (!currentUser) return;
+
+
+  if (
+    window.maxSomConversationChannel
+  ) {
+
+    supabase.removeChannel(
+      window.maxSomConversationChannel
+    );
+  }
+
+
+  window.maxSomConversationChannel =
+    supabase
+      .channel(
+        "maxsom-conversas"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: TABLES.CONVERSAS
+        },
+        async () => {
+
+          if (
+            document.querySelector(
+              "#conversasLista"
+            ) ||
+            document.querySelector(
+              "#conversationsList"
+            )
+          ) {
+
+            await loadConversations();
+          }
+        }
+      )
+      .subscribe();
 }
 
 
@@ -2019,17 +1982,16 @@ function setupServiceRequestForm() {
    25. PRODUTOS PÚBLICOS
    ========================================================= */
 
-async function loadProducts() {
+async function loadPublicProducts() {
 
-  const containers =
-    document.querySelectorAll(
-      "#productsGrid, #produtosGrid"
+  const container =
+    qs(
+      "#produtosLista",
+      "#productsList",
+      "#produtosContainer"
     );
 
-
-  if (!containers.length) {
-    return;
-  }
+  if (!container) return;
 
 
   const {
@@ -2040,9 +2002,9 @@ async function loadProducts() {
       .from(TABLES.PRODUTOS)
       .select("*")
       .order(
-        "created_at",
+        "nome",
         {
-          ascending: false
+          ascending: true
         }
       );
 
@@ -2054,127 +2016,87 @@ async function loadProducts() {
       error
     );
 
-    containers.forEach(
-      (container) => {
+    return;
+  }
 
-        container.innerHTML = `
-          <div class="empty">
-            Não foi possível carregar os produtos.
-          </div>
-        `;
-      }
-    );
+
+  if (!data?.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <h3>
+          Nenhum produto cadastrado
+        </h3>
+
+      </div>
+    `;
 
     return;
   }
 
 
-  const products =
-    data || [];
+  container.innerHTML =
+    data
+      .map(
+        (product) => `
 
+          <article class="product-card">
 
-  containers.forEach(
-    (container) => {
+            ${
+              product.imagem_url
 
-      if (!products.length) {
-
-        container.innerHTML = `
-          <div class="empty">
-            Nenhum produto disponível no momento.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      container.innerHTML =
-        products
-          .map(
-            (product) => {
-
-              const image =
-                product.imagem_url ||
-                product.imagem ||
-                product.foto_url ||
-                "";
-
-
-              const name =
-                product.nome ||
-                product.name ||
-                "Produto";
-
-
-              const description =
-                product.descricao ||
-                product.description ||
-                "Confira as informações deste produto.";
-
-
-              return `
-
-                <article
-                  class="product-card"
-                >
-
-                  ${
-                    image
-
-                      ? `
-                        <img
-                          src="${esc(image)}"
-                          alt="${esc(name)}"
-                        >
-                      `
-
-                      : `
-                        <div
-                          class="product-image"
-                        >
-                          Max Som
-                        </div>
-                      `
-                  }
-
-
-                  <div
-                    class="product-info"
+                ? `
+                  <img
+                    src="${esc(
+                      product.imagem_url
+                    )}"
+                    alt="${esc(
+                      product.nome ||
+                      "Produto Max Som"
+                    )}"
+                    loading="lazy"
                   >
+                `
 
-                    ${
-                      product.marca
-
-                        ? `
-                          <span>
-                            ${esc(product.marca)}
-                          </span>
-                        `
-
-                        : ""
-                    }
-
-
-                    <h3>
-                      ${esc(name)}
-                    </h3>
-
-
-                    <p>
-                      ${esc(description)}
-                    </p>
-
-
+                : `
+                  <div class="product-placeholder">
+                    Max Som
                   </div>
-
-                </article>
-
-              `;
+                `
             }
-          )
-          .join("");
-    }
-  );
+
+
+            <div class="product-card-content">
+
+              <h3>
+                ${esc(
+                  product.nome ||
+                  "Produto"
+                )}
+              </h3>
+
+              ${
+                product.descricao
+
+                  ? `
+                    <p>
+                      ${esc(
+                        product.descricao
+                      )}
+                    </p>
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          </article>
+
+        `
+      )
+      .join("");
 }
 
 
@@ -2182,17 +2104,16 @@ async function loadProducts() {
    26. SERVIÇOS PÚBLICOS
    ========================================================= */
 
-async function loadServices() {
+async function loadPublicServices() {
 
-  const containers =
-    document.querySelectorAll(
-      "#servicesGrid, #servicosGrid"
+  const container =
+    qs(
+      "#servicosLista",
+      "#servicesList",
+      "#servicosContainer"
     );
 
-
-  if (!containers.length) {
-    return;
-  }
+  if (!container) return;
 
 
   const {
@@ -2203,9 +2124,9 @@ async function loadServices() {
       .from(TABLES.SERVICOS)
       .select("*")
       .order(
-        "created_at",
+        "nome",
         {
-          ascending: false
+          ascending: true
         }
       );
 
@@ -2217,134 +2138,135 @@ async function loadServices() {
       error
     );
 
-    containers.forEach(
-      (container) => {
+    return;
+  }
 
-        container.innerHTML = `
-          <div class="empty">
-            Não foi possível carregar os serviços.
-          </div>
-        `;
-      }
-    );
+
+  if (!data?.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <h3>
+          Nenhum serviço cadastrado
+        </h3>
+
+      </div>
+    `;
 
     return;
   }
 
 
-  const services =
-    data || [];
+  container.innerHTML =
+    data
+      .map(
+        (service) => `
 
+          <article class="service-card">
 
-  containers.forEach(
-    (container) => {
+            ${
+              service.imagem_url
 
-      if (!services.length) {
+                ? `
+                  <img
+                    src="${esc(
+                      service.imagem_url
+                    )}"
+                    alt="${esc(
+                      service.nome ||
+                      "Serviço Max Som"
+                    )}"
+                    loading="lazy"
+                  >
+                `
 
-        container.innerHTML = `
-          <div class="empty">
-            Nenhum serviço disponível no momento.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      container.innerHTML =
-        services
-          .map(
-            (service) => {
-
-              const image =
-                service.imagem_url ||
-                service.imagem ||
-                service.foto_url ||
-                "";
-
-
-              const name =
-                service.nome ||
-                service.name ||
-                "Serviço";
-
-
-              const description =
-                service.descricao ||
-                service.description ||
-                "Conheça este serviço da Max Som.";
-
-
-              const id =
-                service.id || "";
-
-
-              return `
-
-                <article
-                  class="service-card"
-                >
-
-                  ${
-                    image
-
-                      ? `
-                        <img
-                          src="${esc(image)}"
-                          alt="${esc(name)}"
-                        >
-                      `
-
-                      : ""
-                  }
-
-
-                  <div>
-
-                    <h3>
-                      ${esc(name)}
-                    </h3>
-
-
-                    <p>
-                      ${esc(description)}
-                    </p>
-
-
-                    <a
-                      href="atendimento.html?servico=${encodeURIComponent(
-                        id
-                      )}"
-                    >
-                      Solicitar atendimento →
-                    </a>
-
-                  </div>
-
-                </article>
-
-              `;
+                : ""
             }
-          )
-          .join("");
-    }
-  );
+
+
+            <div class="service-card-content">
+
+              <h3>
+                ${esc(
+                  service.nome ||
+                  "Serviço"
+                )}
+              </h3>
+
+              ${
+                service.descricao
+
+                  ? `
+                    <p>
+                      ${esc(
+                        service.descricao
+                      )}
+                    </p>
+                  `
+
+                  : ""
+              }
+
+
+              <button
+                type="button"
+                class="btn-primary"
+                data-service-name="${esc(
+                  service.nome ||
+                  "Atendimento"
+                )}"
+              >
+                Solicitar atendimento
+              </button>
+
+            </div>
+
+          </article>
+
+        `
+      )
+      .join("");
+
+
+  container
+    .querySelectorAll(
+      "[data-service-name]"
+    )
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const serviceName =
+            button.dataset.serviceName ||
+            "Atendimento";
+
+          window.location.href =
+            `atendimento.html?servico=${encodeURIComponent(
+              serviceName
+            )}`;
+        }
+      );
+    });
 }
+
+
 /* =========================================================
    27. PROJETOS PÚBLICOS
    ========================================================= */
 
-async function loadProjects() {
+async function loadPublicProjects() {
 
-  const containers =
-    document.querySelectorAll(
-      "#projectsGrid, #projetosGrid"
+  const container =
+    qs(
+      "#projetosLista",
+      "#projectsList",
+      "#projetosContainer"
     );
 
-
-  if (!containers.length) {
-    return;
-  }
+  if (!container) return;
 
 
   const {
@@ -2352,10 +2274,10 @@ async function loadProjects() {
     error
   } =
     await supabase
-      .from("projetos")
+      .from(TABLES.PROJETOS)
       .select("*")
       .order(
-        "created_at",
+        "criado_em",
         {
           ascending: false
         }
@@ -2369,157 +2291,98 @@ async function loadProjects() {
       error
     );
 
-    containers.forEach(
-      (container) => {
+    return;
+  }
 
-        container.innerHTML = `
-          <div class="empty">
-            Não foi possível carregar os projetos.
-          </div>
-        `;
-      }
-    );
+
+  if (!data?.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <h3>
+          Nenhum projeto cadastrado
+        </h3>
+
+      </div>
+    `;
 
     return;
   }
 
 
-  const projects =
-    data || [];
+  container.innerHTML =
+    data
+      .map(
+        (project) => `
 
+          <article class="project-card">
 
-  containers.forEach(
-    (container) => {
+            ${
+              project.imagem_url
 
-      if (!projects.length) {
-
-        container.innerHTML = `
-          <div class="empty">
-            Nenhum projeto disponível no momento.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      container.innerHTML =
-        projects
-          .map(
-            (project) => {
-
-              const image =
-                project.imagem_url ||
-                project.imagem ||
-                project.foto_url ||
-                "";
-
-
-              const name =
-                project.nome ||
-                project.titulo ||
-                project.name ||
-                "Projeto";
-
-
-              const description =
-                project.descricao ||
-                project.description ||
-                "";
-
-
-              return `
-
-                <article
-                  class="project-card"
-                >
-
-                  ${
-                    image
-
-                      ? `
-                        <img
-                          src="${esc(image)}"
-                          alt="${esc(name)}"
-                        >
-                      `
-
-                      : `
-                        <div
-                          class="project-image"
-                        >
-                          Max Som
-                        </div>
-                      `
-                  }
-
-
-                  <div
-                    class="project-info"
+                ? `
+                  <img
+                    src="${esc(
+                      project.imagem_url
+                    )}"
+                    alt="${esc(
+                      project.nome ||
+                      "Projeto Max Som"
+                    )}"
+                    loading="lazy"
                   >
+                `
 
-                    ${
-                      project.categoria
-
-                        ? `
-                          <span>
-                            ${esc(
-                              project.categoria
-                            )}
-                          </span>
-                        `
-
-                        : ""
-                    }
-
-
-                    <h3>
-                      ${esc(name)}
-                    </h3>
-
-
-                    ${
-                      description
-
-                        ? `
-                          <p>
-                            ${esc(
-                              description
-                            )}
-                          </p>
-                        `
-
-                        : ""
-                    }
-
-                  </div>
-
-                </article>
-
-              `;
+                : ""
             }
-          )
-          .join("");
-    }
-  );
+
+
+            <div class="project-card-content">
+
+              <h3>
+                ${esc(
+                  project.nome ||
+                  "Projeto"
+                )}
+              </h3>
+
+              ${
+                project.descricao
+
+                  ? `
+                    <p>
+                      ${esc(
+                        project.descricao
+                      )}
+                    </p>
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          </article>
+
+        `
+      )
+      .join("");
 }
-
-
 /* =========================================================
    28. PUBLICAÇÕES
    ========================================================= */
 
-async function loadPosts() {
+async function loadPublications() {
 
-  const containers =
-    document.querySelectorAll(
-      "#postsGrid, #publicacoesGrid"
+  const container =
+    qs(
+      "#publicacoesLista",
+      "#publicationsList",
+      "#publicacoesContainer"
     );
 
-
-  if (!containers.length) {
-    return;
-  }
+  if (!container) return;
 
 
   const {
@@ -2527,10 +2390,10 @@ async function loadPosts() {
     error
   } =
     await supabase
-      .from("publicacoes")
+      .from(TABLES.PUBLICACOES)
       .select("*")
       .order(
-        "created_at",
+        "criado_em",
         {
           ascending: false
         }
@@ -2544,158 +2407,111 @@ async function loadPosts() {
       error
     );
 
-    containers.forEach(
-      (container) => {
+    return;
+  }
 
-        container.innerHTML = `
-          <div class="empty">
-            Não foi possível carregar as publicações.
-          </div>
-        `;
-      }
-    );
+
+  if (!data?.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <h3>
+          Nenhuma publicação cadastrada
+        </h3>
+
+      </div>
+    `;
 
     return;
   }
 
 
-  const posts =
-    data || [];
+  container.innerHTML =
+    data
+      .map(
+        (publication) => `
 
+          <article class="publication-card">
 
-  containers.forEach(
-    (container) => {
+            ${
+              publication.imagem_url
 
-      if (!posts.length) {
-
-        container.innerHTML = `
-          <div class="empty">
-            Nenhuma publicação disponível no momento.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      container.innerHTML =
-        posts
-          .map(
-            (post) => {
-
-              const image =
-                post.imagem_url ||
-                post.imagem ||
-                post.foto_url ||
-                "";
-
-
-              const title =
-                post.titulo ||
-                post.nome ||
-                "Publicação";
-
-
-              const description =
-                post.resumo ||
-                post.descricao ||
-                post.conteudo ||
-                "";
-
-
-              return `
-
-                <article
-                  class="post-card"
-                >
-
-                  ${
-                    image
-
-                      ? `
-                        <img
-                          src="${esc(image)}"
-                          alt="${esc(title)}"
-                        >
-                      `
-
-                      : `
-                        <div
-                          class="post-image"
-                        >
-                          Max Som
-                        </div>
-                      `
-                  }
-
-
-                  <div
-                    class="post-info"
+                ? `
+                  <img
+                    src="${esc(
+                      publication.imagem_url
+                    )}"
+                    alt="${esc(
+                      publication.titulo ||
+                      "Publicação Max Som"
+                    )}"
+                    loading="lazy"
                   >
+                `
 
-                    ${
-                      post.categoria
-
-                        ? `
-                          <span>
-                            ${esc(
-                              post.categoria
-                            )}
-                          </span>
-                        `
-
-                        : ""
-                    }
-
-
-                    <h3>
-                      ${esc(title)}
-                    </h3>
-
-
-                    ${
-                      description
-
-                        ? `
-                          <p>
-                            ${esc(
-                              description
-                            )}
-                          </p>
-                        `
-
-                        : ""
-                    }
-
-
-                    ${
-                      post.url
-
-                        ? `
-                          <a
-                            href="${esc(
-                              post.url
-                            )}"
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            Ver publicação →
-                          </a>
-                        `
-
-                        : ""
-                    }
-
-                  </div>
-
-                </article>
-
-              `;
+                : ""
             }
-          )
-          .join("");
-    }
-  );
+
+
+            <div class="publication-card-content">
+
+              <h3>
+                ${esc(
+                  publication.titulo ||
+                  "Publicação"
+                )}
+              </h3>
+
+
+              ${
+                publication.resumo
+
+                  ? `
+                    <p>
+                      ${esc(
+                        publication.resumo
+                      )}
+                    </p>
+                  `
+
+                  : publication.conteudo
+
+                    ? `
+                      <p>
+                        ${esc(
+                          publication.conteudo
+                        )}
+                      </p>
+                    `
+
+                    : ""
+              }
+
+
+              ${
+                publication.criado_em
+
+                  ? `
+                    <time>
+                      ${esc(
+                        formatDate(
+                          publication.criado_em
+                        )
+                      )}
+                    </time>
+                  `
+
+                  : ""
+              }
+
+            </div>
+
+          </article>
+
+        `
+      )
+      .join("");
 }
 
 
@@ -2707,46 +2523,41 @@ function setupServiceLinks() {
 
   document
     .querySelectorAll(
-      "[data-service-id]"
+      "[data-service]"
     )
-    .forEach(
-      (element) => {
+    .forEach((element) => {
 
-        const serviceId =
-          element.dataset.serviceId;
-
-
-        if (!serviceId) {
-          return;
-        }
-
-
-        element.addEventListener(
-          "click",
-          () => {
-
-            const url =
-              `atendimento.html?servico=${encodeURIComponent(
-                serviceId
-              )}`;
-
-
-            if (
-              element.tagName === "A"
-            ) {
-
-              element.href =
-                url;
-
-            } else {
-
-              window.location.href =
-                url;
-            }
-          }
-        );
+      if (
+        element.dataset.serviceBound ===
+        "true"
+      ) {
+        return;
       }
-    );
+
+
+      element.dataset.serviceBound =
+        "true";
+
+
+      element.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+
+          const service =
+            element.dataset.service ||
+            element.textContent.trim();
+
+
+          window.location.href =
+            `atendimento.html?servico=${encodeURIComponent(
+              service
+            )}`;
+        }
+      );
+    });
 }
 
 
@@ -2754,7 +2565,7 @@ function setupServiceLinks() {
    30. WHATSAPP
    ========================================================= */
 
-function setupWhatsAppLinks() {
+function setupWhatsApp() {
 
   const phone =
     "5565996262514";
@@ -2764,48 +2575,45 @@ function setupWhatsAppLinks() {
     .querySelectorAll(
       "[data-whatsapp]"
     )
-    .forEach(
-      (element) => {
+    .forEach((element) => {
 
-        if (
-          element.dataset.whatsappBound ===
-          "true"
-        ) {
-          return;
-        }
-
-
-        element.dataset.whatsappBound =
-          "true";
-
-
-        element.addEventListener(
-          "click",
-          (event) => {
-
-            event.preventDefault();
-
-
-            const message =
-              element.dataset.whatsappMessage ||
-              "Olá! Gostaria de falar com a Max Som.";
-
-
-            const url =
-              `https://wa.me/${phone}?text=${encodeURIComponent(
-                message
-              )}`;
-
-
-            window.open(
-              url,
-              "_blank",
-              "noopener"
-            );
-          }
-        );
+      if (
+        element.dataset.whatsappBound ===
+        "true"
+      ) {
+        return;
       }
-    );
+
+
+      element.dataset.whatsappBound =
+        "true";
+
+
+      element.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+
+          const message =
+            element.dataset.whatsappMessage ||
+            "Olá! Gostaria de falar com a Max Som.";
+
+
+          const url =
+            `https://wa.me/${phone}?text=${encodeURIComponent(
+              message
+            )}`;
+
+
+          window.open(
+            url,
+            "_blank"
+          );
+        }
+      );
+    });
 }
 
 
@@ -2818,13 +2626,11 @@ function setupContactForm() {
   const form =
     qs(
       "#contactForm",
-      "#formContato"
+      "#formContato",
+      "#contatoForm"
     );
 
-
-  if (!form) {
-    return;
-  }
+  if (!form) return;
 
 
   if (
@@ -2849,67 +2655,75 @@ function setupContactForm() {
       const nome =
         qs(
           "#contactNome",
+          "#nomeContato",
           "#nome"
-        )?.value?.trim() || "";
+        )?.value.trim();
 
 
       const email =
         qs(
           "#contactEmail",
+          "#emailContato",
           "#email"
-        )?.value?.trim() || "";
+        )?.value.trim();
 
 
       const telefone =
         qs(
           "#contactTelefone",
+          "#telefoneContato",
           "#telefone"
-        )?.value?.trim() || "";
+        )?.value.trim();
 
 
       const mensagem =
         qs(
           "#contactMensagem",
+          "#mensagemContato",
           "#mensagem"
-        )?.value?.trim() || "";
+        )?.value.trim();
 
 
-      if (
-        !nome ||
-        !email ||
-        !mensagem
-      ) {
-
-        alert(
-          "Preencha nome, e-mail e mensagem."
+      const feedback =
+        qs(
+          "#contactFeedback",
+          "#mensagemContatoFeedback"
         );
+
+
+      if (!mensagem) {
+
+        if (feedback) {
+
+          feedback.textContent =
+            "Digite uma mensagem.";
+        }
 
         return;
       }
 
 
-      const {
-        data: { user }
-      } =
-        await supabase.auth.getUser();
-
-
       /*
-       * O formulário público não cria uma
-       * solicitação automaticamente caso
-       * não exista usuário autenticado.
+       * O formulário de contato não envia
+       * automaticamente para uma tabela que
+       * não esteja confirmada no banco.
        *
-       * Nesse caso, o contato continua sendo
-       * encaminhado pelo WhatsApp.
+       * Ele direciona o atendimento para
+       * o WhatsApp oficial da empresa.
        */
 
 
-      const whatsappMessage =
+      const text =
         [
-          `Olá! Meu nome é ${nome}.`,
-          `E-mail: ${email}.`,
+          "Olá! Vim pelo site da Max Som.",
+          nome
+            ? `Nome: ${nome}`
+            : "",
+          email
+            ? `E-mail: ${email}`
+            : "",
           telefone
-            ? `Telefone: ${telefone}.`
+            ? `Telefone: ${telefone}`
             : "",
           `Mensagem: ${mensagem}`
         ]
@@ -2919,157 +2733,146 @@ function setupContactForm() {
 
       const url =
         `https://wa.me/5565996262514?text=${encodeURIComponent(
-          whatsappMessage
+          text
         )}`;
 
 
       window.open(
         url,
-        "_blank",
-        "noopener"
+        "_blank"
       );
 
 
-      form.reset();
+      if (feedback) {
+
+        feedback.textContent =
+          "Mensagem preparada para o WhatsApp.";
+      }
     }
   );
 }
 
 
 /* =========================================================
-   32. MENU / PÁGINA ATUAL
+   32. PÁGINA ATUAL
    ========================================================= */
 
-function markCurrentPage() {
+function getCurrentPage() {
 
-  const current =
+  const path =
     window.location.pathname
       .split("/")
-      .pop() ||
+      .pop()
+      .toLowerCase();
+
+
+  return path ||
     "index.html";
-
-
-  document
-    .querySelectorAll(
-      "nav a[href]"
-    )
-    .forEach(
-      (link) => {
-
-        const href =
-          link.getAttribute(
-            "href"
-          );
-
-
-        if (!href) {
-          return;
-        }
-
-
-        const cleanHref =
-          href
-            .split("?")[0]
-            .split("#")[0];
-
-
-        if (
-          cleanHref === current
-        ) {
-
-          link.classList.add(
-            "nav-current"
-          );
-        }
-      }
-    );
 }
 
 
 /* =========================================================
-   33. BOTÕES DE CANCELAR FORMULÁRIOS
+   33. BOTÕES CANCELAR
    ========================================================= */
 
 function setupCancelButtons() {
 
-  document
-    .querySelectorAll(
-      "[id$='Cancelar'], [data-cancel]"
-    )
-    .forEach(
-      (button) => {
+  const buttons = [
 
-        if (
-          button.dataset.cancelBound ===
-          "true"
-        ) {
-          return;
-        }
+    "#produtoCancelar",
 
+    "#servicoCancelar",
 
-        button.dataset.cancelBound =
-          "true";
+    "#projetoCancelar",
 
+    "#publicacaoCancelar",
 
-        button.addEventListener(
-          "click",
-          (event) => {
+    "#cancelarProduto",
 
-            event.preventDefault();
+    "#cancelarServico",
+
+    "#cancelarProjeto",
+
+    "#cancelarPublicacao"
+
+  ];
 
 
-            const form =
-              button.closest(
-                "form"
-              );
+  buttons.forEach(
+    (selector) => {
 
-
-            if (form) {
-
-              form.reset();
-            }
-
-
-            /*
-             * Remove possíveis estados
-             * de edição.
-             */
-
-            delete button.dataset.editing;
-
-
-            document
-              .querySelectorAll(
-                "[data-editing]"
-              )
-              .forEach(
-                (element) => {
-
-                  delete element.dataset.editing;
-                }
-              );
-          }
+      const button =
+        document.querySelector(
+          selector
         );
+
+
+      if (!button) return;
+
+
+      if (
+        button.dataset.cancelBound ===
+        "true"
+      ) {
+        return;
       }
-    );
+
+
+      button.dataset.cancelBound =
+        "true";
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const form =
+            button.closest(
+              "form"
+            );
+
+
+          if (form) {
+            form.reset();
+          }
+
+
+          document
+            .querySelectorAll(
+              ".modal.open, .modal.active, .admin-modal.open"
+            )
+            .forEach(
+              (modal) => {
+
+                modal.classList.remove(
+                  "open",
+                  "active"
+                );
+              }
+            );
+        }
+      );
+    }
+  );
 }
 
 
 /* =========================================================
-   34. ADMIN — CARREGAMENTO PRINCIPAL
+   34. ADMIN
    ========================================================= */
 
-async function loadAdminPage() {
+async function adminMain() {
 
-  const adminContainer =
+  const page =
     document.querySelector(
-      "#adminUsuariosLista"
+      ".admin-page"
+    ) ||
+    document.querySelector(
+      "[data-admin-page]"
     );
 
 
-  if (!adminContainer) {
-    return;
-  }
+  if (!page) return;
 
 
   const allowed =
@@ -3084,22 +2887,37 @@ async function loadAdminPage() {
   await adminStats();
 
   await adminUsers();
+
+  setupCancelButtons();
 }
 
 
 /* =========================================================
-   35. VERIFICAÇÃO DE ACESSO
+   35. VERIFICAÇÃO DE PÁGINAS LOGADAS
    ========================================================= */
 
 async function checkLoggedPage() {
 
-  const loggedElements =
-    document.querySelectorAll(
-      "[data-requires-login]"
-    );
+  const protectedPages = [
+
+    "conta.html",
+
+    "conversas.html",
+
+    "conversa.html"
+
+  ];
 
 
-  if (!loggedElements.length) {
+  const page =
+    getCurrentPage();
+
+
+  if (
+    !protectedPages.includes(
+      page
+    )
+  ) {
     return;
   }
 
@@ -3119,19 +2937,30 @@ async function checkLoggedPage() {
 
 
 /* =========================================================
-   36. REDIRECIONAMENTO DE ADMIN
+   36. REDIRECIONAMENTO ADMIN
    ========================================================= */
 
-async function redirectAdminIfNeeded() {
+async function redirectAdmin() {
 
-  const adminPage =
-    window.location.pathname
-      .endsWith(
-        "/admin.html"
-      );
+  const page =
+    getCurrentPage();
 
 
-  if (!adminPage) {
+  if (
+    page !==
+    "login.html"
+  ) {
+    return;
+  }
+
+
+  const {
+    data: { user }
+  } =
+    await supabase.auth.getUser();
+
+
+  if (!user) {
     return;
   }
 
@@ -3140,13 +2969,10 @@ async function redirectAdminIfNeeded() {
     await ensureProfile();
 
 
-  if (
-    !profile ||
-    !isAdmin(profile)
-  ) {
+  if (isAdmin(profile)) {
 
     window.location.href =
-      "index.html";
+      "admin.html";
   }
 }
 
@@ -3169,154 +2995,141 @@ async function initializeAuth() {
   if (error) {
 
     console.error(
-      "Erro ao verificar sessão:",
+      "Erro ao recuperar sessão:",
       error
     );
 
-    return;
+    return null;
   }
 
 
-  if (session?.user) {
-
-    currentUser =
-      session.user;
-
-    await ensureProfile();
-
-  } else {
+  if (!session) {
 
     currentUser = null;
     currentProfile = null;
+
+    await updateNav();
+
+    return null;
   }
+
+
+  currentUser =
+    session.user;
+
+
+  await ensureProfile();
+
+  await updateNav();
+
+
+  return currentProfile;
 }
 
 
 /* =========================================================
-   38. EVENTOS DE AUTENTICAÇÃO
+   38. LISTENER DE AUTENTICAÇÃO
    ========================================================= */
 
 function setupAuthListener() {
 
   supabase.auth.onAuthStateChange(
-    () => {
+    async (
+      event,
+      session
+    ) => {
 
-      setTimeout(
-        () => {
+      currentUser =
+        session?.user ||
+        null;
 
-          updateNav();
 
-        },
-        0
-      );
+      if (currentUser) {
+
+        await ensureProfile();
+
+      } else {
+
+        currentProfile = null;
+      }
+
+
+      await updateNav();
+
+
+      if (
+        event ===
+        "SIGNED_OUT"
+      ) {
+
+        const page =
+          getCurrentPage();
+
+
+        if (
+          page ===
+            "conta.html" ||
+          page ===
+            "conversas.html" ||
+          page ===
+            "conversa.html" ||
+          page ===
+            "admin.html"
+        ) {
+
+          window.location.href =
+            "login.html";
+        }
+      }
     }
   );
 }
 
 
 /* =========================================================
-   39. REALTIME DAS MENSAGENS
-   ========================================================= */
-
-function setupMessageRealtime() {
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-
-  const conversationId =
-    params.get("conversa") ||
-    params.get("conversation");
-
-
-  if (!conversationId) {
-    return;
-  }
-
-
-  const container =
-    document.querySelector(
-      "#chatMessages"
-    );
-
-
-  if (!container) {
-    return;
-  }
-
-
-  supabase
-    .channel(
-      `mensagens-${conversationId}`
-    )
-    .on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: TABLES.MENSAGENS,
-        filter:
-          `conversa_id=eq.${conversationId}`
-      },
-      async () => {
-
-        await loadMessages(
-          conversationId
-        );
-      }
-    )
-    .subscribe();
-}
-
-
-/* =========================================================
-   40. REALTIME DAS NOTIFICAÇÕES
+   39. REALTIME DAS NOTIFICAÇÕES
    ========================================================= */
 
 function setupNotificationRealtime() {
 
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return;
 
 
-  const container =
-    document.querySelector(
-      "#notificationsList"
+  if (
+    window.maxSomNotificationChannel
+  ) {
+
+    supabase.removeChannel(
+      window.maxSomNotificationChannel
     );
-
-
-  if (!container) {
-    return;
   }
 
 
-  supabase
-    .channel(
-      `notificacoes-${currentUser.id}`
-    )
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: TABLES.NOTIFICACOES,
-        filter:
-          `usuario_id=eq.${currentUser.id}`
-      },
-      async () => {
+  window.maxSomNotificationChannel =
+    supabase
+      .channel(
+        "maxsom-notificacoes"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: TABLES.NOTIFICACOES,
+          filter:
+            `usuario_id=eq.${currentUser.id}`
+        },
+        async () => {
 
-        await loadNotifications();
-      }
-    )
-    .subscribe();
+          await loadNotifications();
+        }
+      )
+      .subscribe();
 }
 
 
 /* =========================================================
-   41. ATALHOS DE TECLADO
+   40. ATALHOS DO TECLADO
    ========================================================= */
 
 function setupKeyboardShortcuts() {
@@ -3325,23 +3138,22 @@ function setupKeyboardShortcuts() {
     "keydown",
     (event) => {
 
-      /*
-       * ESC fecha elementos que
-       * utilizarem data-close.
-       */
-
       if (
-        event.key === "Escape"
+        event.key ===
+        "Escape"
       ) {
 
         document
           .querySelectorAll(
-            "[data-close]"
+            ".modal.open, .modal.active"
           )
           .forEach(
-            (element) => {
+            (modal) => {
 
-              element.click();
+              modal.classList.remove(
+                "open",
+                "active"
+              );
             }
           );
       }
@@ -3351,34 +3163,32 @@ function setupKeyboardShortcuts() {
 
 
 /* =========================================================
-   42. FORMULÁRIOS ADMIN
+   41. FORMULÁRIOS DO ADMIN
    ========================================================= */
 
 function setupAdminForms() {
 
-  const forms =
-    document.querySelectorAll(
-      "[data-admin-form]"
-    );
+  /*
+   * Os formulários do painel podem ser
+   * controlados pelos atributos data-table
+   * e data-action.
+   */
 
-
-  if (!forms.length) {
-    return;
-  }
-
-
-  forms.forEach(
-    (form) => {
+  document
+    .querySelectorAll(
+      "form[data-table]"
+    )
+    .forEach((form) => {
 
       if (
-        form.dataset.bound ===
+        form.dataset.formBound ===
         "true"
       ) {
         return;
       }
 
 
-      form.dataset.bound =
+      form.dataset.formBound =
         "true";
 
 
@@ -3390,7 +3200,12 @@ function setupAdminForms() {
 
 
           const table =
-            form.dataset.adminForm;
+            form.dataset.table;
+
+
+          const action =
+            form.dataset.action ||
+            "insert";
 
 
           if (!table) {
@@ -3402,31 +3217,48 @@ function setupAdminForms() {
             new FormData(form);
 
 
-          const payload = {};
+          const values = {};
 
 
           formData.forEach(
-            (value, key) => {
+            (
+              value,
+              key
+            ) => {
 
-              payload[key] =
-                value;
+              if (
+                value !==
+                ""
+              ) {
+
+                values[key] =
+                  value;
+              }
             }
           );
 
 
-          const id =
-            form.dataset.id;
+          let result;
 
 
-          let query;
+          if (
+            action ===
+            "update"
+          ) {
+
+            const id =
+              form.dataset.id;
 
 
-          if (id) {
+            if (!id) {
+              return;
+            }
 
-            query =
-              supabase
+
+            result =
+              await supabase
                 .from(table)
-                .update(payload)
+                .update(values)
                 .eq(
                   "id",
                   id
@@ -3434,26 +3266,18 @@ function setupAdminForms() {
 
           } else {
 
-            query =
-              supabase
+            result =
+              await supabase
                 .from(table)
-                .insert(
-                  payload
-                );
+                .insert(values);
           }
 
 
-          const {
-            error
-          } =
-            await query;
-
-
-          if (error) {
+          if (result.error) {
 
             console.error(
-              "Erro ao salvar:",
-              error
+              "Erro no formulário admin:",
+              result.error
             );
 
             alert(
@@ -3471,28 +3295,16 @@ function setupAdminForms() {
 
           form.reset();
 
-          delete form.dataset.id;
 
-
-          /*
-           * Atualiza a página
-           * correspondente quando
-           * houver uma função pública.
-           */
-
-          await loadProducts();
-          await loadServices();
-          await loadProjects();
-          await loadPosts();
+          await adminStats();
         }
       );
-    }
-  );
+    });
 }
 
 
 /* =========================================================
-   43. EXCLUSÃO ADMIN
+   42. EXCLUSÃO DE REGISTROS
    ========================================================= */
 
 function setupDeleteButtons() {
@@ -3501,90 +3313,94 @@ function setupDeleteButtons() {
     .querySelectorAll(
       "[data-delete-table]"
     )
-    .forEach(
-      (button) => {
+    .forEach((button) => {
 
-        if (
-          button.dataset.deleteBound ===
-          "true"
-        ) {
-          return;
-        }
-
-
-        button.dataset.deleteBound =
-          "true";
-
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            const table =
-              button.dataset.deleteTable;
-
-
-            const id =
-              button.dataset.deleteId;
-
-
-            if (!table || !id) {
-              return;
-            }
-
-
-            const confirmed =
-              window.confirm(
-                "Tem certeza que deseja excluir este item?"
-              );
-
-
-            if (!confirmed) {
-              return;
-            }
-
-
-            const {
-              error
-            } =
-              await supabase
-                .from(table)
-                .delete()
-                .eq(
-                  "id",
-                  id
-                );
-
-
-            if (error) {
-
-              console.error(
-                "Erro ao excluir:",
-                error
-              );
-
-              alert(
-                "Não foi possível excluir o item."
-              );
-
-              return;
-            }
-
-
-            button
-              .closest(
-                "[data-row], tr, article, .admin-item"
-              )
-              ?.remove();
-          }
-        );
+      if (
+        button.dataset.deleteBound ===
+        "true"
+      ) {
+        return;
       }
-    );
+
+
+      button.dataset.deleteBound =
+        "true";
+
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const table =
+            button.dataset.deleteTable;
+
+
+          const id =
+            button.dataset.deleteId;
+
+
+          if (
+            !table ||
+            !id
+          ) {
+            return;
+          }
+
+
+          const confirmed =
+            window.confirm(
+              "Tem certeza que deseja excluir este registro?"
+            );
+
+
+          if (!confirmed) {
+            return;
+          }
+
+
+          const {
+            error
+          } =
+            await supabase
+              .from(table)
+              .delete()
+              .eq(
+                "id",
+                id
+              );
+
+
+          if (error) {
+
+            console.error(
+              "Erro ao excluir:",
+              error
+            );
+
+            alert(
+              "Não foi possível excluir o registro."
+            );
+
+            return;
+          }
+
+
+          button
+            .closest(
+              "[data-admin-item]"
+            )
+            ?.remove();
+
+
+          await adminStats();
+        }
+      );
+    });
 }
 
 
 /* =========================================================
-   44. ATUALIZAÇÃO DE LINKS DE CONTA
+   43. LINKS DA CONTA
    ========================================================= */
 
 function setupAccountLinks() {
@@ -3594,19 +3410,25 @@ function setupAccountLinks() {
       "[data-account-link]"
     )
     .forEach(
-      (link) => {
+      (element) => {
 
-        link.addEventListener(
+        if (
+          element.dataset.accountBound ===
+          "true"
+        ) {
+          return;
+        }
+
+
+        element.dataset.accountBound =
+          "true";
+
+
+        element.addEventListener(
           "click",
           async (event) => {
 
-            const {
-              data: { user }
-            } =
-              await supabase.auth.getUser();
-
-
-            if (!user) {
+            if (!currentUser) {
 
               event.preventDefault();
 
@@ -3621,19 +3443,19 @@ function setupAccountLinks() {
 
 
 /* =========================================================
-   45. ATUALIZAÇÃO DE LINKS DE ADMIN
+   44. LINKS ADMIN
    ========================================================= */
 
 function setupAdminLinks() {
 
   document
     .querySelectorAll(
-      "[data-admin-only]"
+      "[data-admin-link]"
     )
     .forEach(
-      (link) => {
+      (element) => {
 
-        link.addEventListener(
+        element.addEventListener(
           "click",
           async (event) => {
 
@@ -3642,14 +3464,14 @@ function setupAdminLinks() {
 
 
             if (
-              !profile ||
               !isAdmin(profile)
             ) {
 
               event.preventDefault();
 
-              window.location.href =
-                "index.html";
+              alert(
+                "Você não possui acesso ao painel administrativo."
+              );
             }
           }
         );
@@ -3659,18 +3481,27 @@ function setupAdminLinks() {
 
 
 /* =========================================================
-   46. INICIALIZAÇÃO DOS COMPONENTES
+   45. INICIALIZAÇÃO
    ========================================================= */
 
-async function initializeComponents() {
+async function initializePage() {
 
   await initializeAuth();
 
-  await updateNav();
+  await checkLoggedPage();
 
-  markCurrentPage();
+  await redirectAdmin();
+
 
   setupAuthListener();
+
+  setupKeyboardShortcuts();
+
+  setupServiceLinks();
+
+  setupWhatsApp();
+
+  setupContactForm();
 
   setupLogin();
 
@@ -3678,13 +3509,9 @@ async function initializeComponents() {
 
   setupAdminRequestButton();
 
-  setupServiceRequestForm();
+  setupAccountLinks();
 
-  setupServiceLinks();
-
-  setupWhatsAppLinks();
-
-  setupContactForm();
+  setupAdminLinks();
 
   setupCancelButtons();
 
@@ -3692,548 +3519,51 @@ async function initializeComponents() {
 
   setupDeleteButtons();
 
-  setupAccountLinks();
-
-  setupAdminLinks();
-
-  setupKeyboardShortcuts();
-
-  await checkLoggedPage();
-
-  await redirectAdminIfNeeded();
 
   await account();
+
+  await adminMain();
 
   await loadConversations();
 
   await loadConversation();
 
-  await loadNotifications();
+  await loadPublicProducts();
 
-  await loadProducts();
+  await loadPublicServices();
 
-  await loadServices();
+  await loadPublicProjects();
 
-  await loadProjects();
+  await loadPublications();
 
-  await loadPosts();
-
-  await loadAdminPage();
 
   setupMessageRealtime();
+
+  setupConversationRealtime();
 
   setupNotificationRealtime();
 }
 
 
 /* =========================================================
-   47. INICIALIZAÇÃO FINAL
-   ========================================================= */
-
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    initializeComponents
-  );
-
-} else {
-
-  initializeComponents();
-}
-/* =========================================================
-   48. CONTA DO USUÁRIO
-   ========================================================= */
-
-async function account() {
-
-  const accountPage =
-    document.querySelector(
-      "[data-account-page]"
-    );
-
-
-  if (!accountPage) {
-    return;
-  }
-
-
-  const profile =
-    await ensureProfile();
-
-
-  if (!profile) {
-    return;
-  }
-
-
-  const nome =
-    document.querySelector(
-      "[data-account-name]"
-    );
-
-
-  const tipo =
-    document.querySelector(
-      "[data-account-type]"
-    );
-
-
-  const email =
-    document.querySelector(
-      "[data-account-email]"
-    );
-
-
-  if (nome) {
-    nome.textContent =
-      profile.nome ||
-      currentUser?.email ||
-      "Usuário";
-  }
-
-
-  if (tipo) {
-    tipo.textContent =
-      profile.tipo_usuario ||
-      "cliente";
-  }
-
-
-  if (email) {
-    email.textContent =
-      currentUser?.email ||
-      "";
-  }
-}
-
-
-/* =========================================================
-   49. CONVERSAS
-   ========================================================= */
-
-async function loadConversations() {
-
-  const container =
-    document.querySelector(
-      "#conversationsList"
-    );
-
-
-  if (!container) {
-    return;
-  }
-
-
-  if (!currentUser) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Faça login para visualizar suas conversas.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.CONVERSAS)
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar conversas:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar suas conversas.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const conversations =
-    data || [];
-
-
-  if (!conversations.length) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Você ainda não possui conversas.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    conversations
-      .map(
-        (conversation) => {
-
-          const title =
-            conversation.titulo ||
-            conversation.assunto ||
-            "Atendimento";
-
-
-          return `
-
-            <article
-              class="conversation-card"
-            >
-
-              <h3>
-                ${esc(title)}
-              </h3>
-
-              ${
-                conversation.status
-                  ? `
-                    <p class="muted">
-                      Status:
-                      ${esc(
-                        conversation.status
-                      )}
-                    </p>
-                  `
-                  : ""
-              }
-
-              <div class="actions">
-
-                <a
-                  class="btn btn-primary"
-                  href="atendimento.html?conversa=${encodeURIComponent(
-                    conversation.id
-                  )}"
-                >
-                  Abrir conversa
-                </a>
-
-              </div>
-
-            </article>
-
-          `;
-        }
-      )
-      .join("");
-}
-
-
-/* =========================================================
-   50. CONVERSA INDIVIDUAL
-   ========================================================= */
-
-async function loadConversation() {
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-
-  const conversationId =
-    params.get("conversa") ||
-    params.get("conversation");
-
-
-  const container =
-    document.querySelector(
-      "#chatMessages"
-    );
-
-
-  if (
-    !conversationId ||
-    !container
-  ) {
-    return;
-  }
-
-
-  if (!currentUser) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Faça login para acessar esta conversa.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  await loadMessages(
-    conversationId
-  );
-
-
-  const form =
-    document.querySelector(
-      "#chatForm"
-    );
-
-
-  if (
-    !form ||
-    form.dataset.bound ===
-    "true"
-  ) {
-    return;
-  }
-
-
-  form.dataset.bound =
-    "true";
-
-
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      const input =
-        document.querySelector(
-          "#chatMessage"
-        );
-
-
-      const message =
-        input?.value?.trim();
-
-
-      if (!message) {
-        return;
-      }
-
-
-      const {
-        error
-      } =
-        await supabase
-          .from(TABLES.MENSAGENS)
-          .insert({
-            conversa_id:
-              conversationId,
-
-            remetente_id:
-              currentUser.id,
-
-            mensagem:
-              message
-          });
-
-
-      if (error) {
-
-        console.error(
-          "Erro ao enviar mensagem:",
-          error
-        );
-
-        alert(
-          "Não foi possível enviar a mensagem."
-        );
-
-        return;
-      }
-
-
-      input.value = "";
-
-
-      await loadMessages(
-        conversationId
-      );
-    }
-  );
-}
-
-
-/* =========================================================
-   51. MENSAGENS
-   ========================================================= */
-
-async function loadMessages(
-  conversationId
-) {
-
-  const container =
-    document.querySelector(
-      "#chatMessages"
-    );
-
-
-  if (!container) {
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(TABLES.MENSAGENS)
-      .select("*")
-      .eq(
-        "conversa_id",
-        conversationId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar mensagens:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar as mensagens.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const messages =
-    data || [];
-
-
-  if (!messages.length) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Nenhuma mensagem ainda.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    messages
-      .map(
-        (message) => {
-
-          const mine =
-            message.remetente_id ===
-            currentUser?.id;
-
-
-          const text =
-            message.mensagem ||
-            message.conteudo ||
-            "";
-
-
-          const date =
-            message.created_at
-              ? new Date(
-                  message.created_at
-                ).toLocaleString(
-                  "pt-BR"
-                )
-              : "";
-
-
-          return `
-
-            <div
-              class="chat-message ${
-                mine
-                  ? "mine"
-                  : ""
-              }"
-            >
-
-              <div>
-                ${esc(text)}
-              </div>
-
-              ${
-                date
-                  ? `
-                    <small>
-                      ${esc(date)}
-                    </small>
-                  `
-                  : ""
-              }
-
-            </div>
-
-          `;
-        }
-      )
-      .join("");
-
-
-  container.scrollTop =
-    container.scrollHeight;
-}
-
-
-/* =========================================================
-   52. NOTIFICAÇÕES
+   46. NOTIFICAÇÕES
    ========================================================= */
 
 async function loadNotifications() {
 
   const container =
-    document.querySelector(
-      "#notificationsList"
+    qs(
+      "#notificacoesLista",
+      "#notificationsList",
+      "#notificationsContainer"
     );
 
-
-  if (!container) {
-    return;
-  }
+  if (!container) return;
 
 
   if (!currentUser) {
 
-    container.innerHTML = `
-      <div class="empty">
-        Faça login para visualizar suas notificações.
-      </div>
-    `;
+    container.innerHTML = "";
 
     return;
   }
@@ -4245,13 +3575,21 @@ async function loadNotifications() {
   } =
     await supabase
       .from(TABLES.NOTIFICACOES)
-      .select("*")
+      .select(`
+        id,
+        usuario_id,
+        titulo,
+        mensagem,
+        lida,
+        link,
+        criado_em
+      `)
       .eq(
         "usuario_id",
         currentUser.id
       )
       .order(
-        "created_at",
+        "criado_em",
         {
           ascending: false
         }
@@ -4265,21 +3603,11 @@ async function loadNotifications() {
       error
     );
 
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar as notificações.
-      </div>
-    `;
-
     return;
   }
 
 
-  const notifications =
-    data || [];
-
-
-  if (!notifications.length) {
+  if (!data?.length) {
 
     container.innerHTML = `
       <div class="empty">
@@ -4292,350 +3620,155 @@ async function loadNotifications() {
 
 
   container.innerHTML =
-    notifications
+    data
       .map(
-        (notification) => {
+        (notification) => `
 
-          const title =
-            notification.titulo ||
-            "Notificação";
+          <article
+            class="
+              notification-item
+              ${
+                notification.lida
+                  ? "is-read"
+                  : "is-unread"
+              }
+            "
+          >
 
-
-          const message =
-            notification.mensagem ||
-            notification.conteudo ||
-            "";
-
-
-          const date =
-            notification.created_at
-              ? new Date(
-                  notification.created_at
-                ).toLocaleString(
-                  "pt-BR"
-                )
-              : "";
-
-
-          return `
-
-            <article
-              class="account-card"
-            >
+            <div>
 
               <strong>
-                ${esc(title)}
+                ${esc(
+                  notification.titulo ||
+                  "Notificação"
+                )}
               </strong>
 
-              ${
-                message
-                  ? `
-                    <p class="muted">
-                      ${esc(message)}
-                    </p>
-                  `
-                  : ""
-              }
+              <p>
+                ${esc(
+                  notification.mensagem ||
+                  ""
+                )}
+              </p>
 
-              ${
-                date
-                  ? `
-                    <small class="muted">
-                      ${esc(date)}
-                    </small>
-                  `
-                  : ""
-              }
+            </div>
 
-            </article>
 
-          `;
-        }
+            ${
+              notification.link
+
+                ? `
+                  <a
+                    href="${esc(
+                      notification.link
+                    )}"
+                  >
+                    Abrir
+                  </a>
+                `
+
+                : ""
+            }
+
+          </article>
+
+        `
       )
       .join("");
 }
 
 
 /* =========================================================
-   53. SOLICITAÇÃO DE SERVIÇO
+   47. SOLICITAÇÃO DE SERVIÇO
    ========================================================= */
 
-function setupServiceRequestForm() {
+async function createServiceRequest(
+  serviceName,
+  description = ""
+) {
 
-  const form =
-    document.querySelector(
-      "#serviceRequestForm"
-    );
+  const profile =
+    await ensureProfile();
 
 
-  if (!form) {
-    return;
+  if (!profile || !currentUser) {
+
+    window.location.href =
+      "login.html";
+
+    return null;
   }
 
 
-  if (
-    form.dataset.bound ===
-    "true"
-  ) {
-    return;
-  }
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from(TABLES.SOLICITACOES)
+      .insert({
 
-
-  form.dataset.bound =
-    "true";
-
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-
-  const service =
-    params.get("servico");
-
-
-  if (service) {
-
-    const select =
-      form.querySelector(
-        "[name='servico_id'], [name='servico']"
-      );
-
-
-    if (select) {
-
-      select.value =
-        service;
-    }
-  }
-
-
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      if (!currentUser) {
-
-        alert(
-          "Faça login para solicitar um atendimento."
-        );
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-
-      const formData =
-        new FormData(form);
-
-
-      const servicoId =
-        formData.get(
-          "servico_id"
-        ) ||
-        formData.get(
-          "servico"
-        );
-
-
-      const descricao =
-        formData.get(
-          "descricao"
-        ) ||
-        formData.get(
-          "mensagem"
-        ) ||
-        "";
-
-
-      const dataSolicitada =
-        formData.get(
-          "data_solicitada"
-        ) ||
-        null;
-
-
-      const horario =
-        formData.get(
-          "horario"
-        ) ||
-        null;
-
-
-      const payload = {
-
-        usuario_id:
+        cliente_id:
           currentUser.id,
 
-        servico_id:
-          servicoId ||
-          null,
+        servico:
+          serviceName,
 
         descricao:
-          descricao,
-
-        data_solicitada:
-          dataSolicitada,
-
-        horario:
-          horario,
+          description,
 
         status:
           "pendente"
-      };
+
+      })
+      .select()
+      .single();
 
 
-      /*
-       * A tabela real do projeto possui
-       * acento:
-       *
-       * solicitações_servico
-       */
+  if (error) {
 
-      const {
-        error
-      } =
-        await supabase
-          .from(
-            TABLES.SOLICITACOES
-          )
-          .insert(
-            payload
-          );
+    console.error(
+      "Erro ao criar solicitação:",
+      error
+    );
+
+    alert(
+      "Não foi possível registrar sua solicitação."
+    );
+
+    return null;
+  }
 
 
-      if (error) {
-
-        console.error(
-          "Erro ao criar solicitação:",
-          error
-        );
-
-        alert(
-          "Não foi possível enviar sua solicitação."
-        );
-
-        return;
-      }
-
-
-      const whatsappMessage =
-        [
-          "Olá! Quero solicitar um serviço.",
-          `Descrição: ${descricao}`,
-          dataSolicitada
-            ? `Data: ${dataSolicitada}`
-            : "",
-          horario
-            ? `Horário: ${horario}`
-            : ""
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-
-      const whatsapp =
-        `https://wa.me/5565996262514?text=${encodeURIComponent(
-          whatsappMessage
-        )}`;
-
-
-      alert(
-        "Solicitação enviada com sucesso!"
-      );
-
-
-      form.reset();
-
-
-      window.open(
-        whatsapp,
-        "_blank",
-        "noopener"
-      );
-    }
-  );
+  return data;
 }
 
 
 /* =========================================================
-   54. SOLICITAÇÃO DE ADMIN
+   48. SOLICITAÇÃO DE ADMIN
    ========================================================= */
 
-function setupAdminRequestButton() {
+async function setupAdminApproval() {
 
   const button =
-    document.querySelector(
-      "[data-request-admin]"
+    qs(
+      "#aprovarAdmin",
+      "#aprovarAdministrador"
     );
 
 
-  if (!button) {
-    return;
-  }
-
-
-  if (
-    button.dataset.bound ===
-    "true"
-  ) {
-    return;
-  }
-
-
-  button.dataset.bound =
-    "true";
+  if (!button) return;
 
 
   button.addEventListener(
     "click",
     async () => {
 
-      if (!currentUser) {
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
+      const userId =
+        button.dataset.userId;
 
 
-      const profile =
-        await ensureProfile();
-
-
-      if (!profile) {
-        return;
-      }
-
-
-      if (
-        isAdmin(profile)
-      ) {
-
-        alert(
-          "Sua conta já possui acesso de administrador."
-        );
-
-        return;
-      }
-
-
-      if (
-        profile.tipo_usuario ===
-        "solicitante_admin"
-      ) {
-
-        alert(
-          "Sua solicitação de administrador já foi enviada."
-        );
-
+      if (!userId) {
         return;
       }
 
@@ -4647,513 +3780,74 @@ function setupAdminRequestButton() {
           .from(TABLES.USUARIO)
           .update({
             tipo_usuario:
-              "solicitante_admin"
+              "admin"
           })
           .eq(
             "id",
-            currentUser.id
+            userId
           );
 
 
       if (error) {
 
         console.error(
-          "Erro ao solicitar administrador:",
+          "Erro ao aprovar administrador:",
           error
         );
 
         alert(
-          "Não foi possível enviar a solicitação."
+          "Não foi possível aprovar."
         );
 
         return;
       }
 
 
-      currentProfile =
-        {
-          ...profile,
-          tipo_usuario:
-            "solicitante_admin"
-        };
-
-
       alert(
-        "Solicitação enviada para análise."
+        "Usuário aprovado como administrador."
       );
 
 
-      updateNav();
+      await adminUsers();
     }
   );
 }
 
 
 /* =========================================================
-   55. ADMIN — ESTATÍSTICAS
+   49. FUNÇÃO DE ACESSO ADMIN
    ========================================================= */
 
-async function adminStats() {
-
-  const counters =
-    document.querySelectorAll(
-      "[data-admin-count]"
-    );
-
-
-  if (!counters.length) {
-    return;
-  }
-
-
-  const tables = {
-
-    usuarios:
-      TABLES.USUARIO,
-
-    produtos:
-      TABLES.PRODUTOS,
-
-    servicos:
-      TABLES.SERVICOS,
-
-    projetos:
-      TABLES.PROJETOS
-  };
-
-
-  for (
-    const [key, table]
-    of Object.entries(tables)
-  ) {
-
-    const element =
-      document.querySelector(
-        `[data-admin-count="${key}"]`
-      );
-
-
-    if (!element) {
-      continue;
-    }
-
-
-    const {
-      count,
-      error
-    } =
-      await supabase
-        .from(table)
-        .select(
-          "*",
-          {
-            count:
-              "exact",
-            head:
-              true
-          }
-        );
-
-
-    if (error) {
-
-      console.error(
-        `Erro ao contar ${key}:`,
-        error
-      );
-
-      element.textContent =
-        "—";
-
-      continue;
-    }
-
-
-    element.textContent =
-      count ??
-      0;
-  }
-}
-
-
-/* =========================================================
-   56. ADMIN — USUÁRIOS
-   ========================================================= */
-
-async function adminUsers() {
-
-  const container =
-    document.querySelector(
-      "#adminUsuariosLista"
-    );
-
-
-  if (!container) {
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(
-        TABLES.USUARIO
-      )
-      .select(
-        "id,nome,tipo_usuario"
-      )
-      .order(
-        "nome",
-        {
-          ascending: true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erro ao carregar usuários:",
-      error
-    );
-
-    container.innerHTML = `
-      <div class="empty">
-        Não foi possível carregar os usuários.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const users =
-    data || [];
-
-
-  if (!users.length) {
-
-    container.innerHTML = `
-      <div class="empty">
-        Nenhum usuário encontrado.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    users
-      .map(
-        (user) => {
-
-          const admin =
-            user.tipo_usuario ===
-            "admin";
-
-
-          const request =
-            user.tipo_usuario ===
-            "solicitante_admin";
-
-
-          return `
-
-            <div
-              class="admin-request"
-            >
-
-              <div>
-
-                <strong>
-                  ${esc(
-                    user.nome ||
-                    "Usuário"
-                  )}
-                </strong>
-
-                <small>
-                  ${esc(
-                    user.tipo_usuario ||
-                    "cliente"
-                  )}
-                </small>
-
-              </div>
-
-
-              <div
-                class="admin-actions"
-              >
-
-                ${
-                  request
-                    ? `
-                      <button
-                        type="button"
-                        class="btn btn-green"
-                        data-approve-admin
-                        data-user-id="${esc(
-                          user.id
-                        )}"
-                      >
-                        Aprovar administrador
-                      </button>
-
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-reject-admin
-                        data-user-id="${esc(
-                          user.id
-                        )}"
-                      >
-                        Recusar
-                      </button>
-                    `
-                    : ""
-                }
-
-
-                ${
-                  admin
-                    ? `
-                      <span
-                        class="muted"
-                      >
-                        Administrador
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-            </div>
-
-          `;
-        }
-      )
-      .join("");
-
-
-  setupAdminUserActions();
-}
-
-
-/* =========================================================
-   57. ADMIN — APROVAR / RECUSAR
-   ========================================================= */
-
-function setupAdminUserActions() {
-
-  document
-    .querySelectorAll(
-      "[data-approve-admin]"
-    )
-    .forEach(
-      (button) => {
-
-        if (
-          button.dataset.bound ===
-          "true"
-        ) {
-          return;
-        }
-
-
-        button.dataset.bound =
-          "true";
-
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            const userId =
-              button.dataset.userId;
-
-
-            if (!userId) {
-              return;
-            }
-
-
-            const {
-              error
-            } =
-              await supabase
-                .from(
-                  TABLES.USUARIO
-                )
-                .update({
-                  tipo_usuario:
-                    "admin"
-                })
-                .eq(
-                  "id",
-                  userId
-                );
-
-
-            if (error) {
-
-              console.error(
-                "Erro ao aprovar administrador:",
-                error
-              );
-
-              alert(
-                "Não foi possível aprovar o usuário."
-              );
-
-              return;
-            }
-
-
-            await adminUsers();
-
-            await adminStats();
-          }
-        );
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      "[data-reject-admin]"
-    )
-    .forEach(
-      (button) => {
-
-        if (
-          button.dataset.bound ===
-          "true"
-        ) {
-          return;
-        }
-
-
-        button.dataset.bound =
-          "true";
-
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            const userId =
-              button.dataset.userId;
-
-
-            if (!userId) {
-              return;
-            }
-
-
-            const {
-              error
-            } =
-              await supabase
-                .from(
-                  TABLES.USUARIO
-                )
-                .update({
-                  tipo_usuario:
-                    "cliente"
-                })
-                .eq(
-                  "id",
-                  userId
-                );
-
-
-            if (error) {
-
-              console.error(
-                "Erro ao recusar solicitação:",
-                error
-              );
-
-              alert(
-                "Não foi possível recusar a solicitação."
-              );
-
-              return;
-            }
-
-
-            await adminUsers();
-          }
-        );
-      }
-    );
-}
-
-
-/* =========================================================
-   58. ADMIN — PROTEÇÃO FINAL
-   ========================================================= */
-
-async function requireAdmin() {
-
-  if (!currentUser) {
-
-    window.location.href =
-      "login.html";
-
-    return false;
-  }
-
+async function checkAdminAccess() {
 
   const profile =
     await ensureProfile();
 
 
-  if (
-    !profile ||
-    !isAdmin(profile)
-  ) {
-
-    window.location.href =
-      "index.html";
-
-    return false;
-  }
-
-
-  return true;
+  return isAdmin(
+    profile
+  );
 }
 
 
 /* =========================================================
-   59. FINALIZAÇÃO
+   50. FINALIZAÇÃO
    ========================================================= */
 
-window.MaxSom = {
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-  reload: initializeComponents,
+    try {
 
-  loadProducts,
+      await initializePage();
 
-  loadServices,
+    } catch (error) {
 
-  loadProjects,
-
-  loadPosts,
-
-  loadConversations,
-
-  loadMessages,
-
-  loadNotifications,
-
-  ensureProfile,
-
-  requireAdmin
-
-};
+      console.error(
+        "Erro na inicialização do Max Som:",
+        error
+      );
+    }
+  }
+);
