@@ -1,266 +1,454 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Max Som | Projetos</title>
 
-  <title>Projetos | Max Som</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/projects.css">
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="container header-content">
+    <!-- MENU LATERAL -->
+    <aside class="sidebar" id="sidebar">
 
-      <a class="logo" href="index.html">
-        <img src="logo-maxsom-white.png" alt="Max Som">
-      </a>
+        <div class="sidebar-top">
+            <a href="index.html" class="logo">
+                <span class="logo-symbol">MS</span>
 
-      <div class="header-actions">
-        <a
-          class="header-whatsapp"
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener"
-        >
-          WhatsApp
-        </a>
+                <span class="logo-text">
+                    <strong>MAX</strong>
+                    <small>SOM</small>
+                </span>
+            </a>
 
-        <span class="phone">
-          65 99626-2514
-        </span>
-      </div>
-
-      <nav>
-        <a href="index.html">Início</a>
-        <a href="produtos.html">Produtos</a>
-        <a href="servicos.html">Serviços</a>
-        <a href="projetos.html">Projetos</a>
-        <a href="publicacoes.html">Publicações</a>
-        <a href="atendimento.html">Atendimento</a>
-
-        <a href="admin.html" data-admin-only>
-          ⚙ Painel
-        </a>
-
-        <a href="conta.html" data-logged-only>
-          Minha conta
-        </a>
-
-        <a href="login.html" data-guest-only>
-          Entrar
-        </a>
-
-        <a href="cadastro.html" data-guest-only>
-          Criar conta
-        </a>
-
-        <button
-          class="btn btn-outline"
-          data-logout
-          data-logged-only
-          type="button"
-        >
-          Sair
-        </button>
-      </nav>
-
-    </div>
-  </header>
-
-
-  <!-- CONTEÚDO -->
-  <main>
-
-    <!-- TÍTULO DA PÁGINA -->
-    <section class="page-header">
-      <div class="container">
-
-        <span class="eyebrow">
-          Projetos Max Som
-        </span>
-
-        <h1>
-          Nossos projetos
-        </h1>
-
-        <p class="muted">
-          Conheça projetos publicados pela Max Som e veja algumas das soluções
-          realizadas em som e atendimento.
-        </p>
-
-      </div>
-    </section>
-
-
-    <!-- PROJETOS -->
-    <section class="section">
-      <div class="container">
-
-        <div
-          class="projects-grid"
-          id="projectsGrid"
-        >
-          <div class="empty">
-            Carregando projetos...
-          </div>
+            <button
+                class="close-sidebar"
+                id="closeSidebar"
+                aria-label="Fechar menu"
+            >
+                ×
+            </button>
         </div>
 
-      </div>
-    </section>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar">M</div>
+
+            <div>
+                <strong>Olá!</strong>
+                <span>Visitante</span>
+            </div>
+        </div>
 
 
-    <!-- CTA -->
-    <section class="section section-highlight">
-      <div class="container">
+        <nav class="sidebar-nav">
 
-        <div class="cta-box">
+            <p class="nav-label">PRINCIPAL</p>
 
-          <div>
-            <span class="eyebrow">
-              Precisa de uma solução?
+            <a href="index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Início</span>
+            </a>
+
+            <a href="produtos.html" class="nav-item">
+                <span class="nav-icon">▦</span>
+                <span>Produtos</span>
+            </a>
+
+            <a href="servicos.html" class="nav-item">
+                <span class="nav-icon">◈</span>
+                <span>Serviços</span>
+            </a>
+
+            <a href="projetos.html" class="nav-item active">
+                <span class="nav-icon">▣</span>
+                <span>Projetos</span>
+            </a>
+
+            <a href="publicacoes.html" class="nav-item">
+                <span class="nav-icon">✦</span>
+                <span>Publicações</span>
+            </a>
+
+
+            <p class="nav-label nav-label-space">
+                ATENDIMENTO
+            </p>
+
+            <a href="atendimento.html" class="nav-item">
+                <span class="nav-icon">◌</span>
+                <span>Atendimento</span>
+            </a>
+
+            <a href="login.html" class="nav-item">
+                <span class="nav-icon">⇥</span>
+                <span>Entrar</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <div class="help-card">
+                <strong>Precisa de ajuda?</strong>
+
+                <span>
+                    Entre em contato com a Max Som.
+                </span>
+
+                <a href="atendimento.html">
+                    Ir para atendimento →
+                </a>
+            </div>
+
+            <span class="copyright">
+                © <span id="sidebarYear"></span> Max Som
             </span>
 
-            <h2>
-              Vamos conversar sobre seu projeto
-            </h2>
-
-            <p>
-              Entre em contato com a Max Som para saber mais sobre nossos
-              serviços e possibilidades para seu projeto.
-            </p>
-          </div>
-
-          <div class="cta-actions">
-
-            <a
-              href="atendimento.html"
-              class="btn btn-primary"
-            >
-              Solicitar atendimento
-            </a>
-
-            <a
-              href="https://wa.me/5565996262514"
-              class="btn btn-outline"
-              target="_blank"
-              rel="noopener"
-            >
-              Falar pelo WhatsApp
-            </a>
-
-          </div>
-
         </div>
 
-      </div>
-    </section>
-
-  </main>
+    </aside>
 
 
-  <!-- FOOTER -->
-  <footer class="footer footer-v2">
 
-    <div class="container footer-content">
+    <!-- ÁREA PRINCIPAL -->
+    <div class="page">
 
-      <div class="footer-column">
+        <!-- CABEÇALHO -->
+        <header class="topbar">
 
-        <a class="logo" href="index.html">
-          <img src="logo-maxsom-white.png" alt="Max Som">
-        </a>
+            <div class="topbar-left">
 
-        <p>
-          Soluções em som, equipamentos, serviços e atendimento.
-        </p>
+                <button
+                    class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Abrir menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
 
-      </div>
+                <div class="mobile-brand">
+                    <span class="logo-symbol small">MS</span>
+                    <span>MAX SOM</span>
+                </div>
 
-
-      <div class="footer-column">
-
-        <h3>
-          Navegação
-        </h3>
-
-        <a href="index.html">Início</a>
-        <a href="produtos.html">Produtos</a>
-        <a href="servicos.html">Serviços</a>
-        <a href="projetos.html">Projetos</a>
-        <a href="publicacoes.html">Publicações</a>
-
-      </div>
+            </div>
 
 
-      <div class="footer-column">
+            <div class="topbar-right">
 
-        <h3>
-          Atendimento
-        </h3>
+                <a href="#" class="top-link">
+                    WhatsApp
+                </a>
 
-        <a href="atendimento.html">
-          Solicitar atendimento
-        </a>
+                <a href="login.html" class="account-button">
+                    <span class="account-icon">○</span>
+                    <span>Minha conta</span>
+                </a>
 
-        <a href="conta.html">
-          Minha conta
-        </a>
+            </div>
 
-        <a href="login.html">
-          Entrar
-        </a>
-
-      </div>
+        </header>
 
 
-      <div class="footer-column">
 
-        <h3>
-          Contato
-        </h3>
+        <main>
 
-        <p>
-          Telefone: (65) 99626-2514
-        </p>
+            <!-- APRESENTAÇÃO -->
+            <section class="projects-header">
 
-        <p>
-          WhatsApp: (65) 99626-2514
-        </p>
+                <span class="section-label">
+                    PROJETOS MAX SOM
+                </span>
 
-        <p>
-          Email: lojamaxsom2@gmail.com
-        </p>
+                <h1>
+                    Conheça alguns dos nossos
+                    <span>projetos e trabalhos.</span>
+                </h1>
 
-      </div>
+                <p>
+                    Esta página apresentará os trabalhos realizados pela
+                    Max Som, mostrando diferentes aplicações e soluções em som.
+                </p>
+
+            </section>
+
+
+
+            <!-- LISTA DE PROJETOS -->
+            <section class="projects-content">
+
+                <div class="projects-title">
+
+                    <div>
+                        <span class="section-label">
+                            PORTFÓLIO
+                        </span>
+
+                        <h2>
+                            Projetos em destaque
+                        </h2>
+                    </div>
+
+                    <p>
+                        Estes cartões são exemplos temporários.
+                        Depois, o administrador poderá cadastrar os projetos reais.
+                    </p>
+
+                </div>
+
+
+
+                <div class="projects-grid">
+
+                    <!-- PROJETO 1 -->
+                    <article class="project-card">
+
+                        <div class="project-photo photo-blue">
+                            <span>PROJETO</span>
+                        </div>
+
+                        <div class="project-info">
+
+                            <small>AUTOMOTIVO</small>
+
+                            <h3>
+                                Som automotivo
+                            </h3>
+
+                            <p>
+                                Exemplo de projeto de som realizado em veículo.
+                            </p>
+
+                            <a href="atendimento.html">
+                                Quero saber mais →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- PROJETO 2 -->
+                    <article class="project-card">
+
+                        <div class="project-photo photo-dark">
+                            <span>PROJETO</span>
+                        </div>
+
+                        <div class="project-info">
+
+                            <small>NÁUTICO</small>
+
+                            <h3>
+                                Som para barco
+                            </h3>
+
+                            <p>
+                                Exemplo de projeto de áudio para aplicação náutica.
+                            </p>
+
+                            <a href="atendimento.html">
+                                Quero saber mais →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- PROJETO 3 -->
+                    <article class="project-card">
+
+                        <div class="project-photo photo-light">
+                            <span>PROJETO</span>
+                        </div>
+
+                        <div class="project-info">
+
+                            <small>INSTALAÇÃO</small>
+
+                            <h3>
+                                Instalação de equipamentos
+                            </h3>
+
+                            <p>
+                                Exemplo de instalação e organização de equipamentos.
+                            </p>
+
+                            <a href="atendimento.html">
+                                Quero saber mais →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- PROJETO 4 -->
+                    <article class="project-card">
+
+                        <div class="project-photo photo-blue-dark">
+                            <span>PROJETO</span>
+                        </div>
+
+                        <div class="project-info">
+
+                            <small>TÉCNICO</small>
+
+                            <h3>
+                                Manutenção e ajustes
+                            </h3>
+
+                            <p>
+                                Exemplo de trabalho técnico e suporte.
+                            </p>
+
+                            <a href="atendimento.html">
+                                Quero saber mais →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- CHAMADA PARA ATENDIMENTO -->
+            <section class="projects-bottom">
+
+                <div>
+
+                    <span class="section-label">
+                        ATENDIMENTO
+                    </span>
+
+                    <h2>
+                        Quer fazer um projeto com a Max Som?
+                    </h2>
+
+                    <p>
+                        Entre em contato com a equipe e explique o que você precisa.
+                    </p>
+
+                </div>
+
+
+                <div class="projects-buttons">
+
+                    <a
+                        href="atendimento.html"
+                        class="btn btn-primary"
+                    >
+                        Falar com a equipe →
+                    </a>
+
+                    <a
+                        href="servicos.html"
+                        class="btn btn-secondary"
+                    >
+                        Ver serviços
+                    </a>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- RODAPÉ -->
+        <footer class="footer">
+
+            <div class="footer-top">
+
+                <div>
+
+                    <div class="footer-brand">
+
+                        <span class="logo-symbol">MS</span>
+
+                        <div>
+                            <strong>MAX SOM</strong>
+
+                            <small>
+                                DIVULGAÇÃO • SERVIÇOS • ATENDIMENTO
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        Plataforma da Max Som para divulgação,
+                        apresentação e atendimento ao cliente.
+                    </p>
+
+                </div>
+
+
+
+                <div class="footer-links">
+
+                    <div>
+                        <span>EXPLORE</span>
+
+                        <a href="index.html">Início</a>
+                        <a href="produtos.html">Produtos</a>
+                        <a href="servicos.html">Serviços</a>
+                    </div>
+
+
+                    <div>
+                        <span>EMPRESA</span>
+
+                        <a href="projetos.html">Projetos</a>
+                        <a href="publicacoes.html">Publicações</a>
+                        <a href="atendimento.html">Atendimento</a>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="footer-bottom">
+
+                <span>
+                    © <span id="currentYear"></span>
+                    Max Som. Todos os direitos reservados.
+                </span>
+
+                <span>Projetos</span>
+
+            </div>
+
+        </footer>
 
     </div>
 
 
-    <div class="footer-bottom">
 
-      <div class="container">
-        © 2026 Max Som. Todos os direitos reservados.
-      </div>
-
-    </div>
-
-  </footer>
+    <!-- FUNDO DO MENU NO CELULAR -->
+    <div class="overlay" id="overlay"></div>
 
 
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="main.js"></script>
+    <!-- JAVASCRIPT COMPARTILHADO -->
+    <script src="js/main.js"></script>
 
 </body>
 </html>
