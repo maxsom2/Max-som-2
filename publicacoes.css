@@ -1,349 +1,95 @@
-/* =========================
-   CABEÇALHO
-========================= */
+/* CORREÇÃO DO MENU LATERAL */
 
-.publications-header {
-    padding: 65px max(32px, calc((100vw - 1200px) / 2));
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
 
-    background: #0b2445;
-
-    color: #fff;
-}
-
-.publications-header h1 {
-    max-width: 760px;
-
-    margin-top: 10px;
-
-    font-size: clamp(36px, 5vw, 58px);
-
-    line-height: 1.05;
-}
-
-.publications-header h1 span {
-    display: block;
-
-    color: #9fc6f5;
-
-    font-weight: 500;
-}
-
-.publications-header p {
-    max-width: 650px;
-
-    margin-top: 18px;
-
-    color: #bfd0e5;
-
-    font-size: 14px;
-}
-
-
-/* =========================
-   CONTEÚDO
-========================= */
-
-.publications-content {
-    width: min(1200px, calc(100% - 64px));
-
-    margin: 0 auto;
-
-    padding: 65px 0;
-}
-
-.publications-heading {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: end;
-
-    gap: 25px;
-
-    margin-bottom: 25px;
-}
-
-.publications-heading h2 {
-    color: var(--navy);
-
-    font-size: 34px;
-
-    line-height: 1.1;
-}
-
-.publications-heading p {
-    max-width: 400px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-}
-
-
-/* =========================
-   STORIES
-========================= */
-
-.stories-list {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 24px;
-
-    margin-bottom: 65px;
-}
-
-.story-card {
-    width: 90px;
+    width: 260px;
+    height: 100vh;
 
     display: flex;
-
-    align-items: center;
-
     flex-direction: column;
 
-    gap: 9px;
+    background: #07192f;
+    color: #ffffff;
 
-    color: var(--navy);
+    z-index: 100;
 
-    font-size: 11px;
+    overflow-y: auto;
 
-    font-weight: 700;
+    transform: translateX(0);
+    transition: transform 0.25s ease;
 }
 
-.story-circle {
-    width: 76px;
-    height: 76px;
-
-    border: 3px solid #fff;
-
-    outline: 2px solid #2f79d8;
-
-    border-radius: 50%;
-
-    display: grid;
-
-    place-items: center;
-
-    color: #fff;
-
-    font-size: 18px;
-
-    font-weight: 900;
+.page {
+    margin-left: 260px;
+    min-height: 100vh;
 }
 
-.story-blue {
-    background: linear-gradient(135deg, #2f79d8, #0b2445);
+/* Botão do menu */
+
+.menu-toggle {
+    display: none;
+
+    width: 40px;
+    height: 40px;
+
+    border: 1px solid #e4e9f1;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    cursor: pointer;
 }
 
-.story-dark {
-    background: linear-gradient(135deg, #07192f, #315777);
+.menu-toggle span {
+    display: block;
+
+    width: 18px;
+    height: 2px;
+
+    margin: 4px auto;
+
+    background: #07192f;
 }
 
-.story-gray {
-    background: linear-gradient(135deg, #334860, #8197b4);
-}
+/* Menu para celulares e telas menores */
 
-.story-light {
-    background: linear-gradient(135deg, #6aa4e8, #173e70);
-}
+@media (max-width: 860px) {
 
-
-/* =========================
-   PUBLICAÇÕES
-========================= */
-
-.posts-heading {
-    margin-bottom: 25px;
-}
-
-.posts-grid {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 18px;
-}
-
-.post-card {
-    overflow: hidden;
-
-    border: 1px solid var(--border);
-
-    border-radius: 16px;
-
-    background: #fff;
-}
-
-.post-image {
-    height: 200px;
-
-    padding: 16px;
-
-    display: flex;
-
-    align-items: end;
-}
-
-.post-image span {
-    padding: 7px 10px;
-
-    border-radius: 7px;
-
-    background: rgba(8, 24, 46, 0.65);
-
-    color: #fff;
-
-    font-size: 8px;
-
-    font-weight: 800;
-
-    letter-spacing: 0.12em;
-}
-
-.post-image-one {
-    background: linear-gradient(135deg, #0d315b, #3784e0);
-}
-
-.post-image-two {
-    background: linear-gradient(135deg, #0b1728, #315777);
-}
-
-.post-image-three {
-    background: linear-gradient(135deg, #183452, #6c8daa);
-}
-
-.post-content {
-    padding: 20px;
-}
-
-.post-category {
-    color: #6e91bc;
-
-    font-size: 8px;
-
-    font-weight: 800;
-
-    letter-spacing: 0.13em;
-}
-
-.post-content h3 {
-    margin-top: 9px;
-
-    color: var(--navy);
-
-    font-size: 19px;
-}
-
-.post-content p {
-    min-height: 58px;
-
-    margin-top: 9px;
-
-    color: var(--muted);
-
-    font-size: 11px;
-}
-
-.post-footer {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-top: 18px;
-
-    padding-top: 13px;
-
-    border-top: 1px solid var(--border);
-
-    color: var(--blue);
-
-    font-size: 10px;
-
-    font-weight: 700;
-}
-
-
-/* =========================
-   CHAMADA PARA ATENDIMENTO
-========================= */
-
-.publications-cta {
-    padding: 60px max(32px, calc((100vw - 1200px) / 2));
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 25px;
-
-    background: var(--blue-soft);
-}
-
-.publications-cta h2 {
-    color: var(--navy);
-
-    font-size: 34px;
-
-    line-height: 1.1;
-}
-
-.publications-cta p {
-    margin-top: 9px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-}
-
-
-/* =========================
-   RESPONSIVIDADE
-========================= */
-
-@media (max-width: 1000px) {
-
-    .posts-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .sidebar {
+        transform: translateX(-100%);
     }
 
-}
-
-@media (max-width: 760px) {
-
-    .publications-header,
-    .publications-cta {
-        padding-left: 18px;
-        padding-right: 18px;
+    .sidebar.open {
+        transform: translateX(0);
     }
 
-    .publications-content {
-        width: min(100% - 36px, 1200px);
+    .page {
+        margin-left: 0;
     }
 
-    .publications-heading,
-    .publications-cta {
-        align-items: flex-start;
-
-        flex-direction: column;
+    .menu-toggle {
+        display: block;
     }
 
-    .publications-heading h2,
-    .publications-cta h2 {
-        font-size: 29px;
+    .mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .posts-grid {
-        grid-template-columns: 1fr;
-    }
+    .overlay.active {
+        display: block;
 
-    .stories-list {
-        gap: 17px;
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.55);
+
+        z-index: 90;
     }
 
 }
