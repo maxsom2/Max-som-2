@@ -111,7 +111,40 @@ footer {
   main {
     width: calc(100% - 32px);
     margin: 44px auto;
-  }
+  } 
+   
+/* Correção da organização do menu lateral */
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 6px;
+}
+
+.side-nav .nav-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 6px;
+}
+
+.sidebar-bottom .nav-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
 
   footer {
     padding: 22px 16px;
