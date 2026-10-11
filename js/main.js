@@ -1,173 +1,65 @@
-document.addEventListener("DOMContentLoaded", function () {
 
-    // Elementos do site
-    const sidebar = document.getElementById("sidebar");
-    const page = document.querySelector(".page");
-    const overlay = document.getElementById("overlay");
+const sidebar = document.getElementById("sidebar");
+const menuToggle = document.getElementById("menuToggle");
+const mobileMenu = document.getElementById("mobileMenu");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+const navLinks = document.querySelectorAll(".nav-link");
 
-    const menuToggle = document.getElementById("menuToggle");
-    const closeSidebar = document.getElementById("closeSidebar");
+// Recolher ou expandir o menu no computador
+if (menuToggle) {
+  menuToggle.addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-collapsed");
 
-    const currentYear = document.getElementById("currentYear");
-    const sidebarYear = document.getElementById("sidebarYear");
+    const collapsed = document.body.classList.contains("sidebar-collapsed");
 
+    menuToggle.setAttribute("aria-expanded", String(!collapsed));
 
-    // ========================================
-    // ANO AUTOMÁTICO
-    // ========================================
+    const label = menuToggle.querySelector(".toggle-label");
 
-    const year = new Date().getFullYear();
-
-    if (currentYear) {
-        currentYear.textContent = year;
+    if (label) {
+      label.textContent = collapsed ? "Expandir menu" : "Recolher menu";
     }
+  });
+}
 
-    if (sidebarYear) {
-        sidebarYear.textContent = year;
-    }
+// Abrir o menu no celular
+if (mobileMenu) {
+  mobileMenu.addEventListener("click", () => {
+    document.body.classList.add("mobile-sidebar-open");
+    mobileMenu.setAttribute("aria-expanded", "true");
+  });
+}
 
+// Fechar o menu do celular
+function closeMobileMenu() {
+  document.body.classList.remove("mobile-sidebar-open");
 
-    // ========================================
-    // VERIFICAR TAMANHO DA TELA
-    // ========================================
+  if (mobileMenu) {
+    mobileMenu.setAttribute("aria-expanded", "false");
+  }
+}
 
-    function isMobile() {
-        return window.innerWidth <= 860;
-    }
+// Fechar ao clicar na área escura
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener("click", closeMobileMenu);
+}
 
+// Fechar ao pressionar Esc
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeMobileMenu();
+  }
+});
 
-    // ========================================
-    // ABRIR MENU NO CELULAR
-    // ========================================
+// Fechar o menu do celular ao escolher uma seção
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    closeMobileMenu();
 
-    function openMobileMenu() {
-
-        if (!sidebar || !overlay) return;
-
-        sidebar.classList.add("open");
-        overlay.classList.add("active");
-
-        document.body.style.overflow = "hidden";
-    }
-
-
-    // ========================================
-    // FECHAR MENU NO CELULAR
-    // ========================================
-
-    function closeMobileMenu() {
-
-        if (sidebar) {
-            sidebar.classList.remove("open");
-        }
-
-        if (overlay) {
-            overlay.classList.remove("active");
-        }
-
-        document.body.style.overflow = "";
-    }
-
-
-    // ========================================
-    // BOTÃO DO MENU
-    // ========================================
-
-    if (menuToggle && sidebar && page) {
-
-        menuToggle.addEventListener("click", function () {
-
-            if (isMobile()) {
-
-                // No celular, abre ou fecha o menu
-                if (sidebar.classList.contains("open")) {
-                    closeMobileMenu();
-                } else {
-                    openMobileMenu();
-                }
-
-            } else {
-
-                // No computador, recolhe ou expande o menu
-                sidebar.classList.toggle("collapsed");
-
-                const collapsed =
-                    sidebar.classList.contains("collapsed");
-
-                page.classList.toggle(
-                    "sidebar-collapsed",
-                    collapsed
-                );
-
-            }
-
-        });
-
-    }
-
-
-    // ========================================
-    // BOTÃO X DO MENU
-    // ========================================
-
-    if (closeSidebar) {
-
-        closeSidebar.addEventListener("click", function () {
-            closeMobileMenu();
-        });
-
-    }
-
-
-    // ========================================
-    // CLICAR NO FUNDO ESCURO
-    // ========================================
-
-    if (overlay) {
-
-        overlay.addEventListener("click", function () {
-            closeMobileMenu();
-        });
-
-    }
-
-
-    // ========================================
-    // FECHAR MENU AO TROCAR DE PÁGINA
-    // ========================================
-
-    document.querySelectorAll(".sidebar a").forEach(function (link) {
-
-        link.addEventListener("click", function () {
-
-            if (isMobile()) {
-                closeMobileMenu();
-            }
-
-        });
-
+    navLinks.forEach((item) => {
+      item.classList.remove("active");
     });
 
-
-    // ========================================
-    // AJUSTAR AO REDIMENSIONAR A TELA
-    // ========================================
-
-    window.addEventListener("resize", function () {
-
-        if (!sidebar || !page) return;
-
-        if (isMobile()) {
-
-            sidebar.classList.remove("collapsed");
-            page.classList.remove("sidebar-collapsed");
-
-        } else {
-
-            closeMobileMenu();
-
-        }
-
-    });
-
+    link.classList.add("active");
+  });
 });
