@@ -1,1217 +1,694 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <title>Painel administrativo | Max Som</title>
 
-  <title>Painel Max Som</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
-
 
 <body>
 
+  <!-- MENU LATERAL -->
+  <aside class="sidebar" id="sidebar">
 
-  <!-- =========================================================
-       CABEÇALHO
-  ========================================================== -->
+    <a href="index.html" class="brand" aria-label="Max Som - Início">
+      <img src="logo-maxsom-white.png" alt="Max Som" class="brand-logo">
+    </a>
 
-  <header>
+    <button class="menu-toggle" id="menuToggle" type="button"
+      aria-controls="sidebar" aria-expanded="true" aria-label="Recolher menu">
+      <span>☰</span>
+      <span class="toggle-label">Recolher menu</span>
+    </button>
 
-    <div class="container header-content">
+    <nav class="side-nav" aria-label="Menu principal">
 
-
-      <a
-        href="index.html"
-        class="logo"
-        aria-label="Max Som - Início"
-      >
-
-        <img
-          src="logo-maxsom-white.png"
-          alt="Max Som"
-        >
-
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">⌂</span>
+        <span>Início</span>
       </a>
 
-
-      <a
-        href="https://wa.me/5565996262514"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="header-whatsapp"
-      >
-        WhatsApp
+      <a href="produtos.html" class="nav-link">
+        <span class="nav-icon">▣</span>
+        <span>Produtos</span>
       </a>
 
+      <a href="servicos.html" class="nav-link">
+        <span class="nav-icon">⚙</span>
+        <span>Serviços</span>
+      </a>
 
-      <span class="phone">
-        65 99626-2514
-      </span>
+      <a href="projetos.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span>Projetos</span>
+      </a>
 
+      <a href="publicacoes.html" class="nav-link">
+        <span class="nav-icon">▧</span>
+        <span>Publicações</span>
+      </a>
 
-      <nav>
+      <a href="atendimento.html" class="nav-link">
+        <span class="nav-icon">☏</span>
+        <span>Atendimento</span>
+      </a>
 
+      <a href="conversas.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span>Conversas</span>
+      </a>
 
-        <a href="index.html">
-          Ver site
-        </a>
+      <a href="conta.html" class="nav-link">
+        <span class="nav-icon">♙</span>
+        <span>Minha conta</span>
+      </a>
 
+      <a href="admin.html" class="nav-link active" aria-current="page">
+        <span class="nav-icon">⚙</span>
+        <span>Painel administrativo</span>
+      </a>
 
-        <a
-          href="produtos.html"
-        >
-          Produtos
-        </a>
+    </nav>
 
+    <div class="sidebar-bottom">
+      <a href="https://wa.me/5565996262514"
+        target="_blank" rel="noopener" class="sidebar-support">
+        <span>☏</span>
+        <span>Falar com a Max Som</span>
+      </a>
+    </div>
 
-        <a
-          href="servicos.html"
-        >
-          Serviços
-        </a>
+  </aside>
 
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <a
-          href="projetos.html"
-        >
-          Projetos
-        </a>
+  <!-- ÁREA PRINCIPAL -->
+  <div class="site-shell">
 
+    <header class="topbar">
 
-        <a
-          href="publicacoes.html"
-        >
-          Publicações
-        </a>
+      <button class="mobile-menu-button" id="mobileMenu" type="button"
+        aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+        ☰
+      </button>
 
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Painel administrativo</strong>
+      </div>
 
-        <a
-          href="atendimento.html"
-        >
-          Atendimento
-        </a>
+      <div class="topbar-actions">
+        <a href="index.html" class="topbar-help">Ver site</a>
 
-
-        <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-
-        <a
-          href="conta.html"
-          data-logged-only
-        >
+        <a href="conta.html" class="account-button">
           Minha conta
         </a>
 
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-
-        <button
-          class="btn btn-outline"
-          data-logout
-          data-logged-only
-          type="button"
-        >
+        <button type="button" class="account-button" data-logout>
           Sair
         </button>
-
-
-      </nav>
-
-    </div>
-
-  </header>
-
-
-
-  <!-- =========================================================
-       CONTEÚDO
-  ========================================================== -->
-
-  <main class="admin-page">
-
-    <div class="container">
-
-
-      <!-- =====================================================
-           TÍTULO
-      ====================================================== -->
-
-      <div class="section-title">
-
-        <span>
-          Área administrativa
-        </span>
-
-        <h1>
-          Painel Max Som
-        </h1>
-
-        <p class="muted">
-          Gerencie as informações do site de forma simples.
-        </p>
-
       </div>
 
+    </header>
 
+    <main class="admin-main">
 
-      <!-- =====================================================
-           MENSAGEM
-      ====================================================== -->
+      <!-- APRESENTAÇÃO -->
+      <section class="admin-hero">
 
-      <div
-        id="adminMensagem"
-        class="message hidden"
-      ></div>
+        <span class="admin-eyebrow">GESTÃO MAX SOM</span>
 
+        <h1>Painel administrativo</h1>
 
+        <p>
+          Gerencie os conteúdos publicados no site, consulte usuários
+          e acompanhe as solicitações e conversas de atendimento.
+        </p>
 
-      <!-- =====================================================
-           PAINEL
-      ====================================================== -->
+        <div class="admin-hero-actions">
+          <a href="index.html" class="admin-hero-button">
+            Ver site público ↗
+          </a>
 
-      <div class="admin-shell">
+          <a href="conversas.html" class="admin-hero-link">
+            Acessar conversas →
+          </a>
+        </div>
 
+      </section>
 
-        <!-- ===================================================
-             MENU
-        ==================================================== -->
+      <div id="adminMensagem" class="message hidden" role="status"></div>
 
+      <!-- ESTRUTURA DO PAINEL -->
+      <section class="admin-shell">
+
+        <!-- NAVEGAÇÃO INTERNA -->
         <aside class="admin-sidebar">
 
-          <h2>
-            Max Som
-          </h2>
+          <div class="admin-sidebar-heading">
+            <span class="admin-sidebar-icon">⚙</span>
 
-          <p>
-            Escolha o que deseja administrar.
-          </p>
+            <div>
+              <strong>Central de gestão</strong>
+              <span>Administração do site</span>
+            </div>
+          </div>
 
+          <p class="admin-menu-label">GERENCIAMENTO</p>
 
-          <div class="admin-menu">
+          <nav class="admin-menu" aria-label="Seções administrativas">
 
-
-            <button
-              class="active"
-              data-panel="resumo"
-              type="button"
-            >
-              🏠 Resumo
+            <button type="button" class="active" data-panel="resumo">
+              <span>▦</span> Resumo
             </button>
 
-
-            <button
-              data-panel="produtosAdmin"
-              type="button"
-            >
-              📦 Produtos
+            <button type="button" data-panel="produtosAdmin">
+              <span>▣</span> Produtos
             </button>
 
-
-            <button
-              data-panel="servicosAdmin"
-              type="button"
-            >
-              🔧 Serviços
+            <button type="button" data-panel="servicosAdmin">
+              <span>⚙</span> Serviços
             </button>
 
-
-            <button
-              data-panel="projetosAdmin"
-              type="button"
-            >
-              📸 Projetos
+            <button type="button" data-panel="projetosAdmin">
+              <span>▤</span> Projetos
             </button>
 
-
-            <button
-              data-panel="publicacoesAdmin"
-              type="button"
-            >
-              📰 Publicações
+            <button type="button" data-panel="publicacoesAdmin">
+              <span>▧</span> Publicações
             </button>
 
-
-            <button
-              data-panel="usuariosAdmin"
-              type="button"
-            >
-              👥 Usuários
+            <button type="button" data-panel="usuariosAdmin">
+              <span>♙</span> Usuários
             </button>
 
-
-            <button
-              data-panel="solicitacoesAdmin"
-              type="button"
-            >
-              💬 Solicitações
+            <button type="button" data-panel="solicitacoesAdmin">
+              <span>☏</span> Atendimentos
             </button>
 
+          </nav>
 
+          <div class="admin-sidebar-help">
+            <span>Precisa de ajuda?</span>
+            <a href="atendimento.html">Abrir atendimento →</a>
           </div>
 
         </aside>
 
+        <!-- PAINÉIS -->
+        <div class="admin-content">
 
+          <!-- RESUMO -->
+          <section class="admin-panel active" id="resumo">
 
-        <!-- ===================================================
-             CONTEÚDO
-        ==================================================== -->
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">VISÃO GERAL</span>
+                <h2>Resumo do sistema</h2>
+                <p>Confira os dados gerais registrados no Max Som.</p>
+              </div>
+            </div>
 
-        <section class="admin-content">
+            <div class="admin-grid" id="adminStats">
+              <div class="stat-card">
+                <span>Carregando dados</span>
+                <strong>—</strong>
+              </div>
+            </div>
 
+            <article class="admin-welcome-card">
 
-          <!-- =================================================
-               RESUMO
-          ================================================== -->
+              <div class="admin-welcome-icon">✦</div>
 
-          <div
-            class="admin-panel active"
-            id="resumo"
-          >
+              <div>
+                <span class="admin-kicker">BEM-VINDO AO PAINEL</span>
+                <h3>Gerencie o conteúdo da Max Som</h3>
 
-            <div
-              class="admin-grid"
-              id="adminStats"
-            ></div>
+                <p>
+                  Utilize o menu para cadastrar, editar e excluir produtos
+                  informativos, serviços, projetos e publicações.
+                  Você também pode consultar os usuários e os atendimentos.
+                </p>
+              </div>
 
+            </article>
 
-            <div
-              class="account-card"
-              style="margin-top:16px"
-            >
+            <div class="admin-quick-grid">
 
-              <h2>
-                Bem-vindo ao painel
-              </h2>
+              <button type="button" data-panel="produtosAdmin" class="admin-quick-card">
+                <span class="admin-quick-icon">▣</span>
+                <strong>Produtos</strong>
+                <small>Gerenciar catálogo informativo</small>
+                <span class="admin-quick-arrow">→</span>
+              </button>
 
-              <p class="muted">
-                Use o menu ao lado para cadastrar,
-                editar ou remover informações do site.
-              </p>
+              <button type="button" data-panel="projetosAdmin" class="admin-quick-card">
+                <span class="admin-quick-icon">▤</span>
+                <strong>Projetos</strong>
+                <small>Gerenciar projetos publicados</small>
+                <span class="admin-quick-arrow">→</span>
+              </button>
+
+              <button type="button" data-panel="usuariosAdmin" class="admin-quick-card">
+                <span class="admin-quick-icon">♙</span>
+                <strong>Usuários</strong>
+                <small>Consultar cadastros e permissões</small>
+                <span class="admin-quick-arrow">→</span>
+              </button>
+
+              <button type="button" data-panel="solicitacoesAdmin" class="admin-quick-card">
+                <span class="admin-quick-icon">☏</span>
+                <strong>Atendimentos</strong>
+                <small>Consultar solicitações e conversas</small>
+                <span class="admin-quick-arrow">→</span>
+              </button>
 
             </div>
 
-          </div>
+          </section>
 
+          <!-- PRODUTOS -->
+          <section class="admin-panel" id="produtosAdmin">
 
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">CATÁLOGO INFORMATIVO</span>
+                <h2>Produtos</h2>
+                <p>Cadastre e mantenha atualizadas as informações dos equipamentos.</p>
+              </div>
+            </div>
 
-          <!-- =================================================
-               PRODUTOS
-          ================================================== -->
+            <article class="admin-card">
 
-          <div
-            class="admin-panel"
-            id="produtosAdmin"
-          >
-
-            <div class="account-card">
-
-              <h2>
-                Produtos
-              </h2>
-
-
-              <div class="admin-help">
-
-                Cadastre produtos apenas para divulgação.
-
-                O site não possui carrinho nem venda online.
-
+              <div class="admin-card-heading">
+                <h3>Cadastrar produto</h3>
+                <p>
+                  Este catálogo é apenas informativo: não inclui carrinho
+                  nem venda direta pelo site.
+                </p>
               </div>
 
+              <form id="produtoForm" class="admin-form">
 
-              <form
-                id="produtoForm"
-                class="admin-form"
-              >
+                <input type="hidden" id="produtoId">
 
-
-                <input
-                  type="hidden"
-                  id="produtoId"
-                >
-
-
-                <div class="form-group">
-
-                  <label for="produtoNome">
-                    Nome
-                  </label>
-
-                  <input
-                    id="produtoNome"
-                    required
-                  >
-
+                <div class="admin-field">
+                  <label for="produtoNome">Nome do produto *</label>
+                  <input id="produtoNome" required placeholder="Ex.: Caixa de som">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label for="produtoModelo">
-                    Modelo
-                  </label>
-
-                  <input
-                    id="produtoModelo"
-                  >
-
+                <div class="admin-field">
+                  <label for="produtoModelo">Modelo</label>
+                  <input id="produtoModelo" placeholder="Modelo do equipamento">
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="produtoDescricao">
-                    Descrição
-                  </label>
-
-                  <textarea
-                    id="produtoDescricao"
-                  ></textarea>
-
+                <div class="admin-field full">
+                  <label for="produtoDescricao">Descrição</label>
+                  <textarea id="produtoDescricao" rows="4"
+                    placeholder="Descreva o produto e suas características"></textarea>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="produtoImagem">
-                    Link da imagem
-                  </label>
-
-                  <input
-                    id="produtoImagem"
-                    placeholder="https://..."
-                  >
-
+                <div class="admin-field full">
+                  <label for="produtoImagem">Link da imagem</label>
+                  <input type="url" id="produtoImagem"
+                    placeholder="https://...">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label>
-
-                    <input
-                      type="checkbox"
-                      id="produtoDisponivel"
-                      checked
-                    >
-
-                    Disponível
-
+                <div class="admin-checkboxes">
+                  <label class="admin-checkbox">
+                    <input type="checkbox" id="produtoDisponivel" checked>
+                    <span>Disponível no catálogo</span>
                   </label>
 
-                </div>
-
-
-                <div class="form-group">
-
-                  <label>
-
-                    <input
-                      type="checkbox"
-                      id="produtoDestaque"
-                    >
-
-                    Destaque
-
+                  <label class="admin-checkbox">
+                    <input type="checkbox" id="produtoDestaque">
+                    <span>Mostrar em destaque</span>
                   </label>
-
                 </div>
-
 
                 <div class="admin-form-actions">
-
-
-                  <button
-                    class="btn btn-primary"
-                    type="submit"
-                  >
+                  <button class="admin-button-primary" type="submit">
                     Salvar produto
                   </button>
 
-
-                  <button
-                    class="btn btn-outline"
-                    type="button"
-                    id="produtoCancelar"
-                  >
-                    Limpar
+                  <button class="admin-button-secondary" type="button" id="produtoCancelar">
+                    Limpar campos
                   </button>
-
-
                 </div>
 
               </form>
 
+            </article>
 
-              <div
-                id="produtosAdminLista"
-                style="margin-top:24px"
-              ></div>
-
-
-            </div>
-
-          </div>
-
-
-
-          <!-- =================================================
-               SERVIÇOS
-          ================================================== -->
-
-          <div
-            class="admin-panel"
-            id="servicosAdmin"
-          >
-
-            <div class="account-card">
-
-
-              <h2>
-                Serviços
-              </h2>
-
-
-              <div class="admin-help">
-
-                Quando o valor depender do projeto,
-                o serviço será apresentado como
-                <strong>Sob orçamento</strong>.
-
+            <article class="admin-card admin-list-card">
+              <div class="admin-card-heading">
+                <h3>Produtos cadastrados</h3>
+                <p>Edite ou remova os registros existentes.</p>
               </div>
 
+              <div id="produtosAdminLista" class="admin-record-list">
+                <p class="admin-loading">Carregando produtos...</p>
+              </div>
+            </article>
 
-              <form
-                id="servicoForm"
-                class="admin-form"
-              >
+          </section>
 
+          <!-- SERVIÇOS -->
+          <section class="admin-panel" id="servicosAdmin">
 
-                <input
-                  type="hidden"
-                  id="servicoId"
-                >
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">SOLUÇÕES MAX SOM</span>
+                <h2>Serviços</h2>
+                <p>Gerencie os serviços divulgados pela empresa.</p>
+              </div>
+            </div>
 
+            <article class="admin-card">
 
-                <div class="form-group">
+              <div class="admin-card-heading">
+                <h3>Cadastrar serviço</h3>
+                <p>Os valores podem variar conforme o projeto e a necessidade do cliente.</p>
+              </div>
 
-                  <label for="servicoNome">
-                    Nome
-                  </label>
+              <form id="servicoForm" class="admin-form">
 
-                  <input
-                    id="servicoNome"
-                    required
-                  >
+                <input type="hidden" id="servicoId">
 
+                <div class="admin-field">
+                  <label for="servicoNome">Nome do serviço *</label>
+                  <input id="servicoNome" required placeholder="Nome do serviço">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label>
-                    Valor
-                  </label>
-
-                  <input
-                    value="Sob orçamento"
-                    disabled
-                  >
-
+                <div class="admin-field">
+                  <label>Valor</label>
+                  <input value="Sob orçamento" disabled>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="servicoDescricao">
-                    Descrição
-                  </label>
-
-                  <textarea
-                    id="servicoDescricao"
-                  ></textarea>
-
+                <div class="admin-field full">
+                  <label for="servicoDescricao">Descrição</label>
+                  <textarea id="servicoDescricao" rows="4"
+                    placeholder="Explique o que está incluído no serviço"></textarea>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="servicoImagem">
-                    Link da imagem
-                  </label>
-
-                  <input
-                    id="servicoImagem"
-                    placeholder="https://..."
-                  >
-
+                <div class="admin-field full">
+                  <label for="servicoImagem">Link da imagem</label>
+                  <input type="url" id="servicoImagem" placeholder="https://...">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label>
-
-                    <input
-                      type="checkbox"
-                      id="servicoAtivo"
-                      checked
-                    >
-
-                    Ativo
-
+                <div class="admin-checkboxes">
+                  <label class="admin-checkbox">
+                    <input type="checkbox" id="servicoAtivo" checked>
+                    <span>Serviço ativo</span>
                   </label>
-
                 </div>
-
 
                 <div class="admin-form-actions">
-
-
-                  <button
-                    class="btn btn-primary"
-                    type="submit"
-                  >
+                  <button class="admin-button-primary" type="submit">
                     Salvar serviço
                   </button>
 
-
-                  <button
-                    class="btn btn-outline"
-                    type="button"
-                    id="servicoCancelar"
-                  >
-                    Limpar
+                  <button class="admin-button-secondary" type="button" id="servicoCancelar">
+                    Limpar campos
                   </button>
-
-
                 </div>
 
               </form>
 
+            </article>
 
-              <div
-                id="servicosAdminLista"
-                style="margin-top:24px"
-              ></div>
+            <article class="admin-card admin-list-card">
+              <div class="admin-card-heading">
+                <h3>Serviços cadastrados</h3>
+              </div>
 
+              <div id="servicosAdminLista" class="admin-record-list">
+                <p class="admin-loading">Carregando serviços...</p>
+              </div>
+            </article>
 
+          </section>
+
+          <!-- PROJETOS -->
+          <section class="admin-panel" id="projetosAdmin">
+
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">PORTFÓLIO</span>
+                <h2>Projetos</h2>
+                <p>Apresente os projetos realizados pela Max Som.</p>
+              </div>
             </div>
 
-          </div>
+            <article class="admin-card">
 
+              <div class="admin-card-heading">
+                <h3>Cadastrar projeto</h3>
+                <p>Preencha as informações que serão exibidas na página de projetos.</p>
+              </div>
 
+              <form id="projetoForm" class="admin-form">
 
-          <!-- =================================================
-               PROJETOS
-          ================================================== -->
+                <input type="hidden" id="projetoId">
 
-          <div
-            class="admin-panel"
-            id="projetosAdmin"
-          >
-
-            <div class="account-card">
-
-
-              <h2>
-                Projetos
-              </h2>
-
-
-              <form
-                id="projetoForm"
-                class="admin-form"
-              >
-
-
-                <input
-                  type="hidden"
-                  id="projetoId"
-                >
-
-
-                <div class="form-group">
-
-                  <label for="projetoTitulo">
-                    Título
-                  </label>
-
-                  <input
-                    id="projetoTitulo"
-                    required
-                  >
-
+                <div class="admin-field">
+                  <label for="projetoTitulo">Título do projeto *</label>
+                  <input id="projetoTitulo" required placeholder="Nome do projeto">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label for="projetoCategoria">
-                    Categoria
-                  </label>
-
-                  <input
-                    id="projetoCategoria"
-                  >
-
+                <div class="admin-field">
+                  <label for="projetoCategoria">Categoria</label>
+                  <input id="projetoCategoria" placeholder="Ex.: Automotivo">
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="projetoDescricao">
-                    Descrição
-                  </label>
-
-                  <textarea
-                    id="projetoDescricao"
-                  ></textarea>
-
+                <div class="admin-field full">
+                  <label for="projetoDescricao">Descrição</label>
+                  <textarea id="projetoDescricao" rows="4"
+                    placeholder="Conte um pouco sobre o projeto"></textarea>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="projetoImagem">
-                    Link da imagem
-                  </label>
-
-                  <input
-                    id="projetoImagem"
-                    placeholder="https://..."
-                  >
-
+                <div class="admin-field full">
+                  <label for="projetoImagem">Link da imagem</label>
+                  <input type="url" id="projetoImagem" placeholder="https://...">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label>
-
-                    <input
-                      type="checkbox"
-                      id="projetoPublicado"
-                      checked
-                    >
-
-                    Publicado
-
+                <div class="admin-checkboxes">
+                  <label class="admin-checkbox">
+                    <input type="checkbox" id="projetoPublicado" checked>
+                    <span>Publicar projeto no site</span>
                   </label>
-
                 </div>
-
 
                 <div class="admin-form-actions">
-
-
-                  <button
-                    class="btn btn-primary"
-                    type="submit"
-                  >
+                  <button class="admin-button-primary" type="submit">
                     Salvar projeto
                   </button>
 
-
-                  <button
-                    class="btn btn-outline"
-                    type="button"
-                    id="projetoCancelar"
-                  >
-                    Limpar
+                  <button class="admin-button-secondary" type="button" id="projetoCancelar">
+                    Limpar campos
                   </button>
-
-
                 </div>
 
               </form>
 
+            </article>
 
-              <div
-                id="projetosAdminLista"
-                style="margin-top:24px"
-              ></div>
+            <article class="admin-card admin-list-card">
+              <div class="admin-card-heading">
+                <h3>Projetos cadastrados</h3>
+              </div>
 
+              <div id="projetosAdminLista" class="admin-record-list">
+                <p class="admin-loading">Carregando projetos...</p>
+              </div>
+            </article>
 
+          </section>
+
+          <!-- PUBLICAÇÕES -->
+          <section class="admin-panel" id="publicacoesAdmin">
+
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">CONTEÚDO DO SITE</span>
+                <h2>Publicações</h2>
+                <p>Gerencie as notícias, novidades e demais conteúdos publicados.</p>
+              </div>
             </div>
 
-          </div>
+            <article class="admin-card">
 
+              <div class="admin-card-heading">
+                <h3>Criar publicação</h3>
+                <p>Adicione um título, resumo e conteúdo para a publicação.</p>
+              </div>
 
+              <form id="publicacaoForm" class="admin-form">
 
-          <!-- =================================================
-               PUBLICAÇÕES
-          ================================================== -->
+                <input type="hidden" id="publicacaoId">
 
-          <div
-            class="admin-panel"
-            id="publicacoesAdmin"
-          >
-
-            <div class="account-card">
-
-
-              <h2>
-                Publicações
-              </h2>
-
-
-              <form
-                id="publicacaoForm"
-                class="admin-form"
-              >
-
-
-                <input
-                  type="hidden"
-                  id="publicacaoId"
-                >
-
-
-                <div class="form-group full">
-
-                  <label for="publicacaoTitulo">
-                    Título
-                  </label>
-
-                  <input
-                    id="publicacaoTitulo"
-                    required
-                  >
-
+                <div class="admin-field full">
+                  <label for="publicacaoTitulo">Título *</label>
+                  <input id="publicacaoTitulo" required placeholder="Título da publicação">
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="publicacaoResumo">
-                    Resumo
-                  </label>
-
-                  <textarea
-                    id="publicacaoResumo"
-                  ></textarea>
-
+                <div class="admin-field full">
+                  <label for="publicacaoResumo">Resumo</label>
+                  <textarea id="publicacaoResumo" rows="2"
+                    placeholder="Resumo que apresenta o conteúdo"></textarea>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="publicacaoConteudo">
-                    Conteúdo
-                  </label>
-
-                  <textarea
-                    id="publicacaoConteudo"
-                  ></textarea>
-
+                <div class="admin-field full">
+                  <label for="publicacaoConteudo">Conteúdo</label>
+                  <textarea id="publicacaoConteudo" rows="7"
+                    placeholder="Escreva o conteúdo da publicação"></textarea>
                 </div>
 
-
-                <div class="form-group full">
-
-                  <label for="publicacaoImagem">
-                    Link da imagem
-                  </label>
-
-                  <input
-                    id="publicacaoImagem"
-                    placeholder="https://..."
-                  >
-
+                <div class="admin-field full">
+                  <label for="publicacaoImagem">Link da imagem</label>
+                  <input type="url" id="publicacaoImagem" placeholder="https://...">
                 </div>
 
-
-                <div class="form-group">
-
-                  <label>
-
-                    <input
-                      type="checkbox"
-                      id="publicacaoPublicado"
-                      checked
-                    >
-
-                    Publicado
-
+                <div class="admin-checkboxes">
+                  <label class="admin-checkbox">
+                    <input type="checkbox" id="publicacaoPublicado" checked>
+                    <span>Publicar no site</span>
                   </label>
-
                 </div>
-
 
                 <div class="admin-form-actions">
-
-
-                  <button
-                    class="btn btn-primary"
-                    type="submit"
-                  >
+                  <button class="admin-button-primary" type="submit">
                     Salvar publicação
                   </button>
 
-
-                  <button
-                    class="btn btn-outline"
-                    type="button"
-                    id="publicacaoCancelar"
-                  >
-                    Limpar
+                  <button class="admin-button-secondary" type="button" id="publicacaoCancelar">
+                    Limpar campos
                   </button>
-
-
                 </div>
 
               </form>
 
+            </article>
 
-              <div
-                id="publicacoesAdminLista"
-                style="margin-top:24px"
-              ></div>
-
-
-            </div>
-
-          </div>
-
-
-
-          <!-- =================================================
-               USUÁRIOS
-          ================================================== -->
-
-          <div
-            class="admin-panel"
-            id="usuariosAdmin"
-          >
-
-            <div class="account-card">
-
-
-              <h2>
-                Usuários e pedidos de administrador
-              </h2>
-
-
-              <p class="muted">
-
-                Consulte os usuários cadastrados e gerencie
-                as solicitações de acesso administrativo.
-
-              </p>
-
-
-              <div id="adminUsuariosLista">
-                Carregando...
+            <article class="admin-card admin-list-card">
+              <div class="admin-card-heading">
+                <h3>Publicações cadastradas</h3>
               </div>
 
+              <div id="publicacoesAdminLista" class="admin-record-list">
+                <p class="admin-loading">Carregando publicações...</p>
+              </div>
+            </article>
 
+          </section>
+
+          <!-- USUÁRIOS -->
+          <section class="admin-panel" id="usuariosAdmin">
+
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">CONTAS E PERMISSÕES</span>
+                <h2>Usuários</h2>
+                <p>Consulte os perfis e analise pedidos de acesso administrativo.</p>
+              </div>
             </div>
 
-          </div>
+            <article class="admin-card">
 
-
-
-          <!-- =================================================
-               SOLICITAÇÕES
-          ================================================== -->
-
-          <div
-            class="admin-panel"
-            id="solicitacoesAdmin"
-          >
-
-            <div class="account-layout">
-
-
-              <!-- SOLICITAÇÕES -->
-
-              <div class="account-card">
-
-
-                <h2>
-                  Solicitações de serviço
-                </h2>
-
-
-                <p class="muted">
-
-                  Solicitações enviadas pelos clientes.
-
+              <div class="admin-card-heading">
+                <h3>Usuários cadastrados</h3>
+                <p>
+                  Os pedidos pendentes de acesso administrativo podem ser aprovados
+                  ou recusados.
                 </p>
+              </div>
 
+              <div id="adminUsuariosLista" class="admin-record-list">
+                <p class="admin-loading">Carregando usuários...</p>
+              </div>
 
-                <div id="adminSolicitacoes">
-                  Carregando...
+            </article>
+
+          </section>
+
+          <!-- ATENDIMENTOS E CONVERSAS -->
+          <section class="admin-panel" id="solicitacoesAdmin">
+
+            <div class="admin-section-heading">
+              <div>
+                <span class="admin-kicker">RELACIONAMENTO COM CLIENTES</span>
+                <h2>Atendimentos e conversas</h2>
+                <p>Consulte os registros de atendimento e as conversas armazenadas.</p>
+              </div>
+            </div>
+
+            <div class="admin-support-grid">
+
+              <article class="admin-card">
+
+                <div class="admin-card-heading">
+                  <h3>Solicitações de serviço</h3>
+                  <p>Registros recebidos dos clientes.</p>
                 </div>
 
-
-              </div>
-
-
-
-              <!-- CONVERSAS -->
-
-              <div class="account-card">
-
-
-                <h2>
-                  Conversas
-                </h2>
-
-
-                <p class="muted">
-
-                  Atendimentos e conversas com clientes.
-
-                </p>
-
-
-                <div id="adminConversas">
-                  Carregando...
+                <div id="adminSolicitacoes" class="admin-record-list">
+                  <p class="admin-loading">Carregando solicitações...</p>
                 </div>
 
+              </article>
 
-              </div>
+              <article class="admin-card">
 
+                <div class="admin-card-heading">
+                  <h3>Conversas</h3>
+                  <p>Conversas registradas no sistema.</p>
+                </div>
+
+                <div id="adminConversas" class="admin-record-list">
+                  <p class="admin-loading">Carregando conversas...</p>
+                </div>
+
+                <a href="conversas.html" class="admin-conversations-link">
+                  Abrir área de conversas →
+                </a>
+
+              </article>
 
             </div>
 
-          </div>
+          </section>
 
+        </div>
+      </section>
 
-        </section>
+    </main>
 
+    <!-- RODAPÉ -->
+    <footer class="site-footer admin-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+
+      <div class="admin-footer-links">
+        <a href="index.html">Ver site</a>
+        <a href="conta.html">Minha conta</a>
+        <a href="atendimento.html">Atendimento</a>
       </div>
+    </footer>
 
-    </div>
+  </div>
 
-  </main>
-
-
-
-  <!-- =========================================================
-       RODAPÉ
-  ========================================================== -->
-
-  <footer class="footer footer-v2">
-
-    <div class="container footer-content">
-
-
-      <div class="footer-column footer-brand">
-
-
-        <a
-          class="logo"
-          href="index.html"
-        >
-
-          <img
-            src="logo-maxsom-white.png"
-            alt="Max Som"
-          >
-
-        </a>
-
-
-        <p>
-          Painel administrativo da Max Som
-          para gerenciamento do site.
-        </p>
-
-
-        <a
-          class="footer-whatsapp"
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener"
-        >
-          WhatsApp: (65) 99626-2514
-        </a>
-
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-
-        <h3>
-          Navegação
-        </h3>
-
-
-        <a href="index.html">
-          Ver site
-        </a>
-
-
-        <a href="produtos.html">
-          Produtos
-        </a>
-
-
-        <a href="servicos.html">
-          Serviços
-        </a>
-
-
-        <a href="projetos.html">
-          Projetos
-        </a>
-
-
-        <a href="publicacoes.html">
-          Publicações
-        </a>
-
-
-        <a href="atendimento.html">
-          Atendimento
-        </a>
-
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-
-        <h3>
-          Administração
-        </h3>
-
-
-        <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-
-        <a
-          href="conta.html"
-          data-logged-only
-        >
-          Minha conta
-        </a>
-
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-
-        <h3>
-          Contato
-        </h3>
-
-
-        <a href="tel:+5565996262514">
-          +55 65 99626-2514
-        </a>
-
-
-        <a
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          WhatsApp: (65) 99626-2514
-        </a>
-
-
-        <a href="mailto:lojamaxsom2@gmail.com">
-          lojamaxsom2@gmail.com
-        </a>
-
-
-      </div>
-
-
-    </div>
-
-
-
-    <div class="footer-bottom">
-
-      <div class="container">
-
-        © 2026 Max Som. Todos os direitos reservados.
-
-      </div>
-
-    </div>
-
-  </footer>
-
-
-
-  <!-- =========================================================
-       SCRIPTS
-  ========================================================== -->
-
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="main.js"></script>
 
-
 </body>
-
 </html>
