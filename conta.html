@@ -1,655 +1,446 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Minha conta | Max Som</title>
 
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/conta.css">
 </head>
-
 
 <body>
 
+  <!-- MENU LATERAL -->
+  <aside class="sidebar" id="sidebar">
 
-  <!-- =========================================================
-       CABEÇALHO
-  ========================================================== -->
+    <a href="index.html" class="brand" aria-label="Max Som - Início">
+      <img src="logo-maxsom-white.png" alt="Max Som" class="brand-logo">
+    </a>
 
-  <header>
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-controls="sidebar"
+      aria-expanded="true"
+      aria-label="Recolher menu"
+    >
+      <span>☰</span>
+      <span class="toggle-label">Recolher menu</span>
+    </button>
 
-    <div class="container header-content">
+    <nav class="side-nav" aria-label="Menu principal">
 
-
-      <a
-        class="logo"
-        href="index.html"
-        aria-label="Max Som - Início"
-      >
-
-        <img
-          src="logo-maxsom-white.png"
-          alt="Max Som"
-        >
-
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">⌂</span>
+        <span>Início</span>
       </a>
 
+      <a href="produtos.html" class="nav-link">
+        <span class="nav-icon">▣</span>
+        <span>Produtos</span>
+      </a>
+
+      <a href="servicos.html" class="nav-link">
+        <span class="nav-icon">⚙</span>
+        <span>Serviços</span>
+      </a>
+
+      <a href="projetos.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span>Projetos</span>
+      </a>
+
+      <a href="publicacoes.html" class="nav-link">
+        <span class="nav-icon">▧</span>
+        <span>Publicações</span>
+      </a>
+
+      <a href="atendimento.html" class="nav-link">
+        <span class="nav-icon">☏</span>
+        <span>Atendimento</span>
+      </a>
+
+      <a href="admin.html" class="nav-link" data-admin-only>
+        <span class="nav-icon">⚙</span>
+        <span>Painel</span>
+      </a>
 
       <a
-        class="header-whatsapp"
+        href="conta.html"
+        class="nav-link active"
+        data-logged-only
+        aria-current="page"
+      >
+        <span class="nav-icon">♙</span>
+        <span>Minha conta</span>
+      </a>
+
+      <a
+        href="conversas.html"
+        class="nav-link"
+        data-conversations-link
+        data-logged-only
+      >
+        <span class="nav-icon">▤</span>
+        <span>Minhas conversas</span>
+      </a>
+
+      <a href="login.html" class="nav-link" data-guest-only>
+        <span class="nav-icon">⇥</span>
+        <span>Entrar</span>
+      </a>
+
+      <a href="cadastro.html" class="nav-link" data-guest-only>
+        <span class="nav-icon">＋</span>
+        <span>Criar conta</span>
+      </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a
         href="https://wa.me/5565996262514"
         target="_blank"
         rel="noopener"
+        class="sidebar-support"
       >
-        WhatsApp
+        <span>☏</span>
+        <span>Falar com a Max Som</span>
       </a>
+    </div>
 
+  </aside>
 
-      <span class="phone">
-        65 99626-2514
-      </span>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="site-shell">
 
-      <nav>
+    <!-- CABEÇALHO SUPERIOR -->
+    <header class="topbar">
 
-        <a href="index.html">
-          Início
+      <button
+        class="mobile-menu-button"
+        id="mobileMenu"
+        type="button"
+        aria-label="Abrir menu"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Minha conta</strong>
+      </div>
+
+      <div class="topbar-actions">
+
+        <a href="atendimento.html" class="topbar-help">
+          Precisa de ajuda?
         </a>
 
-        <a href="produtos.html">
-          Produtos
-        </a>
-
-        <a href="servicos.html">
-          Serviços
-        </a>
-
-        <a href="projetos.html">
-          Projetos
-        </a>
-
-        <a href="publicacoes.html">
-          Publicações
-        </a>
-
-        <a href="atendimento.html">
-          Atendimento
-        </a>
-
-
-        <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-
-        <a
-          href="conta.html"
-          class="active"
-          data-logged-only
-        >
+        <a href="conta.html" class="account-button" data-logged-only>
           Minha conta
         </a>
 
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-
-        <a
-          href="login.html"
-          data-guest-only
-        >
+        <a href="login.html" class="account-button" data-guest-only>
           Entrar
         </a>
 
-        <a
-          href="cadastro.html"
-          data-guest-only
-        >
-          Criar conta
-        </a>
-
-
         <button
-          class="btn btn-outline"
+          type="button"
+          class="account-button"
           data-logout
           data-logged-only
-          type="button"
         >
           Sair
         </button>
 
-      </nav>
+      </div>
+    </header>
 
-    </div>
+    <!-- MINHA CONTA -->
+    <main class="account-main account-page" data-account-page>
 
-  </header>
+      <!-- APRESENTAÇÃO -->
+      <section class="account-hero">
 
-
-
-  <!-- =========================================================
-       CONTEÚDO
-  ========================================================== -->
-
-  <main
-    class="account-page"
-    data-account-page
-  >
-
-    <div class="container">
-
-
-      <!-- TÍTULO -->
-
-      <div class="section-title">
-
-        <span>
-          Área do cliente
+        <span class="account-eyebrow">
+          ÁREA DO CLIENTE
         </span>
 
         <h1>
-          Olá, <span id="contaNomeTitulo">Usuário</span>
+          Olá, <span id="contaNomeTitulo">Carregando...</span>
         </h1>
 
-        <p class="muted">
-          Consulte seus dados, solicitações e conversas com a Max Som.
+        <p>
+          Consulte seus dados e acompanhe seus atendimentos,
+          conversas e notificações em um só lugar.
         </p>
 
-      </div>
-
-
-
-      <!-- =======================================================
-           DADOS DA CONTA
-      ======================================================== -->
-
-      <section class="account-layout">
-
-
-        <!-- PERFIL -->
-
-        <div class="account-card">
-
-          <span class="account-label">
-            Minha conta
-          </span>
-
-          <h2 id="contaNome">
-            Usuário
-          </h2>
-
-
-          <div class="account-item">
-
-            <strong>
-              E-mail
-            </strong>
-
-            <span id="contaEmail">
-              -
-            </span>
-
-          </div>
-
-
-          <div class="account-item">
-
-            <strong>
-              Telefone
-            </strong>
-
-            <span id="contaTelefone">
-              -
-            </span>
-
-          </div>
-
-
-          <div class="account-item">
-
-            <strong>
-              Tipo de conta
-            </strong>
-
-            <span id="contaTipo">
-              Cliente
-            </span>
-
-          </div>
-
-
-          <div class="actions">
-
-            <a
-              href="atendimento.html"
-              class="btn btn-primary"
-            >
-              Nova solicitação
-            </a>
-
-
-            <a
-              href="conversas.html"
-              class="btn btn-outline"
-            >
-              Minhas conversas
-            </a>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- ADMIN -->
-
-        <div class="account-card">
-
-          <span class="account-label">
-            Acesso
-          </span>
-
-          <h2>
-            Área administrativa
-          </h2>
-
-          <p class="muted">
-            O acesso ao painel administrativo depende
-            do tipo de usuário cadastrado.
-          </p>
-
-
-          <a
-            href="admin.html"
-            class="btn btn-outline"
-            data-admin-only
-          >
-            Abrir painel
-          </a>
-
-
-          <button
-            type="button"
-            class="btn btn-primary"
-            id="requestAdminButton"
-            data-request-admin
-            style="margin-top:10px"
-          >
-            Solicitar acesso administrativo
-          </button>
-
-        </div>
-
       </section>
 
+      <!-- RESUMO DA CONTA -->
+      <section class="account-summary-grid" aria-label="Resumo da conta">
 
+        <!-- DADOS DO USUÁRIO -->
+        <article class="account-card account-profile-card">
 
-      <!-- =======================================================
-           SOLICITAÇÕES
-      ======================================================== -->
+          <div class="account-section-heading">
 
-      <section class="section">
+            <span class="account-section-icon">♙</span>
 
-        <div class="section-title">
-
-          <span>
-            Atendimento
-          </span>
-
-          <h2>
-            Minhas solicitações
-          </h2>
-
-          <p>
-            Acompanhe as solicitações enviadas para a Max Som.
-          </p>
-
-        </div>
-
-
-        <div class="account-card">
-
-          <div
-            id="accountRequests"
-            class="conversation-list"
-          >
-
-            <div class="empty">
-              Carregando solicitações...
+            <div>
+              <span class="account-kicker">SEU PERFIL</span>
+              <h2>Seus dados</h2>
             </div>
 
           </div>
 
-        </div>
+          <dl class="account-details">
 
-      </section>
-
-
-
-      <!-- =======================================================
-           CONVERSAS
-      ======================================================== -->
-
-      <section class="section">
-
-        <div class="section-title">
-
-          <span>
-            Comunicação
-          </span>
-
-          <h2>
-            Minhas conversas
-          </h2>
-
-          <p>
-            Veja os atendimentos e converse com a equipe Max Som.
-          </p>
-
-        </div>
-
-
-        <div class="account-card">
-
-          <div
-            id="accountConversations"
-            class="conversation-list"
-          >
-
-            <div class="empty">
-              Carregando conversas...
+            <div>
+              <dt>Nome</dt>
+              <dd id="contaNome">—</dd>
             </div>
 
-          </div>
-
-
-          <div class="actions">
-
-            <a
-              href="conversas.html"
-              class="btn btn-primary"
-            >
-              Ver todas as conversas
-            </a>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =======================================================
-           NOTIFICAÇÕES
-      ======================================================== -->
-
-      <section class="section">
-
-        <div class="section-title">
-
-          <span>
-            Notificações
-          </span>
-
-          <h2>
-            Atualizações da conta
-          </h2>
-
-        </div>
-
-
-        <div class="account-card">
-
-          <div
-            id="notificacoesLista"
-          >
-
-            <div class="empty">
-              Carregando notificações...
+            <div>
+              <dt>E-mail</dt>
+              <dd id="contaEmail">—</dd>
             </div>
 
-          </div>
+            <div>
+              <dt>Telefone / WhatsApp</dt>
+              <dd id="contaTelefone">—</dd>
+            </div>
 
-        </div>
+            <div>
+              <dt>Tipo de usuário</dt>
+              <dd>
+                <span class="account-role" id="contaTipo">—</span>
+              </dd>
+            </div>
 
-      </section>
+          </dl>
 
-
-
-      <!-- =======================================================
-           SAIR
-      ======================================================== -->
-
-      <section class="section">
-
-        <div class="account-card">
-
-          <div class="section-title">
-
-            <span>
-              Conta
-            </span>
-
-            <h2>
-              Encerrar sessão
-            </h2>
+          <div class="account-admin-request">
 
             <p>
-              Saia da sua conta neste dispositivo.
+              Precisa de permissões administrativas para trabalhar no sistema?
             </p>
+
+            <button
+              id="requestAdminButton"
+              class="account-button-secondary"
+              type="button"
+            >
+              Solicitar acesso de administrador
+            </button>
 
           </div>
 
+        </article>
 
-          <button
-            type="button"
-            class="btn btn-outline"
-            data-logout
+        <!-- ATALHOS -->
+        <article class="account-card account-shortcuts-card">
+
+          <span class="account-kicker">ACESSO RÁPIDO</span>
+
+          <h2>O que você precisa?</h2>
+
+          <p class="account-muted">
+            Use os atalhos para continuar seu atendimento com a equipe Max Som.
+          </p>
+
+          <a href="atendimento.html" class="account-action-link">
+
+            <span class="account-action-symbol">＋</span>
+
+            <span>
+              <strong>Solicitar atendimento</strong>
+              <small>Conte à equipe como podemos ajudar.</small>
+            </span>
+
+            <span class="account-arrow">→</span>
+
+          </a>
+
+          <a
+            href="conversas.html"
+            class="account-action-link"
+            data-conversations-link
+            data-logged-only
           >
-            Sair da conta
-          </button>
 
+            <span class="account-action-symbol">☏</span>
+
+            <span>
+              <strong>Minhas conversas</strong>
+              <small>Continue uma conversa existente.</small>
+            </span>
+
+            <span class="account-arrow">→</span>
+
+          </a>
+
+          <a href="servicos.html" class="account-action-link">
+
+            <span class="account-action-symbol">⚙</span>
+
+            <span>
+              <strong>Conhecer os serviços</strong>
+              <small>Veja os serviços divulgados pela Max Som.</small>
+            </span>
+
+            <span class="account-arrow">→</span>
+
+          </a>
+
+        </article>
+
+      </section>
+
+      <!-- SOLICITAÇÕES E CONVERSAS -->
+      <section class="account-lists-grid" aria-label="Atividade da conta">
+
+        <article class="account-card account-list-card">
+
+          <div class="account-list-heading">
+
+            <div>
+              <span class="account-kicker">ACOMPANHAMENTO</span>
+              <h2>Minhas solicitações</h2>
+            </div>
+
+            <a href="atendimento.html" class="account-small-link">
+              Novo atendimento +
+            </a>
+
+          </div>
+
+          <p class="account-muted">
+            Veja o andamento das suas solicitações de atendimento.
+          </p>
+
+          <div id="accountRequests" class="account-dynamic-list">
+            <div class="empty">Carregando solicitações...</div>
+          </div>
+
+        </article>
+
+        <article class="account-card account-list-card">
+
+          <div class="account-list-heading">
+
+            <div>
+              <span class="account-kicker">COMUNICAÇÃO</span>
+              <h2>Minhas conversas</h2>
+            </div>
+
+            <a
+              href="conversas.html"
+              class="account-small-link"
+              data-conversations-link
+              data-logged-only
+            >
+              Ver todas →
+            </a>
+
+          </div>
+
+          <p class="account-muted">
+            Acesse o histórico das conversas com a equipe.
+          </p>
+
+          <div id="accountConversations" class="account-dynamic-list">
+            <div class="empty">Carregando conversas...</div>
+          </div>
+
+        </article>
+
+      </section>
+
+      <!-- NOTIFICAÇÕES -->
+      <section class="account-card account-notifications-card">
+
+        <div class="account-list-heading">
+
+          <div>
+            <span class="account-kicker">AVISOS DO SISTEMA</span>
+            <h2>Notificações</h2>
+          </div>
+
+        </div>
+
+        <p class="account-muted">
+          Atualizações e avisos relacionados à sua conta.
+        </p>
+
+        <div id="notificacoesLista" class="account-dynamic-list">
+          <div class="empty">Carregando notificações...</div>
         </div>
 
       </section>
 
-    </div>
+      <!-- CHAMADA PARA ATENDIMENTO -->
+      <section class="account-help-banner">
 
-  </main>
+        <div>
 
+          <span class="account-kicker">PRECISA DE AJUDA?</span>
 
+          <h2>Estamos aqui para ajudar.</h2>
 
-  <!-- =========================================================
-       RODAPÉ
-  ========================================================== -->
+          <p>
+            Entre em contato com a equipe caso tenha dúvidas
+            sobre seus atendimentos.
+          </p>
 
-  <footer class="footer footer-v2">
-
-    <div class="container footer-content">
-
-
-      <div class="footer-column footer-brand">
-
-        <a
-          class="logo"
-          href="index.html"
-        >
-
-          <img
-            src="logo-maxsom-white.png"
-            alt="Max Som"
-          >
-
-        </a>
-
-        <p>
-          Soluções em som, equipamentos,
-          serviços e atendimento.
-        </p>
-
+        </div>
 
         <a
-          class="footer-whatsapp"
+          class="account-help-button"
           href="https://wa.me/5565996262514"
           target="_blank"
           rel="noopener"
         >
-          WhatsApp: (65) 99626-2514
+          Falar pelo WhatsApp ↗
         </a>
 
+      </section>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="site-footer account-site-footer">
+
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+
+      <div class="account-footer-links">
+        <a href="index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="atendimento.html">Atendimento</a>
+        <a href="mailto:lojamaxsom2@gmail.com">Contato</a>
       </div>
 
+    </footer>
 
+  </div>
 
-      <div class="footer-column">
-
-        <h3>
-          Navegação
-        </h3>
-
-        <a href="index.html">
-          Início
-        </a>
-
-        <a href="produtos.html">
-          Produtos
-        </a>
-
-        <a href="servicos.html">
-          Serviços
-        </a>
-
-        <a href="projetos.html">
-          Projetos
-        </a>
-
-        <a href="publicacoes.html">
-          Publicações
-        </a>
-
-        <a href="atendimento.html">
-          Atendimento
-        </a>
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-        <h3>
-          Minha conta
-        </h3>
-
-        <a
-          href="conta.html"
-          data-logged-only
-        >
-          Minha conta
-        </a>
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-        <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-        <h3>
-          Contato
-        </h3>
-
-        <a href="tel:+5565996262514">
-          +55 65 99626-2514
-        </a>
-
-        <a
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener"
-        >
-          WhatsApp: (65) 99626-2514
-        </a>
-
-        <a href="mailto:lojamaxsom2@gmail.com">
-          lojamaxsom2@gmail.com
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <div class="footer-bottom">
-
-      <div class="container">
-        © 2026 Max Som. Todos os direitos reservados.
-      </div>
-
-    </div>
-
-  </footer>
-
-
-
-  <!-- =========================================================
-       SCRIPTS
-  ========================================================== -->
-
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="main.js"></script>
 
 </body>
-
 </html>
