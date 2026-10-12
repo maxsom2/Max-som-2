@@ -1,270 +1,269 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Criar conta | Max Som</title>
 
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cadastro.css">
 </head>
-
 
 <body>
 
+  <!-- MENU LATERAL -->
+  <aside class="sidebar" id="sidebar">
 
-  <!-- =========================================================
-       CABEÇALHO
-  ========================================================== -->
+    <a href="index.html" class="brand" aria-label="Max Som - Início">
+      <img src="logo-maxsom-white.png" alt="Max Som" class="brand-logo">
+    </a>
 
-  <header>
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-controls="sidebar"
+      aria-expanded="true"
+      aria-label="Recolher menu"
+    >
+      <span>☰</span>
+      <span class="toggle-label">Recolher menu</span>
+    </button>
 
-    <div class="container header-content">
+    <nav class="side-nav" aria-label="Menu principal">
 
-
-      <a
-        class="logo"
-        href="index.html"
-        aria-label="Max Som - Início"
-      >
-
-        <img
-          src="logo-maxsom-white.png"
-          alt="Max Som"
-        >
-
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">⌂</span>
+        <span>Início</span>
       </a>
 
+      <a href="produtos.html" class="nav-link">
+        <span class="nav-icon">▣</span>
+        <span>Produtos</span>
+      </a>
+
+      <a href="servicos.html" class="nav-link">
+        <span class="nav-icon">⚙</span>
+        <span>Serviços</span>
+      </a>
+
+      <a href="projetos.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span>Projetos</span>
+      </a>
+
+      <a href="publicacoes.html" class="nav-link">
+        <span class="nav-icon">▧</span>
+        <span>Publicações</span>
+      </a>
+
+      <a href="atendimento.html" class="nav-link">
+        <span class="nav-icon">☏</span>
+        <span>Atendimento</span>
+      </a>
+
+      <a href="admin.html" class="nav-link" data-admin-only>
+        <span class="nav-icon">⚙</span>
+        <span>Painel</span>
+      </a>
+
+      <a href="conta.html" class="nav-link" data-logged-only>
+        <span class="nav-icon">♙</span>
+        <span>Minha conta</span>
+      </a>
 
       <a
-        class="header-whatsapp"
+        href="conversas.html"
+        class="nav-link"
+        data-conversations-link
+        data-logged-only
+      >
+        <span class="nav-icon">▤</span>
+        <span>Minhas conversas</span>
+      </a>
+
+      <a href="login.html" class="nav-link" data-guest-only>
+        <span class="nav-icon">⇥</span>
+        <span>Entrar</span>
+      </a>
+
+      <a
+        href="cadastro.html"
+        class="nav-link active"
+        data-guest-only
+        aria-current="page"
+      >
+        <span class="nav-icon">＋</span>
+        <span>Criar conta</span>
+      </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a
         href="https://wa.me/5565996262514"
         target="_blank"
         rel="noopener"
+        class="sidebar-support"
       >
-        WhatsApp
+        <span>☏</span>
+        <span>Falar com a Max Som</span>
       </a>
+    </div>
 
+  </aside>
 
-      <span class="phone">
-        65 99626-2514
-      </span>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+  <!-- ÁREA PRINCIPAL -->
+  <div class="site-shell">
 
-      <nav>
+    <!-- CABEÇALHO -->
+    <header class="topbar">
 
-        <a href="index.html">
-          Início
+      <button
+        class="mobile-menu-button"
+        id="mobileMenu"
+        type="button"
+        aria-label="Abrir menu"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Criar conta</strong>
+      </div>
+
+      <div class="topbar-actions">
+
+        <a href="atendimento.html" class="topbar-help">
+          Precisa de ajuda?
         </a>
 
-        <a href="produtos.html">
-          Produtos
+        <a href="login.html" class="account-button" data-guest-only>
+          Já tenho conta
         </a>
 
-        <a href="servicos.html">
-          Serviços
-        </a>
-
-        <a href="projetos.html">
-          Projetos
-        </a>
-
-        <a href="publicacoes.html">
-          Publicações
-        </a>
-
-        <a href="atendimento.html">
-          Atendimento
-        </a>
-
-
-        <a
-          href="admin.html"
-          data-admin-only
-        >
-          ⚙ Painel
-        </a>
-
-
-        <a
-          href="conta.html"
-          data-logged-only
-        >
+        <a href="conta.html" class="account-button" data-logged-only>
           Minha conta
         </a>
 
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-
-        <a
-          href="login.html"
-          data-guest-only
-        >
-          Entrar
-        </a>
-
-
-        <a
-          href="cadastro.html"
-          class="active"
-          data-guest-only
-        >
-          Criar conta
-        </a>
-
-
         <button
-          class="btn btn-outline"
+          type="button"
+          class="account-button"
           data-logout
           data-logged-only
-          type="button"
         >
           Sair
         </button>
 
-      </nav>
+      </div>
+    </header>
 
-    </div>
+    <!-- CONTEÚDO -->
+    <main class="signup-main">
 
-  </header>
+      <section class="signup-hero">
+        <span class="signup-eyebrow">ÁREA DO CLIENTE</span>
 
+        <h1>Faça parte da Max Som</h1>
 
+        <p>
+          Crie sua conta para acessar sua área de cliente,
+          acompanhar atendimentos e conversar com nossa equipe.
+        </p>
+      </section>
 
-  <!-- =========================================================
-       CONTEÚDO
-  ========================================================== -->
+      <section class="signup-layout" aria-label="Criar conta">
 
-  <main>
+        <!-- FORMULÁRIO -->
+        <div class="signup-panel">
 
-    <section class="auth-page">
+          <div class="signup-heading">
+            <span class="signup-kicker">CADASTRO DE CLIENTE</span>
 
-      <div class="container auth-container">
-
-
-        <!-- =====================================================
-             FORMULÁRIO
-        ====================================================== -->
-
-        <div class="form-card auth-card">
-
-
-          <div class="section-title">
-
-            <span>
-              Max Som
-            </span>
-
-            <h1>
-              Criar conta
-            </h1>
+            <h2>Criar minha conta</h2>
 
             <p>
-              Crie sua conta para acompanhar seus atendimentos
-              e conversar com a equipe Max Som.
+              Preencha os campos abaixo para realizar seu cadastro.
             </p>
-
           </div>
-
-
-          <!-- MENSAGEM -->
 
           <div
             id="signupError"
             class="message hidden"
-            role="alert"
+            role="status"
+            aria-live="polite"
           ></div>
 
+          <form id="signupForm" class="signup-form">
 
-          <!-- FORMULÁRIO -->
-
-          <form
-            id="signupForm"
-            novalidate
-          >
-
-
-            <!-- NOME -->
-
-            <div class="form-group">
-
-              <label for="signupNome">
-                Nome
-              </label>
+            <div class="signup-field">
+              <label for="signupNome">Nome completo *</label>
 
               <input
                 type="text"
                 id="signupNome"
                 name="nome"
-                placeholder="Digite seu nome"
+                placeholder="Digite seu nome completo"
                 autocomplete="name"
                 required
               >
-
             </div>
 
+            <div class="signup-field">
+              <label for="signupTelefone">Telefone</label>
 
+              <input
+                type="tel"
+                id="signupTelefone"
+                name="telefone"
+                placeholder="(00) 00000-0000"
+                autocomplete="tel"
+              >
+            </div>
 
-            <!-- E-MAIL -->
+            <div class="signup-field">
+              <label for="signupWhatsapp">WhatsApp</label>
 
-            <div class="form-group">
+              <input
+                type="tel"
+                id="signupWhatsapp"
+                name="whatsapp"
+                placeholder="(00) 00000-0000"
+                autocomplete="tel"
+              >
 
-              <label for="signupEmail">
-                E-mail
-              </label>
+              <small>
+                Informe seu WhatsApp caso queira disponibilizá-lo para contato.
+              </small>
+            </div>
+
+            <div class="signup-field">
+              <label for="signupEmail">E-mail *</label>
 
               <input
                 type="email"
                 id="signupEmail"
                 name="email"
-                placeholder="Digite seu e-mail"
+                placeholder="seuemail@exemplo.com"
                 autocomplete="email"
                 required
               >
-
             </div>
 
-
-
-            <!-- SENHA -->
-
-            <div class="form-group">
-
-              <label for="signupPassword">
-                Senha
-              </label>
+            <div class="signup-field">
+              <label for="signupPassword">Senha *</label>
 
               <input
                 type="password"
@@ -276,314 +275,133 @@
                 required
               >
 
-              <small class="muted">
-                Use uma senha que você consiga lembrar.
+              <small>
+                Use uma senha segura. O mínimo deste formulário é de 6 caracteres.
               </small>
-
             </div>
 
-
-
-            <!-- BOTÃO -->
-
-            <div class="form-actions">
-
+            <div class="signup-submit-area">
               <button
                 type="submit"
-                class="btn btn-primary btn-large"
+                class="signup-submit"
               >
-                Criar minha conta
+                Criar conta
               </button>
 
+              <p>
+                Ao se cadastrar, você poderá acessar a área de cliente
+                da Max Som.
+              </p>
             </div>
-
 
           </form>
 
+          <div class="signup-login-link">
+            <p>Já possui uma conta?</p>
 
-          <!-- LOGIN -->
-
-          <div class="auth-footer">
-
-            <p class="muted">
-              Já possui uma conta?
-            </p>
-
-            <a
-              href="login.html"
-              class="text-link"
-            >
+            <a href="login.html">
               Entrar na minha conta →
             </a>
-
           </div>
 
         </div>
 
+        <!-- PAINEL INFORMATIVO -->
+        <aside class="signup-information">
 
+          <span class="signup-kicker">SUA ÁREA EXCLUSIVA</span>
 
-        <!-- =====================================================
-             INFORMAÇÕES
-        ====================================================== -->
+          <h2>Mais praticidade para seus atendimentos</h2>
 
-        <div class="auth-side">
+          <p>
+            Com uma conta, você pode acessar os recursos disponíveis
+            para acompanhar seu relacionamento com a equipe.
+          </p>
 
+          <div class="signup-benefit">
 
-          <div class="account-card">
+            <span class="signup-benefit-number">01</span>
 
-            <span class="account-label">
-              Por que criar uma conta?
-            </span>
-
-            <h2>
-              Tenha seu atendimento organizado
-            </h2>
-
-            <p class="muted">
-              Com uma conta você consegue acompanhar
-              suas solicitações e acessar suas conversas
-              com a Max Som.
-            </p>
-
-
-            <div class="account-item">
-
-              <strong>
-                Atendimento
-              </strong>
-
-              <span>
-                Envie solicitações pelo site.
-              </span>
-
-            </div>
-
-
-            <div class="account-item">
-
-              <strong>
-                Conversas
-              </strong>
-
-              <span>
-                Converse com a equipe pelo sistema.
-              </span>
-
-            </div>
-
-
-            <div class="account-item">
-
-              <strong>
-                Histórico
-              </strong>
-
-              <span>
-                Consulte seus atendimentos quando precisar.
-              </span>
-
+            <div>
+              <h3>Acompanhe solicitações</h3>
+              <p>
+                Consulte as solicitações de atendimento vinculadas à sua conta.
+              </p>
             </div>
 
           </div>
 
+          <div class="signup-benefit">
 
-          <div class="account-card">
+            <span class="signup-benefit-number">02</span>
 
-            <span class="account-label">
-              Precisa de ajuda?
-            </span>
+            <div>
+              <h3>Converse com a equipe</h3>
+              <p>
+                Acesse suas conversas quando esse recurso estiver disponível.
+              </p>
+            </div>
 
-            <h3>
-              Fale com a Max Som
-            </h3>
+          </div>
 
-            <p class="muted">
-              Você também pode entrar em contato diretamente
-              pelo WhatsApp.
-            </p>
+          <div class="signup-benefit">
 
+            <span class="signup-benefit-number">03</span>
+
+            <div>
+              <h3>Consulte suas informações</h3>
+              <p>
+                Tenha acesso aos dados e às notificações da sua conta.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="signup-side-login">
+            <p>Já está cadastrado?</p>
+
+            <a href="login.html" class="signup-secondary-button">
+              Entrar na conta
+            </a>
+          </div>
+
+          <div class="signup-whatsapp">
+            <p>Precisa de ajuda para se cadastrar?</p>
 
             <a
               href="https://wa.me/5565996262514"
               target="_blank"
               rel="noopener"
-              class="btn btn-outline"
             >
-              Abrir WhatsApp
+              Falar pelo WhatsApp →
             </a>
-
           </div>
 
+        </aside>
 
-        </div>
+      </section>
 
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="site-footer signup-footer">
+
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+
+      <div class="signup-footer-links">
+        <a href="index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="atendimento.html">Atendimento</a>
+        <a href="mailto:lojamaxsom2@gmail.com">Contato</a>
       </div>
 
-    </section>
+    </footer>
 
-  </main>
+  </div>
 
-
-
-  <!-- =========================================================
-       RODAPÉ
-  ========================================================== -->
-
-  <footer class="footer footer-v2">
-
-    <div class="container footer-content">
-
-
-      <div class="footer-column footer-brand">
-
-        <a
-          class="logo"
-          href="index.html"
-        >
-
-          <img
-            src="logo-maxsom-white.png"
-            alt="Max Som"
-          >
-
-        </a>
-
-        <p>
-          Soluções em som, equipamentos,
-          serviços e atendimento.
-        </p>
-
-
-        <a
-          class="footer-whatsapp"
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener"
-        >
-          WhatsApp: (65) 99626-2514
-        </a>
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-        <h3>
-          Navegação
-        </h3>
-
-        <a href="index.html">
-          Início
-        </a>
-
-        <a href="produtos.html">
-          Produtos
-        </a>
-
-        <a href="servicos.html">
-          Serviços
-        </a>
-
-        <a href="projetos.html">
-          Projetos
-        </a>
-
-        <a href="publicacoes.html">
-          Publicações
-        </a>
-
-        <a href="atendimento.html">
-          Atendimento
-        </a>
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-        <h3>
-          Minha conta
-        </h3>
-
-        <a
-          href="conta.html"
-          data-logged-only
-        >
-          Minha conta
-        </a>
-
-        <a
-          href="conversas.html"
-          data-conversations-link
-          data-logged-only
-        >
-          Minhas conversas
-        </a>
-
-        <a
-          href="login.html"
-          data-guest-only
-        >
-          Entrar
-        </a>
-
-      </div>
-
-
-
-      <div class="footer-column">
-
-        <h3>
-          Contato
-        </h3>
-
-        <a href="tel:+5565996262514">
-          +55 65 99626-2514
-        </a>
-
-        <a
-          href="https://wa.me/5565996262514"
-          target="_blank"
-          rel="noopener"
-        >
-          WhatsApp: (65) 99626-2514
-        </a>
-
-        <a href="mailto:lojamaxsom2@gmail.com">
-          lojamaxsom2@gmail.com
-        </a>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="footer-bottom">
-
-      <div class="container">
-
-        © 2026 Max Som. Todos os direitos reservados.
-
-      </div>
-
-    </div>
-
-  </footer>
-
-
-
-  <!-- =========================================================
-       SCRIPTS
-  ========================================================== -->
-
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="main.js"></script>
 
-
 </body>
-
 </html>
