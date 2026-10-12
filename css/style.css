@@ -1061,3 +1061,58 @@ main {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Banner principal com foto real da Max Som */
+.hero-photo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #0b1f3a;
+  isolation: isolate;
+}
+
+.hero-project-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  max-height: 520px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: inherit;
+}
+
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(5, 17, 34, 0.9));
+  pointer-events: none;
+}
+
+.hero-photo-label {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .hero-project-image {
+    min-height: 260px;
+    max-height: 360px;
+  }
+}
