@@ -1,13 +1,15 @@
-
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b1f3a">
-  <meta name="description" content="Conheça os projetos de som automotivo realizados pela Max Som.">
+  <meta name="description" content="Conheça os projetos de som automotivo, instalações e soluções de áudio realizados pela Max Som.">
+
   <title>Max Som | Projetos</title>
 
+  <!-- ESTILOS -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/projects.css">
 </head>
@@ -25,9 +27,11 @@
     <button
       class="menu-toggle"
       id="menuToggle"
+      type="button"
       aria-label="Recolher ou expandir menu"
       aria-controls="sidebar"
       aria-expanded="true">
+
       <span>☰</span>
       <span class="toggle-label">Recolher menu</span>
     </button>
@@ -49,7 +53,11 @@
         <span class="nav-label">Serviços</span>
       </a>
 
-      <a class="nav-link active" href="projetos.html" aria-current="page">
+      <a
+        class="nav-link active"
+        href="projetos.html"
+        aria-current="page">
+
         <span class="nav-icon">▧</span>
         <span class="nav-label">Projetos</span>
       </a>
@@ -83,20 +91,25 @@
   </aside>
 
   <!-- FUNDO DO MENU NO CELULAR -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div
+    class="sidebar-overlay"
+    id="sidebarOverlay">
+  </div>
 
   <!-- ÁREA PRINCIPAL -->
   <div class="site-shell">
 
-    <!-- CABEÇALHO -->
+    <!-- CABEÇALHO SUPERIOR -->
     <header class="topbar">
 
       <button
         class="mobile-menu-button"
         id="mobileMenu"
+        type="button"
         aria-label="Abrir menu"
         aria-controls="sidebar"
         aria-expanded="false">
+
         ☰
       </button>
 
@@ -120,7 +133,7 @@
 
     </header>
 
-    <!-- CONTEÚDO DA PÁGINA -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main id="projetos">
 
       <!-- APRESENTAÇÃO -->
@@ -142,7 +155,7 @@
 
       </section>
 
-      <!-- LISTA DE PROJETOS -->
+      <!-- PORTFÓLIO -->
       <section class="projects-content">
 
         <div class="projects-title">
@@ -159,16 +172,14 @@
 
         </div>
 
+        <!-- GRADE DE PROJETOS -->
         <div class="projects-grid">
 
           <!-- PROJETO 1 -->
           <article class="project-card">
 
-            <div class="project-photo">
-              <img
-                src="assets/projeto-01.png"
-                alt="Projeto de som automotivo da Max Som"
-                class="project-image">
+            <div class="project-photo photo-blue">
+              <span>PROJETO AUTOMOTIVO</span>
             </div>
 
             <div class="project-info">
@@ -194,7 +205,7 @@
           <article class="project-card">
 
             <div class="project-photo photo-dark">
-              <span>PROJETO</span>
+              <span>PROJETO NÁUTICO</span>
             </div>
 
             <div class="project-info">
@@ -220,7 +231,7 @@
           <article class="project-card">
 
             <div class="project-photo photo-light">
-              <span>PROJETO</span>
+              <span>INSTALAÇÃO</span>
             </div>
 
             <div class="project-info">
@@ -246,7 +257,7 @@
           <article class="project-card">
 
             <div class="project-photo photo-blue-dark">
-              <span>PROJETO</span>
+              <span>SUPORTE TÉCNICO</span>
             </div>
 
             <div class="project-info">
@@ -277,7 +288,9 @@
 
         <div>
 
-          <span class="section-label">ATENDIMENTO</span>
+          <span class="section-label">
+            ATENDIMENTO
+          </span>
 
           <h2>
             Quer fazer um projeto com a Max Som?
@@ -294,12 +307,14 @@
           <a
             href="atendimento.html"
             class="button button-primary">
+
             Falar com a equipe →
           </a>
 
           <a
             href="servicos.html"
             class="button button-secondary">
+
             Ver serviços
           </a>
 
@@ -311,14 +326,22 @@
 
     <!-- RODAPÉ -->
     <footer class="site-footer">
-      <span>© 2026 Max Som. Todos os direitos reservados.</span>
-      <span>Som, tecnologia e projetos.</span>
+
+      <span>
+        © 2026 Max Som. Todos os direitos reservados.
+      </span>
+
+      <span>
+        Som, tecnologia e projetos.
+      </span>
+
     </footer>
 
   </div>
 
-  <!-- JAVASCRIPT COMPARTILHADO -->
+  <!-- JAVASCRIPT DO MENU -->
   <script src="js/main.js"></script>
 
 </body>
 </html>
+```
