@@ -1,138 +1,183 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Novidades, notícias e publicações da Max Som.">
-  <title>Publicações | Max Som</title>
+  <meta name="description" content="Novidades, dicas e publicações informativas da Max Som.">
+  <title>Max Som | Publicações</title>
+
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/publicacoes.css">
 </head>
-
 <body>
-  <div class="app-shell">
 
-    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
-      <div class="sidebar-brand">
-        <div class="brand-mark">MS</div>
-        <div class="brand-copy">
-          <strong>MAX SOM</strong>
-          <span>Som • Projetos • Soluções</span>
-        </div>
+  <!-- MENU LATERAL -->
+  <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+    <div class="sidebar-top">
+      <a href="index.html" class="logo" aria-label="Max Som - Início">
+        <span class="logo-symbol">MS</span>
+        <span class="logo-text">
+          <strong>MAX</strong>
+          <small>SOM</small>
+        </span>
+      </a>
+
+      <button class="close-sidebar" id="closeSidebar"
+        type="button" aria-label="Fechar menu">×</button>
+    </div>
+
+    <div class="sidebar-profile">
+      <div class="profile-avatar" aria-hidden="true">M</div>
+      <div>
+        <strong>Olá!</strong>
+        <span>Visitante</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">PRINCIPAL</p>
+
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">⌂</span><span>Início</span>
+      </a>
+
+      <a href="produtos.html" class="nav-item">
+        <span class="nav-icon">▦</span><span>Produtos</span>
+      </a>
+
+      <a href="servicos.html" class="nav-item">
+        <span class="nav-icon">◈</span><span>Serviços</span>
+      </a>
+
+      <a href="projetos.html" class="nav-item">
+        <span class="nav-icon">▣</span><span>Projetos</span>
+      </a>
+
+      <a href="publicacoes.html" class="nav-item active"
+        aria-current="page">
+        <span class="nav-icon">✦</span><span>Publicações</span>
+      </a>
+
+      <p class="nav-label nav-label-space">ATENDIMENTO</p>
+
+      <a href="atendimento.html" class="nav-item">
+        <span class="nav-icon">◌</span><span>Atendimento</span>
+      </a>
+
+      <a href="login.html" class="nav-item">
+        <span class="nav-icon">⇥</span><span>Entrar</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="help-card">
+        <strong>Precisa de ajuda?</strong>
+        <span>Entre em contato com a Max Som.</span>
+        <a href="atendimento.html">Ir para atendimento →</a>
       </div>
 
-      <button
-        class="sidebar-close"
-        id="closeSidebar"
-        type="button"
-        aria-label="Fechar menu"
-      >×</button>
+      <span class="copyright">
+        © <span id="sidebarYear">2026</span> Max Som
+      </span>
+    </div>
+  </aside>
 
-      <nav class="sidebar-nav">
-        <a class="nav-item" href="index.html">
-          <span class="nav-icon">⌂</span>Início
-        </a>
-        <a class="nav-item" href="produtos.html">
-          <span class="nav-icon">▣</span>Produtos
-        </a>
-        <a class="nav-item" href="servicos.html">
-          <span class="nav-icon">⚙</span>Serviços
-        </a>
-        <a class="nav-item" href="projetos.html">
-          <span class="nav-icon">◫</span>Projetos
-        </a>
-        <a class="nav-item active" href="publicacoes.html" aria-current="page">
-          <span class="nav-icon">▤</span>Publicações
-        </a>
-        <a class="nav-item" href="atendimento.html">
-          <span class="nav-icon">☏</span>Atendimento
-        </a>
-      </nav>
+  <div class="sidebar-overlay" id="overlay"></div>
 
-      <div class="sidebar-bottom">
-        <p>Precisa de ajuda com seu projeto de som?</p>
-        <a class="sidebar-contact" href="atendimento.html">
-          Fale com nossa equipe <span>→</span>
-        </a>
-        <small>© <span id="sidebarYear">2026</span> Max Som</small>
-      </div>
-    </aside>
+  <!-- ÁREA PRINCIPAL -->
+  <div class="page">
 
-    <div class="overlay" id="overlay"></div>
+    <!-- CABEÇALHO -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle"
+          type="button" aria-label="Abrir menu"
+          aria-expanded="false">☰</button>
 
-    <main class="main-content">
-
-      <header class="topbar">
-        <button
-          class="menu-toggle"
-          id="menuToggle"
-          type="button"
-          aria-label="Abrir menu"
-          aria-expanded="false"
-        >☰</button>
-
-        <div class="breadcrumb">
+        <div class="page-breadcrumb">
           <span>Max Som</span>
-          <span class="crumb-separator">/</span>
+          <span>/</span>
           <strong>Publicações</strong>
         </div>
+      </div>
 
-        <div class="topbar-actions">
-          <a
-            class="top-link"
-            href="https://wa.me/5565996262514"
-            target="_blank"
-            rel="noopener noreferrer"
-          >WhatsApp <span>↗</span></a>
+      <div class="topbar-actions">
+        <a class="topbar-whatsapp"
+          href="https://wa.me/5565996262514"
+          target="_blank" rel="noopener noreferrer">
+          WhatsApp ↗
+        </a>
 
-          <a class="account-button" href="login.html">Minha conta</a>
-        </div>
-      </header>
+        <a class="btn btn-primary account-link" href="login.html">
+          Minha conta
+        </a>
+      </div>
+    </header>
 
-      <section class="page-intro">
-        <div>
-          <span class="eyebrow">
-            <span class="eyebrow-dot"></span>
+    <!-- CONTEÚDO -->
+    <main class="publicacoes-main">
+
+      <!-- DESTAQUE -->
+      <section class="publicacoes-hero">
+        <div class="publicacoes-hero-copy">
+          <span class="hero-label">
+            <span class="hero-label-dot"></span>
             NOVIDADES MAX SOM
           </span>
 
-          <h1>Publicações</h1>
+          <h1>Publicações e novidades.</h1>
 
           <p>
-            Acompanhe novidades, dicas, projetos e informações
-            sobre o universo do som.
+            Acompanhe dicas, informações, projetos e novidades
+            sobre soluções de som.
           </p>
+
+          <a class="btn btn-primary" href="atendimento.html">
+            Fale com nossa equipe <span aria-hidden="true">→</span>
+          </a>
         </div>
 
-        <div class="intro-decoration" aria-hidden="true">
-          <span class="sound-wave wave-one"></span>
-          <span class="sound-wave wave-two"></span>
-          <span class="sound-wave wave-three"></span>
-          <span class="sound-wave wave-four"></span>
-          <span class="sound-wave wave-five"></span>
+        <div class="publicacoes-hero-art" aria-hidden="true">
+          <div class="sound-disc">
+            <span>MS</span>
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
         </div>
       </section>
 
-      <section class="publications-content" aria-labelledby="latestTitle">
-        <div class="section-heading">
+      <!-- PUBLICAÇÕES -->
+      <section class="publicacoes-section"
+        aria-labelledby="publicacoesTitle">
+
+        <div class="section-title section-title-row publicacoes-section-heading">
           <div>
-            <span class="section-kicker">CONTEÚDO E INFORMAÇÃO</span>
-            <h2 id="latestTitle">Últimas publicações</h2>
+            <span>CONTEÚDO E INFORMAÇÃO</span>
+            <h2 id="publicacoesTitle">Últimas publicações</h2>
+            <p>
+              Informações para ajudar você a planejar seu projeto.
+            </p>
           </div>
 
-          <span class="content-label">Atualizações da Max Som</span>
+          <a class="text-link" href="atendimento.html">
+            Tirar dúvidas <span aria-hidden="true">→</span>
+          </a>
         </div>
 
-        <div class="posts-grid" id="postsGrid">
+        <!-- O main.js pode carregar publicações do Supabase -->
+        <div class="posts-grid posts-v2" id="postsGrid">
 
-          <article class="post-card">
-            <div class="post-image post-image-blue">
-              <span class="image-tag">DICAS</span>
-              <span class="image-symbol">♫</span>
-              <span class="image-caption">MAX SOM / CONHECIMENTO</span>
+          <article class="publication-card">
+            <div class="publication-visual visual-blue">
+              <span class="publication-category">DICAS</span>
+              <span class="publication-symbol" aria-hidden="true">♫</span>
+              <span class="publication-stamp">
+                MAX SOM · CONHECIMENTO
+              </span>
             </div>
 
-            <div class="post-info">
-              <div class="post-meta">
+            <div class="publication-body">
+              <div class="publication-meta">
                 <span>Dicas e informações</span>
                 <span>01</span>
               </div>
@@ -142,25 +187,27 @@
               </h3>
 
               <p>
-                Conheça alguns pontos importantes para encontrar
-                soluções de áudio adequadas às necessidades do seu ambiente.
+                Conheça pontos importantes para encontrar soluções
+                de áudio adequadas às necessidades do seu ambiente.
               </p>
 
-              <a href="atendimento.html" class="read-more">
-                Saiba mais <span>→</span>
+              <a class="publication-link" href="atendimento.html">
+                Saiba mais <span aria-hidden="true">→</span>
               </a>
             </div>
           </article>
 
-          <article class="post-card">
-            <div class="post-image post-image-light">
-              <span class="image-tag">PROJETOS</span>
-              <span class="image-symbol">◈</span>
-              <span class="image-caption">MAX SOM / SOLUÇÕES</span>
+          <article class="publication-card">
+            <div class="publication-visual visual-light">
+              <span class="publication-category">PROJETOS</span>
+              <span class="publication-symbol" aria-hidden="true">◈</span>
+              <span class="publication-stamp">
+                MAX SOM · SOLUÇÕES
+              </span>
             </div>
 
-            <div class="post-info">
-              <div class="post-meta">
+            <div class="publication-body">
+              <div class="publication-meta">
                 <span>Projetos e soluções</span>
                 <span>02</span>
               </div>
@@ -171,24 +218,26 @@
 
               <p>
                 Entenda por que conhecer o espaço e os objetivos
-                do projeto ajuda a definir uma solução de áudio mais eficiente.
+                ajuda a definir uma solução de áudio mais eficiente.
               </p>
 
-              <a href="atendimento.html" class="read-more">
-                Saiba mais <span>→</span>
+              <a class="publication-link" href="atendimento.html">
+                Saiba mais <span aria-hidden="true">→</span>
               </a>
             </div>
           </article>
 
-          <article class="post-card">
-            <div class="post-image post-image-dark">
-              <span class="image-tag">NOVIDADES</span>
-              <span class="image-symbol">〰</span>
-              <span class="image-caption">MAX SOM / ATUALIZAÇÕES</span>
+          <article class="publication-card">
+            <div class="publication-visual visual-dark">
+              <span class="publication-category">NOVIDADES</span>
+              <span class="publication-symbol" aria-hidden="true">〰</span>
+              <span class="publication-stamp">
+                MAX SOM · ATUALIZAÇÕES
+              </span>
             </div>
 
-            <div class="post-info">
-              <div class="post-meta">
+            <div class="publication-body">
+              <div class="publication-meta">
                 <span>Novidades</span>
                 <span>03</span>
               </div>
@@ -196,12 +245,12 @@
               <h3>Fique por dentro das novidades da Max Som</h3>
 
               <p>
-                Este espaço reúne comunicados, informações e conteúdos
+                Um espaço para comunicados, informações e conteúdos
                 preparados para clientes e visitantes.
               </p>
 
-              <a href="atendimento.html" class="read-more">
-                Fale com a equipe <span>→</span>
+              <a class="publication-link" href="atendimento.html">
+                Fale com a equipe <span aria-hidden="true">→</span>
               </a>
             </div>
           </article>
@@ -209,35 +258,135 @@
         </div>
       </section>
 
-      <section class="contact-banner">
-        <div class="contact-icon">✦</div>
+      <!-- CHAMADA PARA ATENDIMENTO -->
+      <section class="publicacoes-cta">
+        <div class="cta-icon" aria-hidden="true">✦</div>
 
-        <div>
-          <span>VAMOS CONVERSAR?</span>
+        <div class="cta-copy">
+          <span class="hero-label">ATENDIMENTO MAX SOM</span>
           <h2>Tem um projeto em mente?</h2>
           <p>
-            Entre em contato com a equipe da Max Som para tirar suas dúvidas.
+            Entre em contato com a equipe da Max Som para tirar
+            suas dúvidas.
           </p>
         </div>
 
-        <a href="atendimento.html" class="contact-button">
-          Ir para atendimento <span>→</span>
-        </a>
+        <div class="cta-actions">
+          <a class="btn btn-light" href="atendimento.html">
+            Solicitar atendimento
+          </a>
+
+          <a class="btn btn-outline-dark"
+            href="https://wa.me/5565996262514"
+            target="_blank" rel="noopener noreferrer">
+            WhatsApp
+          </a>
+        </div>
       </section>
 
-      <footer class="page-footer">
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer footer-v2 publicacoes-footer">
+      <div class="footer-content">
+
+        <div class="footer-column footer-brand">
+          <a class="footer-logo" href="index.html">
+            <span class="footer-logo-mark">MS</span>
+            <span>
+              <strong>MAX SOM</strong>
+              <small>Soluções em áudio</small>
+            </span>
+          </a>
+
+          <p>
+            Soluções em som, equipamentos, serviços e atendimento.
+          </p>
+
+          <a class="footer-whatsapp"
+            href="https://wa.me/5565996262514"
+            target="_blank" rel="noopener noreferrer">
+            WhatsApp: (65) 99626-2514
+          </a>
+        </div>
+
+        <div class="footer-column">
+          <h3>Navegação</h3>
+          <a href="index.html">Início</a>
+          <a href="produtos.html">Produtos</a>
+          <a href="servicos.html">Serviços</a>
+          <a href="projetos.html">Projetos</a>
+          <a href="publicacoes.html">Publicações</a>
+        </div>
+
+        <div class="footer-column">
+          <h3>Atendimento</h3>
+          <a href="atendimento.html">Solicitar atendimento</a>
+          <a href="conta.html">Minha conta</a>
+          <a href="login.html">Entrar</a>
+        </div>
+
+        <div class="footer-column">
+          <h3>Contato</h3>
+          <p>Telefone: (65) 99626-2514</p>
+          <p>WhatsApp: (65) 99626-2514</p>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
         <span>
-          © <span id="currentYear">2026</span> Max Som.
-          Todos os direitos reservados.
+          © <span id="currentYear">2026</span>
+          Max Som. Todos os direitos reservados.
         </span>
         <span>Divulgação e atendimento</span>
-      </footer>
+      </div>
+    </footer>
 
-    </main>
   </div>
 
-  <!-- Carrega a biblioteca do Supabase antes do main.js -->
+  <!-- BIBLIOTECA SUPABASE E SCRIPT DO PROJETO -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/main.js"></script>
+
+  <!-- MENU RESPONSIVO E ANO AUTOMÁTICO -->
+  <script>
+    (() => {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const openButton = document.getElementById('menuToggle');
+      const closeButton = document.getElementById('closeSidebar');
+
+      function openMenu() {
+        sidebar?.classList.add('active');
+        overlay?.classList.add('active');
+        document.body.classList.add('sidebar-open');
+        openButton?.setAttribute('aria-expanded', 'true');
+      }
+
+      function closeMenu() {
+        sidebar?.classList.remove('active');
+        overlay?.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        openButton?.setAttribute('aria-expanded', 'false');
+      }
+
+      openButton?.addEventListener('click', openMenu);
+      closeButton?.addEventListener('click', closeMenu);
+      overlay?.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeMenu();
+      });
+
+      const year = String(new Date().getFullYear());
+
+      ['sidebarYear', 'currentYear'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = year;
+      });
+    })();
+  </script>
+
 </body>
 </html>
