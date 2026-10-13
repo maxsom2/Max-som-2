@@ -1,498 +1,112 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+/* =========================================================
+   PUBLICACOES — CARREGAR NA PAGINA
+   ========================================================= */
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+async function loadPosts() {
+  const containers = qsa(
+    "#postsGrid",
+    "#publicacoesGrid",
+    "#publicacoesLista",
+    "#publicationsList",
+    "#publicacoesContainer"
+  );
 
-    <title>Max Som | Publicações</title>
+  if (!containers.length) return;
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/publicacoes.css">
-</head>
+  if (!isSupabaseReady()) {
+    containers.forEach((container) => {
+      container.innerHTML =
+        '<div class="empty">O sistema de publicações não está disponível.</div>';
+    });
+    return;
+  }
 
-<body>
+  try {
+    let query = supabase
+      .from(TABLES.PUBLICACOES)
+      .select(
+        "id,titulo,resumo,conteudo,imagem_capa,publicado,data_publicacao,criado_em"
+      )
+      .eq("publicado", true);
 
-    <!-- MENU LATERAL -->
-    <aside class="sidebar" id="sidebar">
+    // Na página inicial, mostrar apenas seis publicações.
+    if (getCurrentPage() === "index.html") {
+      query = query.limit(6);
+    }
 
-        <div class="sidebar-top">
+    const {
+      data,
+      error
+    } = await query.order(
+      "data_publicacao",
+      { ascending: false, nullsFirst: false }
+    );
 
-            <a href="index.html" class="logo">
-                <span class="logo-symbol">MS</span>
+    if (error) throw error;
 
-                <span class="logo-text">
-                    <strong>MAX</strong>
-                    <small>SOM</small>
-                </span>
-            </a>
+    containers.forEach((container) => {
+      if (!data || data.length === 0) {
+        container.innerHTML =
+          '<div class="empty">Nenhuma publicação disponível no momento.</div>';
+        return;
+      }
 
-            <button
-                class="close-sidebar"
-                id="closeSidebar"
-                aria-label="Fechar menu"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <!-- PERFIL DO VISITANTE -->
-        <div class="sidebar-profile">
-
-            <div class="profile-avatar">M</div>
-
-            <div>
-                <strong>Olá!</strong>
-                <span>Visitante</span>
-            </div>
-
-        </div>
-
-
-        <!-- NAVEGAÇÃO -->
-        <nav class="sidebar-nav">
-
-            <p class="nav-label">PRINCIPAL</p>
-
-            <a href="index.html" class="nav-item">
-                <span class="nav-icon">⌂</span>
-                <span>Início</span>
-            </a>
-
-            <a href="produtos.html" class="nav-item">
-                <span class="nav-icon">▦</span>
-                <span>Produtos</span>
-            </a>
-
-            <a href="servicos.html" class="nav-item">
-                <span class="nav-icon">◈</span>
-                <span>Serviços</span>
-            </a>
-
-            <a href="projetos.html" class="nav-item">
-                <span class="nav-icon">▣</span>
-                <span>Projetos</span>
-            </a>
-
-            <a href="publicacoes.html" class="nav-item active">
-                <span class="nav-icon">✦</span>
-                <span>Publicações</span>
-            </a>
-
-
-            <p class="nav-label nav-label-space">
-                ATENDIMENTO
-            </p>
-
-            <a href="atendimento.html" class="nav-item">
-                <span class="nav-icon">◌</span>
-                <span>Atendimento</span>
-            </a>
-
-            <a href="login.html" class="nav-item">
-                <span class="nav-icon">⇥</span>
-                <span>Entrar</span>
-            </a>
-
-        </nav>
-
-
-        <!-- AJUDA -->
-        <div class="sidebar-footer">
-
-            <div class="help-card">
-
-                <strong>Precisa de ajuda?</strong>
-
-                <span>
-                    Entre em contato com a Max Som.
-                </span>
-
-                <a href="atendimento.html">
-                    Ir para atendimento →
-                </a>
-
-            </div>
-
-            <span class="copyright">
-                © <span id="sidebarYear"></span> Max Som
-            </span>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="page">
-
-
-        <!-- CABEÇALHO -->
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <button
-                    class="menu-toggle"
-                    id="menuToggle"
-                    aria-label="Abrir menu"
+      container.innerHTML = data.map((post) => `
+        <article class="post-card">
+          ${
+            post.imagem_capa
+              ? `
+                <img
+                  src="${esc(post.imagem_capa)}"
+                  alt="${esc(post.titulo || "Publicação Max Som")}"
+                  loading="lazy"
                 >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-
-                <div class="mobile-brand">
-                    <span class="logo-symbol small">MS</span>
-                    <span>MAX SOM</span>
+              `
+              : `
+                <div class="post-image">
+                  Max Som
                 </div>
-
-            </div>
-
-
-            <div class="topbar-right">
-
-                <a href="#" class="top-link">
-                    WhatsApp
-                </a>
-
-                <a href="login.html" class="account-button">
-                    <span class="account-icon">○</span>
-                    <span>Minha conta</span>
-                </a>
-
-            </div>
-
-        </header>
-
-
-
-        <main>
-
-            <!-- APRESENTAÇÃO -->
-            <section class="publications-header">
-
-                <span class="section-label">
-                    NOVIDADES MAX SOM
-                </span>
-
-                <h1>
-                    Fique por dentro
-                    <span>das novidades.</span>
-                </h1>
-
-                <p>
-                    Acompanhe publicações, novidades, informações e
-                    conteúdos compartilhados pela Max Som.
-                </p>
-
-            </section>
-
-
-
-            <!-- STORIES -->
-            <section class="publications-content">
-
-                <div class="publications-heading">
-
-                    <div>
-                        <span class="section-label">
-                            ATUALIZAÇÕES
-                        </span>
-
-                        <h2>Stories</h2>
-                    </div>
-
-                    <p>
-                        Conteúdos rápidos e atualizações da empresa.
-                    </p>
-
-                </div>
-
-
-                <div class="stories-list">
-
-                    <article class="story-card">
-
-                        <div class="story-circle story-blue">
-                            MS
-                        </div>
-
-                        <span>Max Som</span>
-
-                    </article>
-
-
-                    <article class="story-card">
-
-                        <div class="story-circle story-dark">
-                            <span>✦</span>
-                        </div>
-
-                        <span>Novidades</span>
-
-                    </article>
-
-
-                    <article class="story-card">
-
-                        <div class="story-circle story-gray">
-                            <span>▣</span>
-                        </div>
-
-                        <span>Projetos</span>
-
-                    </article>
-
-
-                    <article class="story-card">
-
-                        <div class="story-circle story-light">
-                            <span>◈</span>
-                        </div>
-
-                        <span>Serviços</span>
-
-                    </article>
-
-                </div>
-
-
-
-                <!-- PUBLICAÇÕES -->
-                <div class="publications-heading posts-heading">
-
-                    <div>
-                        <span class="section-label">
-                            CONTEÚDO DA EMPRESA
-                        </span>
-
-                        <h2>Publicações recentes</h2>
-                    </div>
-
-                </div>
-
-
-
-                <div class="posts-grid">
-
-                    <!-- PUBLICAÇÃO 1 -->
-                    <article class="post-card">
-
-                        <div class="post-image post-image-one">
-                            <span>MAX SOM</span>
-                        </div>
-
-                        <div class="post-content">
-
-                            <span class="post-category">
-                                APRESENTAÇÃO
-                            </span>
-
-                            <h3>
-                                Conheça a Max Som
-                            </h3>
-
-                            <p>
-                                Este espaço será usado para apresentar a empresa,
-                                seus trabalhos e suas novidades.
-                            </p>
-
-                            <div class="post-footer">
-                                <span>Publicação de exemplo</span>
-                                <span>→</span>
-                            </div>
-
-                        </div>
-
-                    </article>
-
-
-
-                    <!-- PUBLICAÇÃO 2 -->
-                    <article class="post-card">
-
-                        <div class="post-image post-image-two">
-                            <span>PROJETOS</span>
-                        </div>
-
-                        <div class="post-content">
-
-                            <span class="post-category">
-                                TRABALHOS
-                            </span>
-
-                            <h3>
-                                Projetos e soluções em som
-                            </h3>
-
-                            <p>
-                                Um espaço para divulgar projetos e mostrar
-                                os trabalhos realizados pela empresa.
-                            </p>
-
-                            <div class="post-footer">
-                                <span>Publicação de exemplo</span>
-                                <span>→</span>
-                            </div>
-
-                        </div>
-
-                    </article>
-
-
-
-                    <!-- PUBLICAÇÃO 3 -->
-                    <article class="post-card">
-
-                        <div class="post-image post-image-three">
-                            <span>SERVIÇOS</span>
-                        </div>
-
-                        <div class="post-content">
-
-                            <span class="post-category">
-                                INFORMAÇÕES
-                            </span>
-
-                            <h3>
-                                Conheça nossos serviços
-                            </h3>
-
-                            <p>
-                                Conteúdos para explicar os serviços oferecidos
-                                pela Max Som e orientar os clientes.
-                            </p>
-
-                            <div class="post-footer">
-                                <span>Publicação de exemplo</span>
-                                <span>→</span>
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- CHAMADA PARA ATENDIMENTO -->
-            <section class="publications-cta">
-
-                <div>
-
-                    <span class="section-label">
-                        MAX SOM
-                    </span>
-
-                    <h2>
-                        Precisa de mais informações?
-                    </h2>
-
-                    <p>
-                        Entre em contato com a equipe para tirar suas dúvidas.
-                    </p>
-
-                </div>
-
-
-                <a
-                    href="atendimento.html"
-                    class="btn btn-primary"
-                >
-                    Ir para atendimento →
-                </a>
-
-            </section>
-
-        </main>
-
-
-
-        <!-- RODAPÉ -->
-        <footer class="footer">
-
-            <div class="footer-top">
-
-                <div>
-
-                    <div class="footer-brand">
-
-                        <span class="logo-symbol">MS</span>
-
-                        <div>
-                            <strong>MAX SOM</strong>
-
-                            <small>
-                                DIVULGAÇÃO • SERVIÇOS • ATENDIMENTO
-                            </small>
-                        </div>
-
-                    </div>
-
-                    <p>
-                        Plataforma da Max Som para divulgação,
-                        apresentação e atendimento ao cliente.
-                    </p>
-
-                </div>
-
-
-
-                <div class="footer-links">
-
-                    <div>
-                        <span>EXPLORE</span>
-
-                        <a href="index.html">Início</a>
-                        <a href="produtos.html">Produtos</a>
-                        <a href="servicos.html">Serviços</a>
-                    </div>
-
-
-                    <div>
-                        <span>EMPRESA</span>
-
-                        <a href="projetos.html">Projetos</a>
-                        <a href="publicacoes.html">Publicações</a>
-                        <a href="atendimento.html">Atendimento</a>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="footer-bottom">
-
-                <span>
-                    © <span id="currentYear"></span>
-                    Max Som. Todos os direitos reservados.
-                </span>
-
-                <span>Publicações</span>
-
-            </div>
-
-        </footer>
-
-    </div>
-
-
-
-    <!-- FUNDO DO MENU MOBILE -->
-    <div class="overlay" id="overlay"></div>
-
-
-    <!-- JAVASCRIPT COMPARTILHADO -->
-    <script src="js/main.js"></script>
-
-</body>
-</html>
+              `
+          }
+
+          <div class="post-info">
+            <span>Publicação Max Som</span>
+
+            <h3>${esc(post.titulo || "Publicação")}</h3>
+
+            ${
+              post.resumo
+                ? `<p>${esc(post.resumo)}</p>`
+                : ""
+            }
+
+            ${
+              post.data_publicacao
+                ? `<small>${esc(formatDate(post.data_publicacao))}</small>`
+                : ""
+            }
+
+            ${
+              post.conteudo
+                ? `
+                  <details>
+                    <summary>Ler publicação</summary>
+                    <p>${esc(post.conteudo)}</p>
+                  </details>
+                `
+                : ""
+            }
+          </div>
+        </article>
+      `).join("");
+    });
+
+  } catch (error) {
+    console.error("Erro ao carregar publicações:", error);
+
+    containers.forEach((container) => {
+      container.innerHTML =
+        '<div class="empty">Não foi possível carregar as publicações. Verifique a conexão com o banco de dados.</div>';
+    });
+  }
+}
