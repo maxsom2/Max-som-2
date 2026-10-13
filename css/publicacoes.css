@@ -1158,3 +1158,18 @@ body .page {
     transition: none;
   }
 }
+.sidebar-top .logo img {
+    display: block;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.footer-logo img {
+    display: block;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
