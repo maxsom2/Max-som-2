@@ -1,1 +1,233 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
+  <meta name="description" content="Acesse sua conta Max Som.">
 
+  <title>Max Som | Minha Conta</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-top">
+      <a href="index.html" class="logo" aria-label="Max Som - Início">
+        <img src="./assets/logo-maxsom-white.png" alt="Max Som">
+      </a>
+
+      <button
+        class="close-sidebar"
+        id="closeSidebar"
+        type="button"
+        aria-label="Fechar menu">
+        ×
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu principal">
+
+      <span class="nav-label">MENU PRINCIPAL</span>
+
+      <a class="nav-item" href="index.html">
+        <span class="nav-icon">⌂</span>
+        <span>Início</span>
+      </a>
+
+      <a class="nav-item" href="produtos.html">
+        <span class="nav-icon">▣</span>
+        <span>Produtos</span>
+      </a>
+
+      <a class="nav-item" href="servicos.html">
+        <span class="nav-icon">⚙</span>
+        <span>Serviços</span>
+      </a>
+
+      <a class="nav-item" href="projetos.html">
+        <span class="nav-icon">▧</span>
+        <span>Projetos</span>
+      </a>
+
+      <a class="nav-item" href="publicacoes.html">
+        <span class="nav-icon">▤</span>
+        <span>Publicações</span>
+      </a>
+
+      <a class="nav-item" href="atendimento.html">
+        <span class="nav-icon">☏</span>
+        <span>Atendimento</span>
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+      <a class="nav-item" href="atendimento.html">
+        <span class="nav-icon">?</span>
+        <span>Ajuda</span>
+      </a>
+
+      <a
+        class="nav-item active"
+        href="login.html"
+        aria-current="page">
+        <span class="nav-icon">♙</span>
+        <span>Minha conta</span>
+      </a>
+
+    </div>
+
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page">
+
+    <header class="topbar">
+
+      <div class="topbar-left">
+
+        <button
+          class="menu-toggle"
+          id="mobileMenu"
+          type="button"
+          aria-label="Abrir menu"
+          aria-controls="sidebar"
+          aria-expanded="false">
+          ☰
+        </button>
+
+        <div class="breadcrumb">
+          <span>Max Som</span>
+          <span class="breadcrumb-separator">/</span>
+          <strong>Minha conta</strong>
+        </div>
+
+      </div>
+
+      <div class="topbar-actions">
+        <a class="topbar-help" href="atendimento.html">
+          Precisa de ajuda?
+        </a>
+      </div>
+
+    </header>
+
+    <main id="conta">
+
+      <section class="account-welcome">
+        <span class="section-label">ÁREA DO USUÁRIO</span>
+
+        <h1>Bem-vindo à <span>Max Som.</span></h1>
+
+        <p>
+          Acesse sua conta para acompanhar suas interações
+          e manter contato com nossa equipe.
+        </p>
+      </section>
+
+      <section class="account-layout">
+
+        <div class="account-info">
+
+          <span class="account-symbol">M</span>
+
+          <h2>Sua conexão com a Max Som.</h2>
+
+          <p>
+            Tenha um canal de contato com nossa equipe para tirar
+            dúvidas, conhecer os equipamentos e conversar sobre
+            seus projetos de som.
+          </p>
+
+          <a href="atendimento.html" class="account-contact">
+            Precisa de ajuda? Fale conosco →
+          </a>
+
+        </div>
+
+        <div class="account-card">
+
+          <span class="section-label">MINHA CONTA</span>
+
+          <h2>Acessar conta</h2>
+
+          <p class="account-description">
+            Entre com seus dados para continuar.
+          </p>
+
+          <form id="loginForm">
+
+            <label for="email">E-mail</label>
+
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="seuemail@exemplo.com"
+              autocomplete="email"
+              required>
+
+            <label for="password">Senha</label>
+
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required>
+
+            <button type="submit" class="account-submit">
+              Entrar na minha conta →
+            </button>
+
+            <p
+              id="loginMessage"
+              class="login-message"
+              role="status"
+              aria-live="polite">
+            </p>
+
+          </form>
+
+          <div class="account-divider">
+            <span>Primeiro acesso?</span>
+          </div>
+
+          <p class="account-register">
+            Entre em contato com a equipe para obter informações
+            sobre cadastro e acesso.
+          </p>
+
+          <a href="atendimento.html" class="account-register-link">
+            Solicitar orientações
+          </a>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+      <span>Som, tecnologia e projetos.</span>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/main.js"></script>
+  <script src="js/login.js"></script>
+
+</body>
+</html>
+```
