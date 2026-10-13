@@ -1,1 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Novidades, notícias e publicações da Max Som.">
+  <title>Publicações | Max Som</title>
+  <link rel="stylesheet" href="css/publicacoes.css">
+</head>
 
+<body>
+  <div class="app-shell">
+
+    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+      <div class="sidebar-brand">
+        <div class="brand-mark">MS</div>
+        <div class="brand-copy">
+          <strong>MAX SOM</strong>
+          <span>Som • Projetos • Soluções</span>
+        </div>
+      </div>
+
+      <button
+        class="sidebar-close"
+        id="closeSidebar"
+        type="button"
+        aria-label="Fechar menu"
+      >×</button>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="index.html">
+          <span class="nav-icon">⌂</span>Início
+        </a>
+        <a class="nav-item" href="produtos.html">
+          <span class="nav-icon">▣</span>Produtos
+        </a>
+        <a class="nav-item" href="servicos.html">
+          <span class="nav-icon">⚙</span>Serviços
+        </a>
+        <a class="nav-item" href="projetos.html">
+          <span class="nav-icon">◫</span>Projetos
+        </a>
+        <a class="nav-item active" href="publicacoes.html" aria-current="page">
+          <span class="nav-icon">▤</span>Publicações
+        </a>
+        <a class="nav-item" href="atendimento.html">
+          <span class="nav-icon">☏</span>Atendimento
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <p>Precisa de ajuda com seu projeto de som?</p>
+        <a class="sidebar-contact" href="atendimento.html">
+          Fale com nossa equipe <span>→</span>
+        </a>
+        <small>© <span id="sidebarYear">2026</span> Max Som</small>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <button
+          class="menu-toggle"
+          id="menuToggle"
+          type="button"
+          aria-label="Abrir menu"
+          aria-expanded="false"
+        >☰</button>
+
+        <div class="breadcrumb">
+          <span>Max Som</span>
+          <span class="crumb-separator">/</span>
+          <strong>Publicações</strong>
+        </div>
+
+        <div class="topbar-actions">
+          <a
+            class="top-link"
+            href="https://wa.me/5565996262514"
+            target="_blank"
+            rel="noopener noreferrer"
+          >WhatsApp <span>↗</span></a>
+
+          <a class="account-button" href="login.html">Minha conta</a>
+        </div>
+      </header>
+
+      <section class="page-intro">
+        <div>
+          <span class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            NOVIDADES MAX SOM
+          </span>
+
+          <h1>Publicações</h1>
+
+          <p>
+            Acompanhe novidades, dicas, projetos e informações
+            sobre o universo do som.
+          </p>
+        </div>
+
+        <div class="intro-decoration" aria-hidden="true">
+          <span class="sound-wave wave-one"></span>
+          <span class="sound-wave wave-two"></span>
+          <span class="sound-wave wave-three"></span>
+          <span class="sound-wave wave-four"></span>
+          <span class="sound-wave wave-five"></span>
+        </div>
+      </section>
+
+      <section class="publications-content" aria-labelledby="latestTitle">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">CONTEÚDO E INFORMAÇÃO</span>
+            <h2 id="latestTitle">Últimas publicações</h2>
+          </div>
+
+          <span class="content-label">Atualizações da Max Som</span>
+        </div>
+
+        <div class="posts-grid" id="postsGrid">
+
+          <article class="post-card">
+            <div class="post-image post-image-blue">
+              <span class="image-tag">DICAS</span>
+              <span class="image-symbol">♫</span>
+              <span class="image-caption">MAX SOM / CONHECIMENTO</span>
+            </div>
+
+            <div class="post-info">
+              <div class="post-meta">
+                <span>Dicas e informações</span>
+                <span>01</span>
+              </div>
+
+              <h3>
+                Como escolher equipamentos de som para seu projeto
+              </h3>
+
+              <p>
+                Conheça alguns pontos importantes para encontrar
+                soluções de áudio adequadas às necessidades do seu ambiente.
+              </p>
+
+              <a href="atendimento.html" class="read-more">
+                Saiba mais <span>→</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="post-card">
+            <div class="post-image post-image-light">
+              <span class="image-tag">PROJETOS</span>
+              <span class="image-symbol">◈</span>
+              <span class="image-caption">MAX SOM / SOLUÇÕES</span>
+            </div>
+
+            <div class="post-info">
+              <div class="post-meta">
+                <span>Projetos e soluções</span>
+                <span>02</span>
+              </div>
+
+              <h3>
+                Planejamento: o primeiro passo para um bom resultado
+              </h3>
+
+              <p>
+                Entenda por que conhecer o espaço e os objetivos
+                do projeto ajuda a definir uma solução de áudio mais eficiente.
+              </p>
+
+              <a href="atendimento.html" class="read-more">
+                Saiba mais <span>→</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="post-card">
+            <div class="post-image post-image-dark">
+              <span class="image-tag">NOVIDADES</span>
+              <span class="image-symbol">〰</span>
+              <span class="image-caption">MAX SOM / ATUALIZAÇÕES</span>
+            </div>
+
+            <div class="post-info">
+              <div class="post-meta">
+                <span>Novidades</span>
+                <span>03</span>
+              </div>
+
+              <h3>Fique por dentro das novidades da Max Som</h3>
+
+              <p>
+                Este espaço reúne comunicados, informações e conteúdos
+                preparados para clientes e visitantes.
+              </p>
+
+              <a href="atendimento.html" class="read-more">
+                Fale com a equipe <span>→</span>
+              </a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="contact-banner">
+        <div class="contact-icon">✦</div>
+
+        <div>
+          <span>VAMOS CONVERSAR?</span>
+          <h2>Tem um projeto em mente?</h2>
+          <p>
+            Entre em contato com a equipe da Max Som para tirar suas dúvidas.
+          </p>
+        </div>
+
+        <a href="atendimento.html" class="contact-button">
+          Ir para atendimento <span>→</span>
+        </a>
+      </section>
+
+      <footer class="page-footer">
+        <span>
+          © <span id="currentYear">2026</span> Max Som.
+          Todos os direitos reservados.
+        </span>
+        <span>Divulgação e atendimento</span>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Carrega a biblioteca do Supabase antes do main.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
