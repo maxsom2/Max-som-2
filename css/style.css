@@ -1,5 +1,6 @@
+
 /* ========================================
-   MAX SOM — ESTILO GLOBAL
+   MAX SOM â€” ESTILO GLOBAL
    ======================================== */
 
 :root {
@@ -85,7 +86,17 @@ a:focus-visible {
 /* Logo */
 
 .brand {
-   /* Logo oficial da Max Som */
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 8px;
+  margin-bottom: 24px;
+  white-space: nowrap;
+}
+
+/* Logo oficial da Max Som */
 .brand-logo {
   display: block;
   width: 170px;
@@ -95,21 +106,12 @@ a:focus-visible {
   object-position: left center;
 }
 
-/* Centraliza a logo quando o menu está recolhido */
+/* Centraliza a logo quando o menu estÃ¡ recolhido */
 body.sidebar-collapsed .brand-logo {
   width: 42px;
   max-width: 42px;
   height: 42px;
   object-position: center;
-}
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 12px;
-  min-height: 48px;
-  padding: 0 8px;
-  margin-bottom: 24px;
-  white-space: nowrap;
 }
 
 .brand-symbol {
@@ -136,7 +138,7 @@ body.sidebar-collapsed .brand-logo {
   font-weight: 800;
 }
 
-/* Botão recolher menu */
+/* BotÃ£o recolher menu */
 
 .menu-toggle {
   display: flex;
@@ -165,7 +167,7 @@ body.sidebar-collapsed .brand-logo {
 }
 
 /* ========================================
-   NAVEGAÇÃO VERTICAL
+   NAVEGAÃ‡ÃƒO VERTICAL
    ======================================== */
 
 .sidebar nav.side-nav {
@@ -182,7 +184,7 @@ body.sidebar-collapsed .brand-logo {
   padding: 0;
 }
 
-/* Cada opção ocupa uma linha */
+/* Cada opÃ§Ã£o ocupa uma linha */
 
 .sidebar nav.side-nav > a.nav-link {
   position: relative;
@@ -289,7 +291,7 @@ body.sidebar-collapsed .brand-logo {
 }
 
 /* ========================================
-   ÁREA PRINCIPAL E CABEÇALHO
+   ÃREA PRINCIPAL E CABEÃ‡ALHO
    ======================================== */
 
 .site-shell {
@@ -512,7 +514,7 @@ main {
   color: #42d392;
 }
 
-/* Ilustração de som feita com CSS */
+/* IlustraÃ§Ã£o de som feita com CSS */
 
 .hero-art {
   position: relative;
@@ -714,7 +716,7 @@ main {
 }
 
 /* ========================================
-   SEÇÕES DE CONTEÚDO
+   SEÃ‡Ã•ES DE CONTEÃšDO
    ======================================== */
 
 .placeholder-section {
@@ -767,7 +769,7 @@ main {
 }
 
 /* ========================================
-   RODAPÉ
+   RODAPÃ‰
    ======================================== */
 
 .site-footer {
@@ -1132,4 +1134,4 @@ main {
     min-height: 260px;
     max-height: 360px;
   }
-} 
+}
