@@ -4,439 +4,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta
-        name="description"
-        content="Confira dicas, informações e novidades da Max Som."
-    >
-
-    <title>Publicações | Max Som</title>
+    <meta name="description" content="Conheça os produtos e equipamentos de som apresentados pela Max Som.">
+    <title>Produtos | Max Som</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
-
-    <!-- CSS geral do projeto -->
     <link rel="stylesheet" href="css/style.css">
-
-    <!-- CSS exclusivo desta página -->
-    <link rel="stylesheet" href="css/publicacoes.css">
+    <link rel="stylesheet" href="css/product.css">
 </head>
-
 <body>
 
     <!-- MENU LATERAL -->
     <aside class="sidebar" id="sidebar">
-
         <div class="sidebar-top">
-           <a class="logo" href="index.html" aria-label="Max Som - Início">
-    <img src="assets/logo-maxsom-white.png" alt="Max Som">
-</a>
+            <a class="logo" href="index.html" aria-label="Max Som - Início">
+                <img src="assets/logo-maxsom-white.png" alt="Max Som">
             </a>
-
-            <button
-                class="close-sidebar"
-                id="closeSidebar"
-                type="button"
-                aria-label="Fechar menu"
-            >
-                &times;
-            </button>
+            <button class="close-sidebar" id="closeSidebar" type="button" aria-label="Fechar menu">&times;</button>
         </div>
 
-        <!-- Perfil -->
         <div class="sidebar-profile">
             <div class="profile-avatar">MS</div>
-
             <div class="profile-info">
                 <strong>Max Som</strong>
                 <span>Divulgação e atendimento</span>
             </div>
         </div>
 
-        <!-- Navegação principal -->
         <nav class="sidebar-nav" aria-label="Menu principal">
-
             <span class="nav-label">MENU PRINCIPAL</span>
 
             <a class="nav-item" href="index.html">
-                <span class="nav-icon">⌂</span>
-                <span>Início</span>
+                <span class="nav-icon">⌂</span><span>Início</span>
             </a>
-
-            <a class="nav-item" href="produtos.html">
-                <span class="nav-icon">▣</span>
-                <span>Produtos</span>
+            <a class="nav-item active" href="produtos.html" aria-current="page">
+                <span class="nav-icon">▣</span><span>Produtos</span>
             </a>
-
             <a class="nav-item" href="servicos.html">
-                <span class="nav-icon">⚙</span>
-                <span>Serviços</span>
+                <span class="nav-icon">⚙</span><span>Serviços</span>
             </a>
-
             <a class="nav-item" href="projetos.html">
-                <span class="nav-icon">▤</span>
-                <span>Projetos</span>
+                <span class="nav-icon">▤</span><span>Projetos</span>
             </a>
-
-            <a
-                class="nav-item active"
-                href="publicacoes.html"
-                aria-current="page"
-            >
-                <span class="nav-icon">▧</span>
-                <span>Publicações</span>
+            <a class="nav-item" href="publicacoes.html">
+                <span class="nav-icon">▧</span><span>Publicações</span>
             </a>
-
             <a class="nav-item" href="atendimento.html">
-                <span class="nav-icon">✉</span>
-                <span>Atendimento</span>
+                <span class="nav-icon">✉</span><span>Atendimento</span>
             </a>
 
-            <span class="nav-label">MINHA CONTA</span>
+            <span class="nav-label nav-label-space">MINHA CONTA</span>
 
-            <a
-                class="nav-item"
-                href="conversas.html"
-                data-conversations-link
-                data-logged-only
-            >
-                <span class="nav-icon">☏</span>
-                <span>Conversas</span>
+            <a class="nav-item" href="conversas.html" data-conversations-link data-logged-only>
+                <span class="nav-icon">☏</span><span>Conversas</span>
             </a>
-
-            <a
-                class="nav-item"
-                href="conta.html"
-                data-logged-only
-            >
-                <span class="nav-icon">♙</span>
-                <span>Minha conta</span>
+            <a class="nav-item" href="conta.html" data-logged-only>
+                <span class="nav-icon">♙</span><span>Minha conta</span>
             </a>
-
-            <a
-                class="nav-item"
-                href="login.html"
-                data-guest-only
-            >
-                <span class="nav-icon">↪</span>
-                <span>Entrar</span>
+            <a class="nav-item" href="login.html" data-guest-only>
+                <span class="nav-icon">↪</span><span>Entrar</span>
             </a>
-
-            <a
-                class="nav-item"
-                href="cadastro.html"
-                data-guest-only
-            >
-                <span class="nav-icon">＋</span>
-                <span>Criar conta</span>
+            <a class="nav-item" href="cadastro.html" data-guest-only>
+                <span class="nav-icon">＋</span><span>Criar conta</span>
             </a>
-
-            <a
-                class="nav-item"
-                href="admin.html"
-                data-admin-only
-            >
-                <span class="nav-icon">⚙</span>
-                <span>Painel administrativo</span>
+            <a class="nav-item" href="admin.html" data-admin-only>
+                <span class="nav-icon">⚙</span><span>Painel administrativo</span>
             </a>
-
-            <button
-                class="nav-item"
-                type="button"
-                data-logout
-                data-logged-only
-            >
-                <span class="nav-icon">⇥</span>
-                <span>Sair da conta</span>
+            <button class="nav-item" type="button" data-logout data-logged-only>
+                <span class="nav-icon">⇥</span><span>Sair da conta</span>
             </button>
-
         </nav>
 
-        <!-- Rodapé do menu -->
         <div class="sidebar-footer">
-
             <div class="help-card">
                 <strong>Precisa de ajuda?</strong>
                 <p>Entre em contato com a equipe da Max Som.</p>
-
-                <a
-                    href="https://wa.me/5565996262514"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
+                <a href="https://wa.me/5565996262514" target="_blank" rel="noopener noreferrer">
                     Falar pelo WhatsApp
                 </a>
             </div>
-
-            <p class="copyright">
-                © <span id="sidebarYear">2026</span> Max Som
-            </p>
-
+            <p class="copyright">© <span id="sidebarYear">2026</span> Max Som</p>
         </div>
-
     </aside>
 
-    <!-- Fundo escurecido no menu mobile -->
-    <div
-        class="sidebar-overlay"
-        id="sidebarOverlay"
-        aria-hidden="true"
-    ></div>
-
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
     <!-- ÁREA PRINCIPAL -->
     <div class="page">
-
-        <!-- BARRA SUPERIOR -->
         <header class="topbar">
-
             <div class="topbar-left">
-
-                <button
-                    class="menu-toggle"
-                    id="menuToggle"
-                    type="button"
-                    aria-label="Abrir menu"
-                    aria-controls="sidebar"
-                    aria-expanded="false"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <button class="menu-toggle" id="menuToggle" type="button"
+                    aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+                    <span></span><span></span><span></span>
                 </button>
-
                 <div class="page-breadcrumb">
                     <span>Max Som</span>
                     <span class="breadcrumb-separator">/</span>
-                    <strong>Publicações</strong>
+                    <strong>Produtos</strong>
                 </div>
-
             </div>
 
             <div class="topbar-actions">
-
-                <a
-                    class="topbar-whatsapp"
-                    href="https://wa.me/5565996262514"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    WhatsApp
-                </a>
-
-                <a class="account-link" href="conta.html">
-                    Minha conta
-                </a>
-
+                <a class="topbar-whatsapp" href="https://wa.me/5565996262514"
+                    target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a class="account-link" href="conta.html">Minha conta</a>
             </div>
-
         </header>
 
-
-        <!-- CONTEÚDO -->
-        <main class="publicacoes-main">
-
+        <main class="produtos-main">
             <!-- APRESENTAÇÃO -->
-            <section class="publicacoes-hero">
-
-                <div class="publicacoes-hero-content">
-
-                    <span class="publicacoes-eyebrow">
-                        INFORMAÇÃO E NOVIDADES
-                    </span>
-
-                    <h1>Publicações</h1>
-
+            <section class="produtos-hero">
+                <div class="produtos-hero-content">
+                    <span class="produtos-eyebrow">CONHEÇA NOSSO CATÁLOGO</span>
+                    <h1>Produtos para suas soluções em som</h1>
                     <p>
-                        Fique por dentro das dicas, informações e novidades
-                        da Max Som. Acompanhe nossos conteúdos e conheça
-                        melhor as soluções que oferecemos.
+                        Conheça os equipamentos apresentados pela Max Som e encontre
+                        informações para escolher a solução mais adequada ao seu projeto.
                     </p>
-
-                    <a href="#lista-publicacoes" class="publicacoes-button">
-                        Explorar publicações
-                    </a>
-
+                    <a href="#catalogo" class="produtos-button">Explorar catálogo <span>↓</span></a>
                 </div>
 
-                <div class="publicacoes-hero-card">
-                    <span class="hero-card-icon">▧</span>
+                <div class="produtos-hero-card" aria-hidden="true">
+                    <span class="hero-card-icon">♫</span>
                     <span class="hero-card-label">MAX SOM</span>
-
-                    <h2>Conteúdo para você</h2>
-
-                    <p>
-                        Informações sobre equipamentos, serviços, projetos
-                        e soluções em som.
-                    </p>
+                    <h2>Som que conecta</h2>
+                    <p>Equipamentos, conhecimento e atendimento especializado.</p>
+                    <div class="hero-sound-lines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
                 </div>
-
             </section>
 
-
-            <!-- LISTA DE PUBLICAÇÕES -->
-            <section
-                class="publicacoes-section"
-                id="lista-publicacoes"
-            >
-
-                <div class="publicacoes-section-heading">
-
+            <!-- CATÁLOGO -->
+            <section class="produtos-section" id="catalogo">
+                <div class="produtos-section-heading">
                     <div>
-                        <span class="publicacoes-eyebrow">
-                            NOSSO CONTEÚDO
-                        </span>
-
-                        <h2>Últimas publicações</h2>
-
-                        <p>
-                            Confira os conteúdos publicados pela nossa equipe.
-                        </p>
-                    </div>
-
-                </div>
-
-                <!-- O main.js carrega as publicações neste elemento -->
-                <div
-                    class="posts-grid posts-v2"
-                    id="postsGrid"
-                    aria-live="polite"
-                >
-                    <div class="empty">
-                        Carregando publicações...
+                        <span class="produtos-eyebrow">CATÁLOGO INFORMATIVO</span>
+                        <h2>Explore nossos produtos</h2>
+                        <p>Consulte as categorias e fale com nossa equipe para saber mais.</p>
                     </div>
                 </div>
 
+                <div class="produtos-grid">
+                    <article class="produto-card">
+                        <div class="produto-visual produto-visual-blue">
+                            <span class="produto-tag">ÁUDIO</span>
+                            <span class="produto-symbol" aria-hidden="true">♫</span>
+                            <span class="produto-visual-caption">MAX SOM · EQUIPAMENTOS</span>
+                        </div>
+                        <div class="produto-body">
+                            <span class="produto-category">Categoria</span>
+                            <h3>Equipamentos de áudio</h3>
+                            <p>Conheça as opções de equipamentos para diferentes necessidades de som.</p>
+                            <a href="atendimento.html" class="produto-link">Consultar informações <span>→</span></a>
+                        </div>
+                    </article>
+
+                    <article class="produto-card">
+                        <div class="produto-visual produto-visual-light">
+                            <span class="produto-tag">SONORIZAÇÃO</span>
+                            <span class="produto-symbol" aria-hidden="true">◉</span>
+                            <span class="produto-visual-caption">MAX SOM · SOLUÇÕES</span>
+                        </div>
+                        <div class="produto-body">
+                            <span class="produto-category">Categoria</span>
+                            <h3>Soluções de sonorização</h3>
+                            <p>Informações sobre opções para ambientes, eventos e instalações.</p>
+                            <a href="atendimento.html" class="produto-link">Consultar informações <span>→</span></a>
+                        </div>
+                    </article>
+
+                    <article class="produto-card">
+                        <div class="produto-visual produto-visual-dark">
+                            <span class="produto-tag">ACESSÓRIOS</span>
+                            <span class="produto-symbol" aria-hidden="true">⌁</span>
+                            <span class="produto-visual-caption">MAX SOM · COMPLEMENTOS</span>
+                        </div>
+                        <div class="produto-body">
+                            <span class="produto-category">Categoria</span>
+                            <h3>Acessórios e componentes</h3>
+                            <p>Conheça acessórios e componentes que podem complementar seu sistema.</p>
+                            <a href="atendimento.html" class="produto-link">Consultar informações <span>→</span></a>
+                        </div>
+                    </article>
+                </div>
+
+                <p class="catalogo-nota">
+                    Este catálogo tem finalidade informativa. A disponibilidade e as especificações
+                    dos produtos devem ser confirmadas diretamente com a equipe da Max Som.
+                </p>
             </section>
 
-
-            <!-- CHAMADA PARA ATENDIMENTO -->
-            <section class="publicacoes-cta">
-
-                <div class="publicacoes-cta-content">
-
-                    <span class="publicacoes-eyebrow">
-                        FALE COM A MAX SOM
-                    </span>
-
-                    <h2>Precisa de mais informações?</h2>
-
-                    <p>
-                        Nossa equipe pode ajudar você a conhecer nossos
-                        produtos, serviços e projetos.
-                    </p>
-
-                    <a href="atendimento.html" class="publicacoes-button">
-                        Solicitar atendimento
+            <!-- ATENDIMENTO -->
+            <section class="produtos-cta">
+                <div class="produtos-cta-icon" aria-hidden="true">✉</div>
+                <div class="produtos-cta-content">
+                    <span class="produtos-eyebrow">FALE COM A MAX SOM</span>
+                    <h2>Precisa de ajuda para escolher?</h2>
+                    <p>Entre em contato com nossa equipe para tirar dúvidas e obter mais informações.</p>
+                </div>
+                <div class="produtos-cta-actions">
+                    <a href="atendimento.html" class="produtos-button">Solicitar atendimento</a>
+                    <a href="https://wa.me/5565996262514" target="_blank"
+                        rel="noopener noreferrer" class="produtos-button produtos-button-outline">
+                        WhatsApp
                     </a>
-
                 </div>
-
             </section>
-
         </main>
 
-
         <!-- RODAPÉ -->
-        <footer class="footer footer-v2">
-
+        <footer class="footer footer-v2 produtos-footer">
             <div class="footer-content">
-
                 <div class="footer-column footer-brand">
-
-                   <a class="footer-logo" href="index.html">
-    <img src="assets/logo-maxsom-white.png" alt="Max Som">
-</a>
-
-                    <p>
-                        Soluções em som, equipamentos, serviços,
-                        projetos e atendimento.
-                    </p>
-
-                    <a
-                        class="footer-whatsapp"
-                        href="https://wa.me/5565996262514"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        WhatsApp: (65) 99626-2514
+                    <a class="footer-logo" href="index.html">
+                        <img src="assets/logo-maxsom-white.png" alt="Max Som">
                     </a>
-
+                    <p>Soluções em som, equipamentos, serviços, projetos e atendimento.</p>
+                    <a class="footer-whatsapp" href="https://wa.me/5565996262514"
+                        target="_blank" rel="noopener noreferrer">WhatsApp: (65) 99626-2514</a>
                 </div>
 
-
                 <div class="footer-column">
-
                     <h3>Navegação</h3>
-
                     <a href="index.html">Início</a>
                     <a href="produtos.html">Produtos</a>
                     <a href="servicos.html">Serviços</a>
                     <a href="projetos.html">Projetos</a>
                     <a href="publicacoes.html">Publicações</a>
-
                 </div>
 
-
                 <div class="footer-column">
-
                     <h3>Atendimento</h3>
-
                     <a href="atendimento.html">Solicitar atendimento</a>
-
-                    <a
-                        href="conversas.html"
-                        data-conversations-link
-                        data-logged-only
-                    >
-                        Conversas
-                    </a>
-
-                    <a href="conta.html" data-logged-only>
-                        Minha conta
-                    </a>
-
-                    <a href="login.html" data-guest-only>
-                        Entrar
-                    </a>
-
+                    <a href="conversas.html" data-conversations-link data-logged-only>Conversas</a>
+                    <a href="conta.html" data-logged-only>Minha conta</a>
+                    <a href="login.html" data-guest-only>Entrar</a>
                 </div>
-
 
                 <div class="footer-column">
-
                     <h3>Contato</h3>
-
                     <p>Telefone: (65) 99626-2514</p>
-
                     <p>WhatsApp: (65) 99626-2514</p>
-
                     <p>contato@maxsom.com.br</p>
-
                 </div>
-
             </div>
-
 
             <div class="footer-bottom">
-                <p>
-                    © <span id="footerYear">2026</span> Max Som.
-                    Todos os direitos reservados.
-                </p>
+                <p>© <span id="footerYear">2026</span> Max Som. Todos os direitos reservados.</p>
             </div>
-
         </footer>
-
     </div>
-
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
     <script src="js/main.js"></script>
 
     <script>
@@ -450,7 +272,6 @@
                 sidebar?.classList.add("active");
                 overlay?.classList.add("active");
                 document.body.classList.add("sidebar-open");
-
                 openButton?.setAttribute("aria-expanded", "true");
                 overlay?.setAttribute("aria-hidden", "false");
             }
@@ -459,36 +280,26 @@
                 sidebar?.classList.remove("active");
                 overlay?.classList.remove("active");
                 document.body.classList.remove("sidebar-open");
-
                 openButton?.setAttribute("aria-expanded", "false");
                 overlay?.setAttribute("aria-hidden", "true");
             }
 
             openButton?.addEventListener("click", function () {
-                if (sidebar?.classList.contains("active")) {
-                    closeMenu();
-                } else {
-                    openMenu();
-                }
+                sidebar?.classList.contains("active") ? closeMenu() : openMenu();
             });
 
             closeButton?.addEventListener("click", closeMenu);
             overlay?.addEventListener("click", closeMenu);
 
             document.addEventListener("keydown", function (event) {
-                if (event.key === "Escape") {
-                    closeMenu();
-                }
+                if (event.key === "Escape") closeMenu();
             });
 
             window.addEventListener("resize", function () {
-                if (window.innerWidth > 920) {
-                    closeMenu();
-                }
+                if (window.innerWidth > 920) closeMenu();
             });
 
             const year = new Date().getFullYear();
-
             const sidebarYear = document.getElementById("sidebarYear");
             const footerYear = document.getElementById("footerYear");
 
@@ -496,6 +307,5 @@
             if (footerYear) footerYear.textContent = year;
         });
     </script>
-
 </body>
 </html>
