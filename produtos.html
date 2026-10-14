@@ -14,93 +14,65 @@
 </head>
 
 <body>
-
-  <!-- MENU LATERAL -->
+  <!-- MENU LATERAL: mantém a estrutura original -->
   <aside class="sidebar" id="sidebar">
-
     <div class="sidebar-top">
       <a href="index.html" class="logo" aria-label="Max Som - Início">
         <img src="./assets/logo-maxsom-white.png" alt="Max Som">
       </a>
 
-      <button
-        class="close-sidebar"
-        id="closeSidebar"
-        type="button"
-        aria-label="Fechar menu">
-        ×
-      </button>
+      <button class="close-sidebar" id="closeSidebar"
+        type="button" aria-label="Fechar menu">×</button>
     </div>
 
     <nav class="sidebar-nav" aria-label="Menu principal">
-
       <span class="nav-label">MENU PRINCIPAL</span>
 
       <a class="nav-item" href="index.html">
-        <span class="nav-icon">⌂</span>
-        <span>Início</span>
+        <span class="nav-icon">⌂</span><span>Início</span>
       </a>
 
       <a class="nav-item active" href="produtos.html" aria-current="page">
-        <span class="nav-icon">▣</span>
-        <span>Produtos</span>
+        <span class="nav-icon">▣</span><span>Produtos</span>
       </a>
 
       <a class="nav-item" href="servicos.html">
-        <span class="nav-icon">⚙</span>
-        <span>Serviços</span>
+        <span class="nav-icon">⚙</span><span>Serviços</span>
       </a>
 
       <a class="nav-item" href="projetos.html">
-        <span class="nav-icon">▧</span>
-        <span>Projetos</span>
+        <span class="nav-icon">▧</span><span>Projetos</span>
       </a>
 
       <a class="nav-item" href="publicacoes.html">
-        <span class="nav-icon">▤</span>
-        <span>Publicações</span>
+        <span class="nav-icon">▤</span><span>Publicações</span>
       </a>
 
       <a class="nav-item" href="atendimento.html">
-        <span class="nav-icon">☏</span>
-        <span>Atendimento</span>
+        <span class="nav-icon">☏</span><span>Atendimento</span>
       </a>
-
     </nav>
 
     <div class="sidebar-footer">
-
       <a class="nav-item" href="atendimento.html">
-        <span class="nav-icon">?</span>
-        <span>Ajuda</span>
+        <span class="nav-icon">?</span><span>Ajuda</span>
       </a>
 
       <a class="nav-item" href="login.html">
-        <span class="nav-icon">♙</span>
-        <span>Minha conta</span>
+        <span class="nav-icon">♙</span><span>Minha conta</span>
       </a>
-
     </div>
-
   </aside>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ÁREA PRINCIPAL -->
   <div class="page">
-
     <header class="topbar">
-
       <div class="topbar-left">
-        <button
-          class="menu-toggle"
-          id="mobileMenu"
-          type="button"
-          aria-label="Abrir menu"
-          aria-controls="sidebar"
-          aria-expanded="false">
-          ☰
-        </button>
+        <button class="menu-toggle" id="mobileMenu"
+          type="button" aria-label="Abrir menu"
+          aria-controls="sidebar" aria-expanded="false">☰</button>
 
         <div class="breadcrumb">
           <span>Max Som</span>
@@ -110,44 +82,42 @@
       </div>
 
       <div class="topbar-actions">
-        <a class="topbar-help" href="atendimento.html">
-          Precisa de ajuda?
-        </a>
-
+        <a class="topbar-help" href="atendimento.html">Precisa de ajuda?</a>
         <a class="account-button" href="login.html">
           Minha conta <span>↗</span>
         </a>
       </div>
-
     </header>
 
-    <main id="produtos">
-
+    <main id="produtos" class="products-main">
       <!-- APRESENTAÇÃO -->
       <section class="products-header">
+        <div class="products-header-content">
+          <span class="section-label">CATÁLOGO MAX SOM</span>
 
-        <span class="section-label">CATÁLOGO MAX SOM</span>
+          <h1>
+            Equipamentos e soluções
+            <span>para o seu projeto de som.</span>
+          </h1>
 
-        <h1>
-          Equipamentos e soluções
-          <span>para o seu projeto de som.</span>
-        </h1>
+          <p>
+            Conheça os produtos e equipamentos divulgados pela Max Som.
+            Explore as opções e entre em contato com nossa equipe
+            para esclarecer dúvidas e obter informações.
+          </p>
 
-        <p>
-          Conheça os produtos e equipamentos divulgados pela Max Som.
-          Explore as opções e entre em contato com nossa equipe
-          para esclarecer dúvidas e obter informações.
-        </p>
+          <a class="button button-primary" href="atendimento.html">
+            Consultar a equipe <span aria-hidden="true">→</span>
+          </a>
+        </div>
 
-        <a class="button button-primary" href="atendimento.html">
-          Consultar a equipe →
-        </a>
-
+        <div class="products-header-decoration" aria-hidden="true">
+          <span>MS</span>
+        </div>
       </section>
 
       <!-- CATÁLOGO -->
       <section class="products-content">
-
         <div class="products-title">
           <div>
             <span class="section-label">NOSSO CATÁLOGO</span>
@@ -160,12 +130,10 @@
           </p>
         </div>
 
-        <!-- BUSCA E FILTROS -->
+        <!-- BUSCA E FILTRO -->
         <div class="products-toolbar">
-
           <label class="products-search">
             <span class="search-icon" aria-hidden="true">⌕</span>
-
             <input
               type="search"
               id="productSearch"
@@ -175,7 +143,6 @@
 
           <label class="products-filter">
             <span class="visually-hidden">Filtrar por categoria</span>
-
             <select id="productCategory">
               <option value="">Todas as categorias</option>
               <option value="automotivo">Som automotivo</option>
@@ -185,20 +152,14 @@
               <option value="outros">Outros equipamentos</option>
             </select>
           </label>
-
         </div>
 
-        <!-- PRODUTOS CARREGADOS PELO JAVASCRIPT -->
-        <div
-          class="products-grid products-v2"
+        <!-- O JAVASCRIPT DEVE CONTINUAR CARREGANDO OS PRODUTOS AQUI -->
+        <div class="products-grid products-v2"
           id="productsGrid"
           aria-live="polite"
           aria-busy="true">
-
-          <div class="products-loading">
-            Carregando produtos...
-          </div>
-
+          <div class="products-loading">Carregando produtos...</div>
         </div>
 
         <p class="products-note">
@@ -206,19 +167,13 @@
           características e disponibilidade dos equipamentos,
           entre em contato com a equipe Max Som.
         </p>
-
       </section>
 
-      <!-- ATENDIMENTO -->
+      <!-- CHAMADA PARA ATENDIMENTO -->
       <section class="products-bottom">
-
-        <div>
+        <div class="products-bottom-text">
           <span class="section-label">PRECISA DE AJUDA?</span>
-
-          <h2>
-            Vamos encontrar a solução para o seu projeto.
-          </h2>
-
+          <h2>Vamos encontrar a solução para o seu projeto.</h2>
           <p>
             Nossa equipe pode esclarecer dúvidas sobre os produtos
             e orientar você sobre as opções disponíveis.
@@ -226,31 +181,23 @@
         </div>
 
         <div class="products-buttons">
-
           <a href="atendimento.html" class="button button-primary">
             Falar com a equipe →
           </a>
-
           <a href="servicos.html" class="button button-secondary">
             Conhecer serviços
           </a>
-
         </div>
-
       </section>
-
     </main>
 
-    <!-- RODAPÉ -->
     <footer class="site-footer">
       <span>© 2026 Max Som. Todos os direitos reservados.</span>
       <span>Som, tecnologia e projetos.</span>
     </footer>
-
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/main.js"></script>
-
 </body>
 </html>
