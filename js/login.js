@@ -1,5 +1,3 @@
-```javascript
-// js/login.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
@@ -13,22 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  if (
-    typeof supabase === "undefined" ||
-    typeof SUPABASE_URL === "undefined" ||
-    typeof SUPABASE_ANON_KEY === "undefined" ||
-    SUPABASE_URL.includes("COLE_AQUI") ||
-    SUPABASE_ANON_KEY.includes("COLE_AQUI")
-  ) {
+  const client = window.supabaseClient;
+
+  if (!client) {
     message.textContent =
-      "O sistema de login ainda não está configurado.";
+      "Não foi possível conectar ao sistema. Atualize a página e tente novamente.";
+    console.error(
+      "Cliente Supabase não encontrado. Confira a ordem dos scripts no HTML."
+    );
     return;
   }
-
-  const client = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -55,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (error) {
+        console.error("Erro de login:", error.message);
         message.textContent =
           "Não foi possível entrar. Confira seu e-mail e sua senha.";
         return;
@@ -66,10 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Guarda a sessão por meio do cliente oficial do Supabase.
-      // A página de destino poderá consultar a sessão autenticada.
       window.location.href = "index.html";
-
     } catch (error) {
       console.error("Erro ao realizar login:", error);
       message.textContent =
@@ -82,4 +72,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-```
