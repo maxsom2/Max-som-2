@@ -1,9 +1,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("loginForm");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const message = document.getElementById("loginMessage");
+  const emailInput = document.getElementById("loginemail");
+  const passwordInput = document.getElementById("loginpassword");
   const submitButton = form?.querySelector('button[type="submit"]');
 
   if (!form || !emailInput || !passwordInput || !message) {
