@@ -573,7 +573,7 @@ function setupAuthListener() {
 
     if (currentUser) {
       await loadProfile(currentUser);
-           } else {
+    } else {
       currentProfile = null;
     }
 
@@ -1147,6 +1147,7 @@ async function setupAttendancePage() {
 /* =========================================================
    19. PRODUTOS
    ========================================================= */
+
 async function loadProducts() {
   const containers = qsa(
     "#productsGrid",
@@ -1644,6 +1645,7 @@ async function loadMessages(conversationId) {
 
   container.scrollTop = container.scrollHeight;
 }
+
 function setupMessageForm(conversationId) {
   const form = qs(
     "#mensagemForm",
@@ -2181,6 +2183,7 @@ async function setupAdminForms() {
     });
   }
 }
+
 async function bindEditButtons() {
   qsa("[data-edit-type]").forEach((button) => {
     if (button.dataset.editBound === "true") return;
@@ -2723,3 +2726,4 @@ window.MaxSom = {
   loadConversation,
   loadNotifications
 };
+
