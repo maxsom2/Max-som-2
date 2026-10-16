@@ -1135,3 +1135,390 @@ main {
     max-height: 360px;
   }
 }
+/* ========================================
+   MAX SOM — AJUSTE DO MENU LATERAL GLOBAL
+   Usar junto com o style.css existente
+   ======================================== */
+
+:root {
+  --sidebar-width: 250px;
+  --sidebar-small: 76px;
+}
+
+/* MENU LATERAL */
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  height: 100vh;
+  height: 100dvh;
+  padding: 22px 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--navy, #0b1f3a);
+  color: #fff;
+  transition: width 0.25s ease, transform 0.25s ease;
+}
+
+/* LOGO */
+
+.sidebar .brand {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 48px;
+  margin-bottom: 24px;
+  padding: 0 8px;
+}
+
+.sidebar .brand-logo {
+  display: block;
+  width: 170px;
+  max-width: 100%;
+  height: 48px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* BOTÃO DE RECOLHER */
+
+.sidebar .menu-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  margin-bottom: 22px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar .menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sidebar .toggle-label {
+  font-size: 12px;
+}
+
+/* NAVEGAÇÃO PRINCIPAL */
+
+.sidebar nav.side-nav {
+  display: flex !important;
+  flex: 0 0 auto;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar nav.side-nav > a.nav-link {
+  position: relative;
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 13px;
+  width: 100% !important;
+  min-width: 0;
+  min-height: 46px;
+  margin: 0;
+  padding: 11px 12px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #c4d0df;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sidebar nav.side-nav > a.nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sidebar nav.side-nav > a.nav-link.active {
+  background: var(--blue, #1479f6);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ÍCONES E NOMES */
+
+.sidebar .nav-icon {
+  display: grid;
+  flex: 0 0 22px;
+  width: 22px;
+  min-width: 22px;
+  place-items: center;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.sidebar .nav-label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+}
+
+/* AJUDA E MINHA CONTA */
+
+.sidebar .sidebar-bottom {
+  display: flex !important;
+  flex: 0 0 auto;
+  flex-direction: column !important;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.sidebar .sidebar-bottom > a.nav-link {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 13px;
+  width: 100% !important;
+  min-height: 46px;
+  margin: 0;
+  padding: 11px 12px;
+  overflow: hidden;
+  border-radius: 7px;
+  color: #c4d0df;
+  white-space: nowrap;
+}
+
+.sidebar .sidebar-bottom > a.nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* FUNDO DO MENU MOBILE */
+
+.sidebar-overlay {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: none;
+  background: rgba(4, 15, 30, 0.6);
+}
+
+body.mobile-sidebar-open .sidebar-overlay {
+  display: block;
+}
+
+/* ÁREA PRINCIPAL */
+
+.site-shell {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.25s ease;
+}
+
+/* CABEÇALHO */
+
+.site-shell > .topbar {
+  position: sticky;
+  z-index: 500;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 72px;
+  padding: 14px 34px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+}
+
+.site-shell .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted, #718096);
+  font-size: 13px;
+}
+
+.site-shell .breadcrumb strong {
+  color: var(--text, #17263b);
+}
+
+.site-shell .topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-shell .topbar-help {
+  color: var(--muted, #718096);
+  font-size: 12px;
+}
+
+.site-shell .account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--navy, #0b1f3a);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* BOTÃO DE ABRIR NO CELULAR */
+
+.mobile-menu-button {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--navy, #0b1f3a);
+  cursor: pointer;
+  font-size: 21px;
+}
+
+/* MENU RECOLHIDO NO COMPUTADOR */
+
+@media (min-width: 769px) {
+  body.sidebar-collapsed .sidebar {
+    width: var(--sidebar-small);
+  }
+
+  body.sidebar-collapsed .site-shell {
+    margin-left: var(--sidebar-small);
+  }
+
+  body.sidebar-collapsed .sidebar .brand {
+    justify-content: center;
+    padding: 0;
+  }
+
+  body.sidebar-collapsed .sidebar .brand-logo {
+    width: 42px;
+    height: 42px;
+    object-position: center;
+  }
+
+  body.sidebar-collapsed .sidebar .toggle-label,
+  body.sidebar-collapsed .sidebar .nav-label {
+    display: none;
+  }
+
+  body.sidebar-collapsed .sidebar .menu-toggle {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  body.sidebar-collapsed .sidebar nav.side-nav > a.nav-link,
+  body.sidebar-collapsed .sidebar .sidebar-bottom > a.nav-link {
+    justify-content: center;
+    gap: 0;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+/* TABLETS */
+
+@media (max-width: 1100px) {
+  .site-shell > .topbar {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+/* CELULARES */
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 270px;
+  }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    max-width: 85vw;
+    transform: translateX(-105%);
+  }
+
+  body.mobile-sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .site-shell {
+    margin-left: 0;
+  }
+
+  body.sidebar-collapsed .site-shell {
+    margin-left: 0;
+  }
+
+  .sidebar .menu-toggle {
+    display: none;
+  }
+
+  .site-shell > .topbar {
+    min-height: 64px;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+
+  .mobile-menu-button {
+    display: inline-grid;
+    flex: 0 0 42px;
+  }
+
+  .site-shell .breadcrumb {
+    flex: 1;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .site-shell .topbar-actions {
+    gap: 0;
+  }
+
+  .site-shell .topbar-help {
+    display: none;
+  }
+
+  .site-shell .account-button {
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .site-shell main {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
