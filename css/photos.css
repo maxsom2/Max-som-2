@@ -1,0 +1,119 @@
+/* FOTOS DO MAX SOM */
+
+/* Página inicial */
+
+.publication-image.image-one {
+    background:
+        linear-gradient(
+            to top,
+            rgba(7, 25, 47, 0.65),
+            transparent
+        ),
+        url("https://images.squarespace-cdn.com/content/v1/68895e17e9df1835de451336/96e33413-aef6-4c32-ac36-0141580adf29/unnamed.png")
+        center / cover no-repeat;
+}
+
+.publication-image.image-two {
+    background:
+        linear-gradient(
+            to top,
+            rgba(7, 25, 47, 0.65),
+            transparent
+        ),
+        url("https://www.carismacustoms.com/Content/images/tile/BoatAudioSystem.jpg")
+        center / cover no-repeat;
+}
+
+.publication-image.image-three {
+    background:
+        linear-gradient(
+            to top,
+            rgba(7, 25, 47, 0.65),
+            transparent
+        ),
+        url("https://mobileacoustics.co.za/cdn/shop/files/08d58aa4f0ca2c750057c9934ee8f3e4_801x801_crop_center.jpg?v=1614730159")
+        center / cover no-repeat;
+}
+
+
+/* Catálogo de produtos */
+
+.product-image-blue {
+    background:
+        url("https://images.squarespace-cdn.com/content/v1/68895e17e9df1835de451336/96e33413-aef6-4c32-ac36-0141580adf29/unnamed.png")
+        center / cover no-repeat;
+}
+
+.product-image-dark {
+    background:
+        url("https://mobileacoustics.co.za/cdn/shop/files/08d58aa4f0ca2c750057c9934ee8f3e4_801x801_crop_center.jpg?v=1614730159")
+        center / cover no-repeat;
+}
+
+.product-image-navy {
+    background:
+        url("https://www.carismacustoms.com/Content/images/tile/BoatAudioSystem.jpg")
+        center / cover no-repeat;
+}
+
+.product-image-gray {
+    background:
+        linear-gradient(
+            rgba(7, 25, 47, 0.15),
+            rgba(7, 25, 47, 0.15)
+        ),
+        url("https://frankfurt.apollo.olxcdn.com/v1/files/i3kbcei6kc7e2-KZ/image")
+        center / cover no-repeat;
+}
+
+
+/* Página Projetos */
+
+.project-photo.photo-blue,
+.project-image.project-image-one {
+    background:
+        url("https://images.squarespace-cdn.com/content/v1/68895e17e9df1835de451336/96e33413-aef6-4c32-ac36-0141580adf29/unnamed.png")
+        center / cover no-repeat;
+}
+
+.project-photo.photo-dark,
+.project-image.project-image-two {
+    background:
+        url("https://www.carismacustoms.com/Content/images/tile/BoatAudioSystem.jpg")
+        center / cover no-repeat;
+}
+
+.project-photo.photo-light,
+.project-image.project-image-three {
+    background:
+        url("https://frankfurt.apollo.olxcdn.com/v1/files/i3kbcei6kc7e2-KZ/image")
+        center / cover no-repeat;
+}
+
+.project-photo.photo-blue-dark,
+.project-image.project-image-four {
+    background:
+        url("https://mobileacoustics.co.za/cdn/shop/files/08d58aa4f0ca2c750057c9934ee8f3e4_801x801_crop_center.jpg?v=1614730159")
+        center / cover no-repeat;
+}
+
+
+/* Página Publicações */
+
+.post-image-one {
+    background:
+        url("https://images.squarespace-cdn.com/content/v1/68895e17e9df1835de451336/96e33413-aef6-4c32-ac36-0141580adf29/unnamed.png")
+        center / cover no-repeat;
+}
+
+.post-image-two {
+    background:
+        url("https://www.carismacustoms.com/Content/images/tile/BoatAudioSystem.jpg")
+        center / cover no-repeat;
+}
+
+.post-image-three {
+    background:
+        url("https://mobileacoustics.co.za/cdn/shop/files/08d58aa4f0ca2c750057c9934ee8f3e4_801x801_crop_center.jpg?v=1614730159")
+        center / cover no-repeat;
+}
