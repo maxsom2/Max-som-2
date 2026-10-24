@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
+  <meta name="description" content="Conheça os produtos e equipamentos de som divulgados pela Max Som.">
+
+  <title>Max Som | Produtos</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/products.css">
+</head>
+
+<body>
+  <!-- MENU LATERAL: mantém a estrutura original -->
+<!-- ÁREA PRINCIPAL -->
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-button" id="mobileMenu"
+          type="button" aria-label="Abrir menu"
+          aria-controls="sidebar" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+
+        <div class="breadcrumb">
+          <span>Max Som</span>
+          <span class="breadcrumb-separator">/</span>
+          <strong>Produtos</strong>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a class="topbar-help" href="atendimento.html">Precisa de ajuda?</a>
+        <a class="account-button" href="login.html" data-smart-account-link>
+          Minha conta <span>↗</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="produtos" class="products-main">
+      <!-- APRESENTAÇÃO -->
+      <section class="products-header">
+        <div class="products-header-content">
+          <span class="section-label">CATÁLOGO MAX SOM</span>
+
+          <h1>
+            Equipamentos e soluções
+            <span>para o seu projeto de som.</span>
+          </h1>
+
+          <p>
+            Conheça os produtos e equipamentos divulgados pela Max Som.
+            Explore as opções e entre em contato com nossa equipe
+            para esclarecer dúvidas e obter informações.
+          </p>
+
+          <a class="button button-primary" href="atendimento.html">
+            Consultar a equipe <span aria-hidden="true">→</span>
+          </a>
+
+          <div class="products-trust-points" aria-label="Áreas de atuação">
+            <span><i class="fa-solid fa-car-side" aria-hidden="true"></i> Som automotivo</span>
+            <span><i class="fa-solid fa-ship" aria-hidden="true"></i> Som náutico</span>
+            <span><i class="fa-solid fa-volume-high" aria-hidden="true"></i> Som em geral</span>
+          </div>
+        </div>
+
+        <figure class="products-header-decoration">
+          <img src="../assets/galeria-08.jpeg" alt="Sistema de som instalado no porta-malas de um veículo" loading="eager">
+          <span class="products-photo-badge"><i class="fa-solid fa-camera" aria-hidden="true"></i> Foto de projeto</span>
+          <figcaption class="products-photo-caption">
+            <span>MAX SOM · PROJETOS REAIS</span>
+            <strong>Som que acompanha o seu estilo.</strong>
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- CATÁLOGO -->
+      <section class="products-content">
+        <div class="products-title">
+          <div>
+            <span class="section-label">NOSSO CATÁLOGO</span>
+            <h2>Produtos em destaque</h2>
+          </div>
+
+          <p>
+            Consulte informações sobre os equipamentos e descubra
+            quais opções atendem às necessidades do seu projeto.
+          </p>
+        </div>
+
+        <!-- BUSCA E FILTRO -->
+        <div class="products-toolbar">
+          <label class="products-search">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              id="productSearch"
+              placeholder="Buscar produtos..."
+              aria-label="Buscar produtos pelo nome">
+          </label>
+
+          <label class="products-filter">
+            <span class="visually-hidden">Filtrar por categoria</span>
+            <select id="productCategory">
+              <option value="">Todas as categorias</option>
+              <option value="automotivo">Som automotivo</option>
+              <option value="alto-falantes">Alto-falantes</option>
+              <option value="amplificadores">Amplificadores</option>
+              <option value="acessorios">Acessórios</option>
+              <option value="outros">Outros equipamentos</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- O JAVASCRIPT DEVE CONTINUAR CARREGANDO OS PRODUTOS AQUI -->
+        <div class="products-grid products-v2"
+          id="productsGrid"
+          aria-live="polite"
+          aria-busy="true">
+          <div class="products-loading">Carregando produtos...</div>
+        </div>
+
+        <p class="products-note">
+          Este catálogo tem finalidade informativa. Para consultar
+          características e disponibilidade dos equipamentos,
+          entre em contato com a equipe Max Som.
+        </p>
+      </section>
+
+      <!-- CHAMADA PARA ATENDIMENTO -->
+      <section class="products-bottom">
+        <div class="products-bottom-text">
+          <span class="section-label">PRECISA DE AJUDA?</span>
+          <h2>Vamos encontrar a solução para o seu projeto.</h2>
+          <p>
+            Nossa equipe pode esclarecer dúvidas sobre os produtos
+            e orientar você sobre as opções disponíveis.
+          </p>
+        </div>
+
+        <div class="products-buttons">
+          <a href="atendimento.html" class="button button-primary">
+            Falar com a equipe →
+          </a>
+          <a href="servicos.html" class="button button-secondary">
+            Conhecer serviços
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+      <span>Som, tecnologia e projetos.</span>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/menu.js"></script>
+  <script src="../js/main.js"></script>
+
+</body>
+</html>
