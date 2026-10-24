@@ -1,0 +1,23 @@
+{
+  "html_pages": 14,
+  "css_files": 14,
+  "js_files": 4,
+  "image_files": 42,
+  "local_html_references_checked": 196,
+  "broken_local_references": 0,
+  "duplicate_html_ids": 0,
+  "css_parse_errors": 0,
+  "invalid_images": 0,
+  "post_forms_with_explicit_native_submit_guard": 8,
+  "logic_regression_tests": {
+    "passed": 34,
+    "total": 34
+  },
+  "browser_dom_interaction_tests": {
+    "passed": 7,
+    "total": 7
+  },
+  "live_supabase_end_to_end_test": "not performed; no schema, policies, or data changed",
+  "published_site_browser_test": "not performed; environment blocks localhost/file navigation; interaction tests ran with DOM/CSS/JS in memory",
+  "result": "Static and simulated interaction checks passed; live Supabase validation remains pending."
+}
