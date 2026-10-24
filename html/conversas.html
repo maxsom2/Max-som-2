@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversas | Max Som</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/conversas.css">
+</head>
+<body>
+<div class="site-shell">
+    <header class="topbar">
+      <button class="mobile-menu-button" id="mobileMenu" type="button"
+        aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Conversas</strong>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="atendimento.html" class="topbar-help">Precisa de ajuda?</a>
+        <a href="conta.html" class="account-button" data-logged-only>Minha conta</a>
+        <a href="login.html" class="account-button" data-guest-only>Entrar</a>
+        <button type="button" class="account-button" data-logout data-logged-only>
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <main class="conversations-main">
+      <section class="conversations-hero">
+        <span class="conversations-eyebrow">ATENDIMENTO MAX SOM</span>
+        <h1>Suas conversas</h1>
+        <p>
+          Consulte suas conversas e continue o atendimento com a equipe Max Som.
+        </p>
+      </section>
+
+      <section class="conversations-panel">
+        <div class="conversations-panel-heading">
+          <div>
+            <span class="conversations-kicker">CENTRAL DE MENSAGENS</span>
+            <h2>Histórico de conversas</h2>
+            <p>Suas conversas aparecem aqui quando estiverem vinculadas à sua conta.</p>
+          </div>
+
+          <button
+            class="conversation-new-button"
+            type="button"
+            data-open-conversation="Atendimento geral"
+          >
+            ＋ Iniciar conversa
+          </button>
+        </div>
+
+        <div id="conversationsList" class="conversations-list">
+          <div class="empty">Carregando conversas...</div>
+        </div>
+      </section>
+
+      <section class="conversations-help">
+        <div>
+          <h2>Precisa de um atendimento novo?</h2>
+          <p>Você também pode enviar uma solicitação pela página de atendimento.</p>
+        </div>
+        <a href="atendimento.html">Ir para Atendimento →</a>
+      </section>
+    </main>
+
+    <footer class="site-footer conversations-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+      <div class="conversations-footer-links">
+        <a href="index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="atendimento.html">Atendimento</a>
+        <a href="mailto:lojamaxsom2@gmail.com">Contato</a>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/menu.js"></script>
+  <script src="../js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Entrar | Max Som</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/login.css">
+</head>
+
+<body>
+
+  <!-- MENU LATERAL -->
+<!-- ÁREA PRINCIPAL -->
+  <div class="site-shell">
+
+    <!-- CABEÇALHO SUPERIOR -->
+    <header class="topbar">
+      <button
+        class="mobile-menu-button"
+        id="mobileMenu"
+        type="button"
+        aria-label="Abrir menu"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Entrar</strong>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="atendimento.html" class="topbar-help">
+          Precisa de ajuda?
+        </a>
+
+        <a href="cadastro.html" class="account-button" data-guest-only>
+          Criar conta
+        </a>
+
+        <a href="conta.html" class="account-button" data-logged-only>
+          Minha conta
+        </a>
+
+        <button
+          class="account-button"
+          data-logout
+          data-logged-only
+          type="button"
+        >
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <main id="login">
+
+      <!-- APRESENTAÇÃO -->
+      <section class="login-hero">
+        <span class="login-eyebrow">ÁREA DO CLIENTE</span>
+
+        <h1>Bem-vindo à Max Som</h1>
+
+        <p>
+          Entre na sua conta para acompanhar seus atendimentos
+          e continuar suas conversas com nossa equipe.
+        </p>
+      </section>
+
+      <!-- CONTEÚDO DO LOGIN -->
+      <section class="login-layout" aria-label="Acesso à conta">
+
+        <!-- FORMULÁRIO -->
+        <div class="login-panel">
+
+          <div class="login-heading">
+            <span class="login-section-label">SEU ACESSO</span>
+            <h2>Entrar na conta</h2>
+            <p>
+              Informe seus dados cadastrados para continuar.
+            </p>
+          </div>
+
+          <div
+            id="loginError"
+            class="message hidden"
+            role="alert"
+            aria-live="polite"
+          ></div>
+
+          <form method="post" id="loginForm" class="login-form" onsubmit="event.preventDefault(); if (this.dataset.loginBound !== 'true') { const m = document.getElementById('loginError'); if (m) { m.textContent = 'O formulário de login não terminou de carregar. Atualize a página e tente novamente.'; m.classList.remove('hidden','message-info','message-success','message-warning'); m.classList.add('message-error'); } return false; }">
+
+            <div class="form-group">
+              <label for="loginEmail">E-mail</label>
+
+              <input
+                type="email"
+                id="loginEmail"
+                name="email"
+                placeholder="Digite seu e-mail"
+                autocomplete="email"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="loginPassword">Senha</label>
+
+              <input
+                type="password"
+                id="loginPassword"
+                name="senha"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+                required
+              >
+            </div>
+
+            <div class="login-form-actions">
+              <button
+                type="submit"
+                class="button button-primary login-submit"
+              >
+                Entrar na minha conta
+              </button>
+            </div>
+
+          </form>
+
+          <div class="login-register">
+            <p>Ainda não possui uma conta?</p>
+
+            <a href="cadastro.html" class="login-text-link">
+              Criar minha conta →
+            </a>
+          </div>
+
+        </div>
+
+        <!-- PAINEL INFORMATIVO -->
+        <aside class="login-information">
+
+          <div class="login-information-header">
+            <span class="login-section-label">SUA ÁREA EXCLUSIVA</span>
+
+            <h2>Seu atendimento em um só lugar</h2>
+
+            <p>
+              Acesse os recursos disponíveis para sua conta
+              depois de entrar no sistema.
+            </p>
+          </div>
+
+          <div class="login-benefit">
+            <span class="login-benefit-icon">01</span>
+
+            <div>
+              <h3>Atendimentos</h3>
+              <p>Acompanhe suas solicitações de atendimento.</p>
+            </div>
+          </div>
+
+          <div class="login-benefit">
+            <span class="login-benefit-icon">02</span>
+
+            <div>
+              <h3>Conversas</h3>
+              <p>Consulte suas conversas com a equipe Max Som.</p>
+            </div>
+          </div>
+
+          <div class="login-benefit">
+            <span class="login-benefit-icon">03</span>
+
+            <div>
+              <h3>Seus dados</h3>
+              <p>Acesse as informações vinculadas à sua conta.</p>
+            </div>
+          </div>
+
+          <div class="login-information-footer">
+            <p>Ainda não tem cadastro?</p>
+
+            <a href="cadastro.html" class="button button-secondary">
+              Criar conta gratuitamente
+            </a>
+          </div>
+
+          <div class="login-whatsapp">
+            <p>Precisa de ajuda para acessar sua conta?</p>
+
+            <a
+              href="https://wa.me/5565996262514"
+              target="_blank"
+              rel="noopener"
+            >
+              Falar pelo WhatsApp →
+            </a>
+          </div>
+
+        </aside>
+
+      </section>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="site-footer login-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+
+      <div class="login-footer-links">
+        <a href="index.html">Início</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="atendimento.html">Atendimento</a>
+        <a href="mailto:lojamaxsom2@gmail.com">Contato</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/menu.js"></script>
+  <script src="../js/main.js"></script>
+
+</body>
+</html>
