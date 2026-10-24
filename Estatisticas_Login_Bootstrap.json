@@ -1,0 +1,19 @@
+{
+  "audit_scope": "Static local source audit plus Node syntax and logic tests; not live Supabase credentials or deployed-domain e2e.",
+  "html_pages": 15,
+  "js_files": 5,
+  "css_files": 14,
+  "asset_files": 42,
+  "html_local_references": 200,
+  "html_broken_references": 0,
+  "css_local_url_references": 14,
+  "css_broken_references": 0,
+  "main_js_syntax": "PASS",
+  "auth_bootstrap_js_syntax": "PASS",
+  "existing_logic_tests": 39,
+  "auth_bootstrap_unit_tests": 5,
+  "total_logic_tests": 44,
+  "passed_logic_tests": 44,
+  "live_supabase_login_test": "NOT RUN",
+  "live_vercel_e2e": "NOT RUN"
+}

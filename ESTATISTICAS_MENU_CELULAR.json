@@ -1,0 +1,11 @@
+{
+  "html_pages": 14,
+  "css_files": 14,
+  "js_files": 4,
+  "html_local_refs_checked": 74,
+  "css_local_urls_checked": 14,
+  "broken_local_references": 0,
+  "duplicate_html_ids": 0,
+  "css_parser_errors": 0,
+  "javascript_syntax": "passed (node --check main.js + menu.js)"
+}
