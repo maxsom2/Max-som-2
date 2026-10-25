@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atendimento por mensagens | Max Som</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/conversa.css">
+</head>
+<body>
+<div class="site-shell">
+    <header class="topbar">
+      <button class="mobile-menu-button" id="mobileMenu" type="button"
+        aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+
+      <div class="breadcrumb" aria-label="Localização">
+        <a href="index.html">Início</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="conversas.html">Conversas</a>
+        <span class="breadcrumb-separator">/</span>
+        <strong>Atendimento</strong>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="atendimento.html" class="topbar-help">Precisa de ajuda?</a>
+        <a href="conta.html" class="account-button" data-logged-only>Minha conta</a>
+        <button type="button" class="account-button" data-logout data-logged-only>
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <main class="chat-main">
+
+      <section class="chat-page-heading">
+        <a href="conversas.html" class="chat-back-link">← Voltar às conversas</a>
+        <span class="chat-eyebrow">ATENDIMENTO MAX SOM</span>
+        <h1>Central de mensagens</h1>
+        <p>Converse com a equipe Max Som por esta área do site.</p>
+      </section>
+
+      <section id="conversaContainer" class="chat-panel">
+
+        <header class="chat-header">
+          <div class="chat-avatar" aria-hidden="true">M</div>
+
+          <div class="chat-heading-text">
+            <h2 id="conversaTitulo">Carregando conversa...</h2>
+            <p>Equipe Max Som</p>
+          </div>
+
+          <span class="chat-status" id="conversaStatus">Carregando</span>
+        </header>
+
+        <div
+          id="mensagemConversa"
+          class="chat-alert hidden"
+          role="alert"
+          aria-live="polite"
+        ></div>
+
+        <div
+          id="mensagensLista"
+          class="chat-messages"
+          role="log"
+          aria-live="polite"
+          aria-label="Mensagens da conversa"
+        >
+          <div class="empty-messages">Carregando mensagens...</div>
+        </div>
+
+        <form method="post" id="mensagemForm" class="chat-compose" onsubmit="event.preventDefault(); if (this.dataset.messageBound !== 'true') { alert('O formulário de mensagem não terminou de carregar. Atualize a página e tente novamente.'); return false; }">
+
+          <label class="chat-compose-label" for="mensagemInput">
+            Escreva sua mensagem
+          </label>
+
+          <textarea
+            id="mensagemInput"
+            name="mensagem"
+            rows="3"
+            placeholder="Digite sua mensagem..."
+            maxlength="5000"
+            required
+          ></textarea>
+
+          <div class="chat-compose-footer">
+            <p>Envie mensagens de texto para a equipe.</p>
+
+            <button
+              type="submit"
+              id="mensagemEnviar"
+              class="chat-send-button"
+            >
+              Enviar mensagem →
+            </button>
+          </div>
+
+        </form>
+
+      </section>
+
+      <section class="chat-help">
+        <div>
+          <h2>Precisa de outro tipo de ajuda?</h2>
+          <p>Entre em contato ou registre uma nova solicitação de atendimento.</p>
+        </div>
+
+        <a href="atendimento.html">Ir para Atendimento →</a>
+      </section>
+
+    </main>
+
+    <footer class="site-footer chat-footer">
+      <span>© 2026 Max Som. Todos os direitos reservados.</span>
+
+      <div class="chat-footer-links">
+        <a href="index.html">Início</a>
+        <a href="conversas.html">Conversas</a>
+        <a href="atendimento.html">Atendimento</a>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/menu.js?v=20261024-logout-fallback-fix3"></script>
+  <script src="../js/main.js?v=20261024-isolated-main-fix3"></script>
+
+</body>
+</html>
