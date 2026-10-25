@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Confira dicas, informações e novidades da Max Som."
+    >
+
+    <title>Publicações | Max Som</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS geral do projeto -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../css/style.css">
+
+    <!-- CSS exclusivo desta página -->
+    <link rel="stylesheet" href="../css/publicacoes.css">
+</head>
+
+<body>
+
+    <!-- MENU LATERAL -->
+<!-- Fundo escurecido no menu mobile -->
+<!-- ÁREA PRINCIPAL -->
+    <div class="page">
+
+        <!-- BARRA SUPERIOR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    class="mobile-menu-button"
+                    id="mobileMenu"
+                    type="button"
+                    aria-label="Abrir menu"
+                    aria-controls="sidebar"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+
+                <div class="page-breadcrumb">
+                    <span>Max Som</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <strong>Publicações</strong>
+                </div>
+
+            </div>
+
+            <div class="topbar-actions">
+
+                <a
+                    class="topbar-whatsapp"
+                    href="https://wa.me/5565996262514"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    WhatsApp
+                </a>
+
+                <a class="account-link" href="login.html" data-smart-account-link>
+                    Minha conta
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTEÚDO -->
+        <main class="publicacoes-main">
+
+            <!-- APRESENTAÇÃO -->
+            <section class="publicacoes-hero">
+
+                <div class="publicacoes-hero-content">
+
+                    <span class="publicacoes-eyebrow">
+                        INFORMAÇÃO E NOVIDADES
+                    </span>
+
+                    <h1>Publicações</h1>
+
+                    <p>
+                        Fique por dentro das dicas, informações e novidades
+                        da Max Som. Acompanhe nossos conteúdos e conheça
+                        melhor as soluções que oferecemos.
+                    </p>
+
+                    <a href="#lista-publicacoes" class="publicacoes-button">
+                        Explorar publicações
+                    </a>
+
+                </div>
+
+                <div class="publicacoes-hero-card">
+                    <span class="hero-card-icon">▧</span>
+                    <span class="hero-card-label">MAX SOM</span>
+
+                    <h2>Conteúdo para você</h2>
+
+                    <p>
+                        Informações sobre equipamentos, serviços, projetos
+                        e soluções em som.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <!-- LISTA DE PUBLICAÇÕES -->
+            <section
+                class="publicacoes-section"
+                id="lista-publicacoes"
+            >
+
+                <div class="publicacoes-section-heading">
+
+                    <div>
+                        <span class="publicacoes-eyebrow">
+                            NOSSO CONTEÚDO
+                        </span>
+
+                        <h2>Últimas publicações</h2>
+
+                        <p>
+                            Confira os conteúdos publicados pela nossa equipe.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- O main.js carrega as publicações neste elemento -->
+                <div
+                    class="posts-grid posts-v2"
+                    id="postsGrid"
+                    aria-live="polite"
+                >
+                    <div class="empty">
+                        Carregando publicações...
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- CHAMADA PARA ATENDIMENTO -->
+            <section class="publicacoes-cta">
+
+                <div class="publicacoes-cta-content">
+
+                    <span class="publicacoes-eyebrow">
+                        FALE COM A MAX SOM
+                    </span>
+
+                    <h2>Precisa de mais informações?</h2>
+
+                    <p>
+                        Nossa equipe pode ajudar você a conhecer nossos
+                        produtos, serviços e projetos.
+                    </p>
+
+                    <a href="atendimento.html" class="publicacoes-button">
+                        Solicitar atendimento
+                    </a>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- RODAPÉ -->
+        <footer class="footer footer-v2 publicacoes-footer">
+
+            <div class="footer-content">
+
+                <div class="footer-column footer-brand">
+
+                   <a class="footer-logo" href="index.html">
+    <img src="../assets/logo-maxsom-white.png" alt="Max Som">
+</a>
+
+                    <p>
+                        Soluções em som, equipamentos, serviços,
+                        projetos e atendimento.
+                    </p>
+
+                    <a
+                        class="footer-whatsapp"
+                        href="https://wa.me/5565996262514"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        WhatsApp: (65) 99626-2514
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h3>Navegação</h3>
+
+                    <a href="index.html">Início</a>
+                    <a href="produtos.html">Produtos</a>
+                    <a href="servicos.html">Serviços</a>
+                    <a href="projetos.html">Projetos</a>
+                    <a href="publicacoes.html">Publicações</a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h3>Atendimento</h3>
+
+                    <a href="atendimento.html">Solicitar atendimento</a>
+
+                    <a
+                        href="conversas.html"
+                        data-conversations-link
+                        data-logged-only
+                    >
+                        Conversas
+                    </a>
+
+                    <a href="conta.html" data-logged-only>
+                        Minha conta
+                    </a>
+
+                    <a href="login.html" data-guest-only>
+                        Entrar
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h3>Contato</h3>
+
+                    <p>Telefone: (65) 99626-2514</p>
+
+                    <p>WhatsApp: (65) 99626-2514</p>
+
+                    <p>contato@maxsom.com.br</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-bottom">
+                <p>
+                    © <span id="footerYear">2026</span> Max Som.
+                    Todos os direitos reservados.
+                </p>
+            </div>
+
+        </footer>
+
+    </div>
+
+
+    <!-- SCRIPTS -->
+
+    <script>
+        // Este arquivo mantém apenas o ano do rodapé.
+        // O menu lateral e seus eventos são controlados por js/menu.js + js/main.js.
+        document.addEventListener("DOMContentLoaded", function () {
+            const year = String(new Date().getFullYear());
+            const footerYear = document.getElementById("footerYear");
+            if (footerYear) footerYear.textContent = year;
+        }, { once: true });
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/menu.js?v=20261025-admin-references-conversation-fix2"></script>
+  <script src="../js/main.js?v=20261025-admin-references-conversation-fix2"></script>
+
+</body>
+</html>
